@@ -9,11 +9,7 @@ Asegúrate de tener instalados estos elementos:
 
 ### Cómo levantar el proyecto localmente
 
-1. Ubicate en la carpeta de desarrollo de código de MentalSync, para ello ejecuta el siguiente comando en la terminal:
-   ```bash
-   cd desarrollo/mentalsync/fuentes
-   ```
-1. Después, descarga los módulos necesarios de node para el backend con el siguiente comando:
+1. Descarga los módulos necesarios de node para el backend con el siguiente comando:
 
    ```bash
    npm ci
