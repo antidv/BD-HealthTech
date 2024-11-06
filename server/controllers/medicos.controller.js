@@ -101,27 +101,21 @@ export const deleteMedicos = async (req, res) => {
         const result = await connection.query('SELECT idusuario FROM medico WHERE idmedico = ?', [id]);
         const medico = result[0];
 
-        if (!medico || medico.length === 0) {
+        if (!medico || medico.length <= 0) {
             await connection.rollback();
             return res.status(404).json({ error: "El médico no existe" });
         }
 
         const idusuario = medico.idusuario;
 
-        const resultMedico = await connection.query('DELETE FROM medico WHERE idmedico = ?', [id]);
-        if (resultMedico.affectedRows === 0) {
-            await connection.rollback();
-            return res.status(404).json({ error: "El médico no existe" });
-        }
-
         const resultUsuario = await connection.query('DELETE FROM usuario WHERE idusuario = ?', [idusuario]);
-        if (resultUsuario.affectedRows === 0) {
+        if (resultUsuario.affectedRows <= 0) {
             await connection.rollback();
             return res.status(404).json({ error: "El usuario no existe" });
         }
 
         await connection.commit();
-        res.json('Datos de medico y usuario eliminado con exito');
+        res.json('Datos de medico y usuario eliminados con éxito');
         connection.end();
     } catch (error) {
         console.error('Error durante la eliminación:', error);
