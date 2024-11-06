@@ -1,7 +1,7 @@
-const mariadb = require('mariadb');
-const { DB_HOST, DB_PASSWORD, DB_NAME, DB_USER, DB_PORT } = require('./config');
+import mariadb from 'mariadb';
+import { DB_HOST, DB_PASSWORD, DB_NAME, DB_USER, DB_PORT } from './config.js';
 
-const pool = mariadb.createPool({
+export const pool = mariadb.createPool({
     host: DB_HOST,
     user: DB_USER,
     password: DB_PASSWORD,
@@ -10,7 +10,7 @@ const pool = mariadb.createPool({
     ssl: { rejectUnauthorized: false },
 });
 
-async function getConnection() {
+export async function getConnection() {
     try {
         const connection = await pool.getConnection();
         return connection;
@@ -18,5 +18,3 @@ async function getConnection() {
         console.log(error);
     }
 }
-
-module.exports = { getConnection };

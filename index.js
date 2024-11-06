@@ -1,8 +1,10 @@
-const app = require('./server/src/app');
+import express from 'express';
+import medicosRoutes from './server/routes/medicos.routes.js';
 
-async function main() {
-  await app.listen(3000);
-  console.log('Server running on port 3000');
-}
+const app = express();
+app.use(express.json());
 
-main(); 
+app.use(medicosRoutes);
+
+app.listen(3000)
+console.log('Server on port', 3000);
