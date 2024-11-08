@@ -1,12 +1,13 @@
-import { Router } from "express";
-import * as medicosCtrl from "../controllers/medicos.controller.js";
+import { Router } from 'express';
+import { getMedicos, getMedico, postMedico, updateMedicos, deleteMedicos } from '../controllers/medicos.controller.js';
+import { verifyToken, isAdmin } from '../controllers/auth.middleware.js';
 
 const router = Router();
 
-router.get('/medicos', medicosCtrl.getMedicos);
-router.get('/medicos/:id', medicosCtrl.getMedico);
-router.post('/medicos', medicosCtrl.postMedico);
-router.put('/medicos/:id', medicosCtrl.updateMedicos);
-router.delete('/medicos/:id', medicosCtrl.deleteMedicos);
+router.get('/medicos', verifyToken, isAdmin, getMedicos);
+router.get('/medicos/:id', verifyToken, isAdmin, getMedico);
+router.post('/medicos', verifyToken, isAdmin, postMedico);
+router.put('/medicos/:id', verifyToken, isAdmin, updateMedicos);
+router.delete('/medicos/:id', verifyToken, isAdmin, deleteMedicos);
 
 export default router;

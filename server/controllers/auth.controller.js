@@ -24,7 +24,7 @@ export const login = async (req, res) => {
             return res.status(401).json({ message: "Contraseña incorrecta" });
         }
 
-        const token = await createAccesToken({ id: userFound.idusuario });
+        const token = await createAccesToken({ id: userFound.idusuario, rol: userFound.rol });
 
         res.cookie("token", token);
         res.json({
