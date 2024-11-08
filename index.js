@@ -1,10 +1,14 @@
 import express from 'express';
 import medicosRoutes from './server/routes/medicos.routes.js';
+import pacienteRoutes from './server/routes/pacientes.routes.js';
+import authRoutes from './server/routes/auth.routes.js';
 
 const app = express();
 app.use(express.json());
 
+app.use(authRoutes);
 app.use(medicosRoutes);
+app.use(pacienteRoutes);
 
 app.listen(3000)
 console.log('Server on port', 3000);
