@@ -30,3 +30,10 @@ export const isPaciente = (req, res, next) => {
     }
     next();
 }
+
+export const isMedico = (req, res, next) => {
+    if (req.userRole !== 'Medico') {
+        return res.status(403).json({ message: "Se requiere rol medico" });
+    }
+    next();
+}
