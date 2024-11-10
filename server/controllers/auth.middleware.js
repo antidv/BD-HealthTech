@@ -23,3 +23,10 @@ export const isAdmin = (req, res, next) => {
     }
     next();
 };
+
+export const isPaciente = (req, res, next) => {
+    if (req.userRole !== 'Paciente') {
+        return res.status(403).json({ message: "Se requiere rol paciente" });
+    }
+    next();
+}
