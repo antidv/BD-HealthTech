@@ -18,3 +18,13 @@ export async function getConnection() {
         console.log(error);
     }
 }
+
+(async function testConnection() {
+    try {
+        const connection = await pool.getConnection();
+        console.log("Conexión exitosa a la base de datos");
+        connection.release();
+    } catch (error) {
+        console.error("Errorcín", error);
+    }
+})();

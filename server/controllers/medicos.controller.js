@@ -2,7 +2,7 @@ import { pool } from "../src/database.js";
 
 export const postMedico = async (req, res, next) => {
     try {
-        const { correo, contrasenia, nombre, apellidoP, apellidoM, especialidad, estado } = req.body;
+        const { correo, contrasenia, nombre, apellidoP, apellidoM, especialidad, estado, idposta } = req.body;
 
         const connection = await pool.getConnection();
         try {
@@ -31,9 +31,15 @@ export const postMedico = async (req, res, next) => {
                 [idusuario, nombre, apellidoP, apellidoM, especialidad, estado]
             );
 
+            const medicoPostaResult = await connection.query(
+                `INSERT INTO medico_posta (idmedico, idposta)
+                 VALUES (?, ?)`,
+                [medicoResult.insertId, idposta]
+            );
+
             await connection.commit();
 
-            res.json({ idusuario: idusuario.toString(), idmedico: medicoResult.insertId.toString() });
+            res.json({ idusuario: idusuario.toString(), idmedico: medicoResult.insertId.toString(), idmedico_posta: medicoPostaResult.insertId.toString() });
         } catch (error) {
             await connection.rollback();
             throw error;
@@ -77,13 +83,26 @@ export const updateMedicos = async (req, res) => {
     try {
         const connection = await pool.getConnection();
         const { id } = req.params;
-        const { estado } = req.body;
+        const { estado, idposta } = req.body;
         const result = await connection.query('UPDATE medico SET estado = ? WHERE idmedico = ?', [estado, id]);
+        let nuevaPosta = null;
+        
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: "El médico no existe" });
         }
+
+        if (estado === 1 && idposta) {
+            await connection.query('UPDATE medico_posta SET idposta = ? WHERE idmedico = ?', [idposta, id]);
+
+            const resultadoPosta = await connection.query('SELECT idposta FROM medico_posta WHERE idmedico = ?', [id]);
+            nuevaPosta = resultadoPosta.length > 0 ? resultadoPosta[0].idposta : null;
+        }
+
         const rows = await connection.query('SELECT * FROM medico WHERE idmedico = ?', [id]);
-        res.json(rows[0]);
+        res.json({
+            ...rows[0], 
+            idposta: nuevaPosta
+        });
         connection.end();
     } catch (error) {
         console.error(error);
