@@ -5,8 +5,8 @@ import { verifyToken, isAdmin } from '../controllers/auth.middleware.js';
 const router = Router();
 
 router.post("/consultoriosMP", verifyToken, isAdmin, postConsultorioMediposta);
-router.get("/consultoriosMP", verifyToken, isAdmin, getConsultoriosMedipostas);
-router.get("/consultoriosMP/:id", verifyToken, isAdmin, getConsultorioMediposta);
+router.get("/consultoriosMP", verifyToken, getConsultoriosMedipostas);
+router.get("/consultoriosMP/:id", verifyToken, getConsultorioMediposta);
 router.put("/consultoriosMP/:id", verifyToken, isAdmin, updateConsultorioMediposta);
 router.delete("/consultoriosMP/:id", verifyToken, isAdmin, deleteConsultorioMediposta);
 

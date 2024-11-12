@@ -7,6 +7,7 @@ import antecendetesRoutes from './server/routes/antecedentes.routes.js';
 import postaRoutes from './server/routes/posta.routes.js'
 import horarioRoutes from './server/routes/horario.routes.js'
 import conMediPosta from './server/routes/conMediPosta.routes.js'
+import medicoPosta from './server/routes/medicoPosta.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -19,6 +20,7 @@ app.use(antecendetesRoutes);
 app.use(postaRoutes)
 app.use(horarioRoutes)
 app.use(conMediPosta)
+app.use(medicoPosta)
 
 app.listen(3000)
 console.log('Server on port', 3000);
