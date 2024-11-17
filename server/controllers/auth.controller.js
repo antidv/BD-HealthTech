@@ -55,7 +55,7 @@ export const verify = async (req, res) => {
 
     try {
         const decoded = jwt.verify(token, TOKEN_SECRET);
-        const [rows] = await pool.query('SELECT idusuario, correo, rol FROM usuario WHERE idusuario = ?',
+        const rows = await pool.query('SELECT idusuario, correo, rol FROM usuario WHERE idusuario = ?',
              [decoded.id]);
         const userFound = rows[0];
 
