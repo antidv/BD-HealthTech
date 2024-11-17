@@ -4,10 +4,16 @@ import medicosRoutes from './server/routes/medicos.routes.js';
 import pacienteRoutes from './server/routes/pacientes.routes.js';
 import authRoutes from './server/routes/auth.routes.js';
 import antecendetesRoutes from './server/routes/antecedentes.routes.js';
+import cors from 'cors'
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true
+}));
 
 app.use(authRoutes);
 app.use(medicosRoutes);

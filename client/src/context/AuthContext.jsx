@@ -1,0 +1,73 @@
+import { createContext, useState, useContext, useEffect } from 'react'
+import { loginRequest } from '../api/auth'
+// import Cookies from 'js-cookie'
+
+const AuthContext = createContext();
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) { 
+    throw new Error("useAuth debe usarse dentro de un AuthProvider");
+  }
+  return context;
+}
+
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState("");
+
+  const signin = async (user) => {
+    try {
+      const res = await loginRequest(user);
+      console.log(res)
+      setUser(res.data);
+      setIsAuthenticated(true);
+    } catch (error) {
+      setError(error.response.data.message);
+    }
+  };
+
+  useEffect(() => {
+    if (error != "") {
+      const timer = setTimeout(() => { 
+        setError("");
+      }, 3000)
+      return () => clearTimeout(timer);
+    }
+  }, [error])
+
+  /*
+  useEffect(() => {
+    async function checkLogin () {
+      const cookies = Cookies.get();
+      if (cookies.token) {
+        try {
+          const res = await verifyTokenRequest(cookies.token);
+          if (!res.data) return setIsAuthenticated(false);
+  
+          setIsAuthenticated(true);
+          setUser(res.data);
+        } catch (error) {
+          setIsAuthenticated(false);
+          setUser(null);
+        }
+      }
+    }
+    checkLogin();
+  }, [])
+  */
+  
+  return (
+    <AuthContext.Provider value={{
+      signin,
+      user,
+      isAuthenticated,
+      error
+    }}>
+      {children}
+    </AuthContext.Provider>
+  )
+}
+
+export default AuthContext;

@@ -1,12 +1,12 @@
+import { AuthProvider } from './context/AuthContext'
+import Rutas from './routes/index.routes'
+
 function App() {
 
   return (
-    <>
-      <h1>Vite + React</h1>
-      <p>
-        Hola mundo
-      </p>
-    </>
+    <AuthProvider>
+      <Rutas />
+    </AuthProvider>
   )
 }
 
