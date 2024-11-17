@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
  
 function Login() { 
   const { register, handleSubmit, formState: { errors }, setValue, reset } = useForm();
-  const { signin, error, isAuthenticated } = useAuth();
+  const { user, signin, error, isAuthenticated } = useAuth();
 
   const navigate = useNavigate();
 
@@ -21,9 +21,22 @@ function Login() {
     }
   }, [error]);
 
-   useEffect(() => {
+  useEffect( () => {
     if (isAuthenticated) {
-      navigate("/paciente");
+      switch (user.rol) {
+        case "Paciente":
+          navigate("/paciente");
+          break;
+        case "Medico":
+          navigate("/medico");
+          break;
+        case "Administrador":
+          navigate("/admin");
+          break;
+        default:
+          navigate("/404");
+          break;
+      }
     }
   }, [isAuthenticated]);
 
@@ -38,12 +51,12 @@ function Login() {
           type="email" placeholder="Correo"
           {...register("correo", {required: true})}
         />
-        { errors.email && <p>Correo es requerido</p>}
+        { errors.correo && <p>Correo es requerido</p>}
         <input
           type="password" placeholder="Contraseña"
           {...register("contrasenia", {required: true})}
         />
-        { errors.password && <p>Contraseña es requerida</p>}
+        { errors.contrasenia && <p>Contraseña es requerida</p>}
         <button type="submit">Iniciar</button>
       </form>
     </div>
