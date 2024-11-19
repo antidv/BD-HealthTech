@@ -49,14 +49,28 @@ function Login() {
       <form onSubmit={ onSubmit }>
         <input
           type="email" placeholder="Correo"
-          {...register("correo", {required: true})}
+          {...register("correo", {
+            required: {
+              value: true,
+              message: "Correo es requerido"
+            },
+            pattern: {
+              value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+              message: "Correo no válido"
+            }
+          })}
         />
-        { errors.correo && <p>Correo es requerido</p>}
+        {errors.correo && <p>{ errors.correo.message }</p>}
         <input
           type="password" placeholder="Contraseña"
-          {...register("contrasenia", {required: true})}
+          {...register("contrasenia", {
+            required: {
+              value: true,
+              message: "Contaseña es requerida"
+            }
+          })}
         />
-        { errors.contrasenia && <p>Contraseña es requerida</p>}
+        { errors.contrasenia && <p>{ errors.contrasenia.message }</p>}
         <button type="submit">Iniciar</button>
       </form>
     </div>
