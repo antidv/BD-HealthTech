@@ -79,3 +79,101 @@ export const registrarPaciente = async (req, res) => {
         res.status(500).send('Error al registrar el paciente');
     }
 };
+
+export const verPacientes = async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const result = await connection.query("SELECT * FROM paciente");
+        res.json(result);
+        connection.release();
+    } catch (error) {
+        console.error('Error al obtener los pacientes:', error);
+        res.status(500).send('Error al obtener los pacientes');
+    }
+};
+
+export const verPaciente = async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const rows = await connection.query('SELECT * FROM paciente WHERE idpaciente = ?', [req.params.id]);
+        if (rows.length <= 0) {
+            return res.status(404).json({ error: "El paciente no existe" });
+        }
+        res.status(200).json(rows[0]);
+        connection.end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener el paciente');
+    }
+};
+
+export const perfilPaciente = async (req, res) => {
+    try {
+        const idusuario = req.userId;
+        const connection = await pool.getConnection();
+
+        const rows = await connection.query('SELECT * FROM paciente WHERE idusuario = ?', idusuario);
+        if (rows.length <= 0) {
+            return res.status(404).json({ error: "El paciente no existe" });
+        }
+        res.status(200).json(rows[0]);
+        connection.release();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener el paciente');
+    }
+};
+
+export const updatePaciente = async (req, res) => {
+    try{
+        const idusuario = req.userId;
+        const connection = await pool.getConnection();
+
+        const paciente = await connection.query(
+            "SELECT idpaciente FROM paciente WHERE idusuario = ?",
+            [idusuario]
+        );
+
+        const idpaciente = paciente[0].idpaciente;
+
+        await connection.beginTransaction();
+
+        const { correo, contrasenia, celular } = req.body;
+
+        if(celular){
+            await connection.query(
+                "UPDATE paciente SET celular = ? WHERE idpaciente = ?",
+                [celular, idpaciente]
+            );
+        }
+        if(correo || contrasenia){
+            const updates = [];
+            const params = [];
+
+            if (correo) {
+                updates.push("correo = ?");
+                params.push(correo);
+            }
+
+            if (contrasenia) {
+                updates.push("contrasenia = ?");
+                params.push(contrasenia);
+            }
+
+            params.push(idusuario);
+
+            await connection.query(
+                `UPDATE usuario SET ${updates.join(", ")} WHERE idusuario = ?`,
+                params
+            );
+        }
+
+        await connection.commit();
+        res.json({ message: "Paciente actualizado" });
+        connection.release();
+
+    } catch (error) {
+        console.error('Error al actualizar el paciente:', error);
+        res.status(500).send('Error al actualizar el paciente');
+    }
+};
