@@ -1,0 +1,218 @@
+create table alergia
+(
+    idalergia   int auto_increment
+        primary key,
+    nombre      varchar(50)                                      not null,
+    descripcion varchar(100) default 'Descripción no disponible' null
+);
+
+create table consultorio
+(
+    idconsultorio int auto_increment
+        primary key,
+    nombre        varchar(50)                                      not null,
+    descripcion   varchar(250) default 'Descripción no disponible' null
+);
+
+create table enfermedad
+(
+    idenfermedad int auto_increment
+        primary key,
+    nombre       varchar(50)                                      not null,
+    descripcion  varchar(100) default 'Descripción no disponible' null
+);
+
+create table horario
+(
+    idhorario   int auto_increment
+        primary key,
+    hora_inicio time not null,
+    hora_fin    time not null
+);
+
+create table medicamento
+(
+    idmedicamento int auto_increment
+        primary key,
+    nombre        varchar(50)                    not null,
+    via           enum ('Oral', 'Intramuscular') not null
+);
+
+create table posta
+(
+    idposta   int auto_increment
+        primary key,
+    nombre    varchar(50)            not null,
+    ciudad    varchar(50)            not null,
+    direccion varchar(100)           not null,
+    telefono  varchar(9) default '-' null,
+    estado    tinyint(1) default 1   null,
+    constraint nombre
+        unique (nombre)
+);
+
+create table usuario
+(
+    idusuario   int auto_increment
+        primary key,
+    rol         enum ('Administrador', 'Medico', 'Paciente') not null,
+    correo      varchar(100)                                 not null,
+    contrasenia varchar(50)                                  not null,
+    constraint correo
+        unique (correo)
+);
+
+create table admin
+(
+    idadmin   int auto_increment
+        primary key,
+    idusuario int not null,
+    constraint admin_usuario_idusuario_fk
+        foreign key (idusuario) references usuario (idusuario)
+);
+
+create table medico
+(
+    idmedico     int auto_increment
+        primary key,
+    idusuario    int                  not null,
+    nombre       varchar(50)          not null,
+    apellidoP    varchar(20)          not null,
+    apellidoM    varchar(20)          not null,
+    especialidad varchar(50)          not null,
+    estado       tinyint(1) default 1 not null,
+    constraint medico_usuario_idusuario_fk
+        foreign key (idusuario) references usuario (idusuario)
+            on delete cascade
+);
+
+create table medico_posta
+(
+    idmedico_posta int auto_increment
+        primary key,
+    idmedico       int not null,
+    idposta        int not null,
+    constraint medico_posta_medico_idmedico_fk
+        foreign key (idmedico) references medico (idmedico),
+    constraint medico_posta_posta_idposta_fk
+        foreign key (idposta) references posta (idposta)
+);
+
+create table consultoriomediposta
+(
+    idconMediPosta    int auto_increment
+        primary key,
+    idconsultorio     int         not null,
+    idhorario         int         not null,
+    idmedico_posta    int         not null,
+    fecha             date        not null,
+    dia_semana        varchar(15) not null,
+    cupos_totales     int         not null,
+    cupos_disponibles int         null,
+    constraint consultorioMediPosta_consultorio_idconsultorio_fk
+        foreign key (idconsultorio) references consultorio (idconsultorio),
+    constraint consultorioMediPosta_horario_idhorario_fk
+        foreign key (idhorario) references horario (idhorario),
+    constraint consultorioMediPosta_medico_posta_idmedico_posta_fk
+        foreign key (idmedico_posta) references medico_posta (idmedico_posta)
+);
+
+create table paciente
+(
+    idpaciente       int auto_increment
+        primary key,
+    idusuario        int                            null,
+    nombre           varchar(50)                    not null,
+    apellidoP        varchar(20)                    not null,
+    apellidoM        varchar(20)                    not null,
+    genero           enum ('Masculino', 'Femenino') not null,
+    dni              int                            not null,
+    fecha_nacimiento date                           not null,
+    celular          varchar(9) default '-'         null,
+    direccion        varchar(100)                   not null,
+    constraint dni
+        unique (dni),
+    constraint paciente_usuario_idusuario_fk
+        foreign key (idusuario) references usuario (idusuario)
+            on delete cascade
+);
+
+create table antecedentes
+(
+    idantecedentes int auto_increment
+        primary key,
+    idpaciente     int                    not null,
+    fecha_creacion date default curdate() null,
+    constraint antecedentes_paciente_idpaciente_fk
+        foreign key (idpaciente) references paciente (idpaciente)
+);
+
+create table alergia_historia
+(
+    idalergia_historia int auto_increment
+        primary key,
+    idantecedentes     int not null,
+    idalergia          int not null,
+    constraint alergia_historia_alergia_idalergia_fk
+        foreign key (idalergia) references alergia (idalergia),
+    constraint alergia_historia_antecedentes_idantecedentes_fk
+        foreign key (idantecedentes) references antecedentes (idantecedentes)
+);
+
+create table cita
+(
+    idcita         int auto_increment
+        primary key,
+    idpaciente     int                                                           not null,
+    idconMediPosta int                                                           not null,
+    motivo         varchar(100)                                                  not null,
+    fecha          date                                                          not null,
+    estado         enum ('Atendido', 'Ausente', 'En espera') default 'En espera' null,
+    especialidad   varchar(50)                                                   not null,
+    num_cupo       int                                                           not null,
+    hora_aprox     time                                                          not null,
+    constraint cita_consultoriomediposta_idconMediPosta_fk
+        foreign key (idconMediPosta) references consultoriomediposta (idconMediPosta),
+    constraint cita_paciente_idpaciente_fk
+        foreign key (idpaciente) references paciente (idpaciente)
+);
+
+create table diagnostico
+(
+    iddiagnostico int auto_increment
+        primary key,
+    idcita        int          not null,
+    idenfermedad  int          not null,
+    observacion   varchar(100) not null,
+    triaje        varchar(100) not null,
+    constraint diagnostico_cita_idcita_fk
+        foreign key (idcita) references cita (idcita),
+    constraint diagnostico_enfermedad_idenfermedad_fk
+        foreign key (idenfermedad) references enfermedad (idenfermedad)
+);
+
+create table enfermedad_historia
+(
+    idenfermedad_historia int auto_increment
+        primary key,
+    idenfermedad          int not null,
+    idantecedentes        int not null,
+    constraint enfermedad_historia_antecedentes_idantecedentes_fk
+        foreign key (idantecedentes) references antecedentes (idantecedentes),
+    constraint enfermedad_historia_enfermedad_idenfermedad_fk
+        foreign key (idenfermedad) references enfermedad (idenfermedad)
+);
+
+create table receta
+(
+    idreceta      int auto_increment
+        primary key,
+    iddiagnostico int          not null,
+    idmedicamento int          not null,
+    dosis         varchar(100) not null,
+    constraint receta_diagnostico_iddiagnostico_fk
+        foreign key (iddiagnostico) references diagnostico (iddiagnostico),
+    constraint receta_medicamento_idmedicamento_fk
+        foreign key (idmedicamento) references medicamento (idmedicamento)
+);
+
