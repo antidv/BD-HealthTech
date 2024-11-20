@@ -1,6 +1,6 @@
 import express from 'express';
 import { postHorario, getHorarios, getHorario, updateHorario, deleteHorario } from '../controllers/horario.controller.js';
-import { verifyToken, isAdmin } from '../controllers/auth.middleware.js';
+import { verifyToken, isAdmin } from '../libs/auth.middleware.js';
 
 const router = express.Router();
 

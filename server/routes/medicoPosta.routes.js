@@ -1,6 +1,6 @@
 import express from 'express';
 import { postMedicoPosta, getMedicoPostas, getMedicoPosta, updateMedicoPosta, deleteMedicoPosta } from '../controllers/medicoPosta.controller.js';
-import { verifyToken, isAdmin } from '../controllers/auth.middleware.js';
+import { verifyToken, isAdmin } from '../libs/auth.middleware.js';
 
 const router = express.Router();
 

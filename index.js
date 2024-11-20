@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import medicosRoutes from './server/routes/medicos.routes.js';
 import pacienteRoutes from './server/routes/pacientes.routes.js';

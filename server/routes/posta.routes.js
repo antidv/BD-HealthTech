@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getPostas, getPosta, postPosta, updatePosta, deletePosta } from '../controllers/posta.controller.js';
-import { verifyToken, isAdmin } from '../controllers/auth.middleware.js';
+import { verifyToken, isAdmin } from '../libs/auth.middleware.js';
 
 const router = Router();
 
