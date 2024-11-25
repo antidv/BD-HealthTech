@@ -37,3 +37,12 @@ export const isMedico = (req, res, next) => {
     }
     next();
 }
+
+export const hasRoles = (roles) => {
+    return (req, res, next) => {
+        if (!roles.includes(req.userRole)) {
+            return res.status(403).json({ message: "No tienes los permisos necesarios" });
+        }
+        next();
+    }
+}

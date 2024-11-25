@@ -2,16 +2,16 @@ import { pool } from "../src/database.js";
 
 export const postConsultorioMediposta = async (req, res) => {
     try {
-        const { idconsultorio, idhorario, idmedico_posta, fecha, dia_semana, cupos } = req.body;
+        const { idconsultorio_posta, idhorario, idmedico_posta, fecha, dia_semana, cupos } = req.body;
 
         const connection = await pool.getConnection();
         try {
             await connection.beginTransaction();
 
             const result = await connection.query(
-                `INSERT INTO consultoriomediposta (idconsultorio, idhorario, idmedico_posta, fecha, dia_semana, cupos)
+                `INSERT INTO consultoriomediposta (idconsultorio_posta, idhorario, idmedico_posta, fecha, dia_semana, cupos)
                  VALUES (?, ?, ?, ?, ?, ?)`,
-                [idconsultorio, idhorario, idmedico_posta, fecha, dia_semana, cupos]
+                [idconsultorio_posta, idhorario, idmedico_posta, fecha, dia_semana, cupos]
             );
 
             await connection.commit();
