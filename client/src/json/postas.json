@@ -1,0 +1,23 @@
+[
+  {
+    "idposta": 1,
+    "nombre": "Nombre de posta",
+    "ciudad": "Ciudad de posta",
+    "direccion": "Direccion de posta",
+    "foto": "url_fot"
+  },
+  {
+    "idposta": 2,
+    "nombre": "Nombre de posta",
+    "ciudad": "Ciudad de posta",
+    "direccion": "Direccion de posta",
+    "foto": "url_fot"
+  },
+  {
+    "idposta": 3,
+    "nombre": "Nombre de posta",
+    "ciudad": "Ciudad de posta",
+    "direccion": "Direccion de posta",
+    "foto": "url_fot"
+  }
+]
