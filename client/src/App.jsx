@@ -6,8 +6,7 @@ function App() {
 
   return (
     <AuthProvider>
-      {/* <Rutas /> */}
-      <IniciarSesion />
+      <Rutas />
     </AuthProvider>
   )
 }
