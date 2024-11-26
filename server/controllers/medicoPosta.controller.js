@@ -58,12 +58,12 @@ export const getMedicoPosta = async (req, res) => {
 export const updateMedicoPosta = async (req, res) => {
     try {
         const { id } = req.params;
-        const { idmedico, idposta } = req.body;
+        const { disponible } = req.body;
 
         const connection = await pool.getConnection();
         const result = await connection.query(
-            `UPDATE medico_posta SET idmedico = ?, idposta = ? WHERE idmedico_posta = ?`,
-            [idmedico, idposta, id]
+            `UPDATE medico_posta SET disponible = ? WHERE idmedico_posta = ?`,
+            [disponible, id]
         );
 
         if (result.affectedRows === 0) {
@@ -82,24 +82,3 @@ export const updateMedicoPosta = async (req, res) => {
     }
 };
 
-export const deleteMedicoPosta = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        const connection = await pool.getConnection();
-        const result = await connection.query(
-            `DELETE FROM medico_posta WHERE idmedico_posta = ?`,
-            [id]
-        );
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "La relación Medico-Posta no existe" });
-        }
-
-        res.json({ message: "Relación Medico-Posta eliminada con éxito" });
-        connection.end();
-    } catch (error) {
-        console.error("Error al eliminar la relación Medico-Posta:", error);
-        res.status(500).send("Error al eliminar la relación Medico-Posta");
-    }
-};

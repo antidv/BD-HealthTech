@@ -9,6 +9,7 @@ import postaRoutes from './server/routes/posta.routes.js'
 import horarioRoutes from './server/routes/horario.routes.js'
 import conMediPosta from './server/routes/conMediPosta.routes.js'
 import medicoPosta from './server/routes/medicoPosta.routes.js';
+import consultorioPosta from './server/routes/consultorioPosta.routes.js';
 
 const app = express();
 app.use(express.json());
@@ -27,6 +28,7 @@ app.use(postaRoutes)
 app.use(horarioRoutes)
 app.use(conMediPosta)
 app.use(medicoPosta)
+app.use(consultorioPosta)
 
 app.listen(3000)
 console.log('Server on port', 3000);
