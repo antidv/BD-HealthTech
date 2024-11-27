@@ -2,7 +2,7 @@ function CardPosta(props) {
   return (
     <div className="col-4 justify-content-center">
       <div class="card">
-        <img src={props.foto} class="card-img-top" alt="posta" />
+        <img src={props.foto} class="card-img-top text-center" alt="posta" />
         <div class="card-body">
           <h5 class="card-title">{props.nombre}</h5>
           <p class="card-text">{props.ciudad}</p>
