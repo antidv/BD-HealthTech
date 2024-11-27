@@ -26,22 +26,26 @@ function NavBar() {
 
   return (
     isAuthenticated ? (
-      <nav>
-        <h1>HealthTech</h1>
-        <ul>
-          {/* Enlaces especificos del rol */}
-          {userLinks.map((link) => (
-            <li key={link.to}>
-              <Link to={link.to}>{link.label}</Link>
+      <nav className="navbar navbar-expand-lg">
+        <div className="container-fluid">
+          <a class="navbar-brand" href="#">HealthTech</a>
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            {/* Enlaces especificos del rol */}
+            {userLinks.map((link) => (
+              <li key={link.to} className="nav-item">
+                <Link to={link.to} className="nav-link">{link.label}</Link>
+              </li>
+            ))}
+          </ul>
+          <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
+            {/* Enlace de logout */}
+            <li>
+              <Link to="/" onClick={() => logout()} className="nav-link">
+                Logout
+              </Link>
             </li>
-          ))}
-          {/* Enlace de logout */}
-          <li>
-            <Link to="/" onClick={() => logout()}>
-              Logout
-            </Link>
-          </li>
-        </ul>
+          </ul>
+        </div>
       </nav>
     ) : (
       <></>

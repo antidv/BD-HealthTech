@@ -3,7 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logo_ht.png";
-import inic from "../pages/login.module.css";
+import inic from "../pages/principal.module.css";
 
 function Login() {
   const {
@@ -49,10 +49,10 @@ function Login() {
   }, [isAuthenticated]);
 
   return (
-    <div className={`container-fluid ${inic.containerLogin}`}>
+    <div className={`container-fluid ${inic.containerColor}`}>
       <div className="row align-items-center justify-content-center vh-100">
         <div className="col-6 text-center">
-          <img src={Logo} alt="Logo" className={`${inic.logo}`} />
+          <img src={Logo} alt="Logo" className={`${inic.logoLogin}`} />
         </div>
 
         <div className="col-6 align-items-center justify-content-center text-center">
