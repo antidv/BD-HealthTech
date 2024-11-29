@@ -1,13 +1,5 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
-<<<<<<< HEAD
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import Logo from "../assets/logo_ht.png";
-import inic from "../pages/principal.module.css";
-
-function Login() {
-=======
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
@@ -15,7 +7,6 @@ import Modal from "../components/Modal";
 function Login() {
   const [modal, setModal] = useState({ show: false, message: "" });
 
->>>>>>> baf82e682819684ff2b3fb1ce3625fcb80311075
   const {
     register,
     handleSubmit,
@@ -23,12 +14,8 @@ function Login() {
     setValue,
     reset,
   } = useForm();
-<<<<<<< HEAD
-  const { user, signin, error, isAuthenticated } = useAuth();
-=======
   const { user, signin, error, clearError, loadingLogin, isAuthenticated } =
     useAuth();
->>>>>>> baf82e682819684ff2b3fb1ce3625fcb80311075
 
   const navigate = useNavigate();
 
