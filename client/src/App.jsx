@@ -1,13 +1,17 @@
-import { AuthProvider } from './context/AuthContext'
-import Rutas from './routes/index.routes'
+import { AuthProvider } from "./context/AuthContext";
+import Rutas from "./routes/index.routes";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 function App() {
-
   return (
-    <AuthProvider>
-      <Rutas />
-    </AuthProvider>
-  )
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Rutas />
+      </AuthProvider>
+    </QueryClientProvider>
+  );
 }
 
-export default App
+export default App;
