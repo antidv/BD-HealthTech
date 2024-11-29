@@ -1,14 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function NavBar() {
   const { isAuthenticated, logout, user } = useAuth();
+  const location = useLocation();
 
   // Opciones de navegacion basadas en el rol
   const linksByRole = {
     Paciente: [
       { to: "/paciente", label: "Inicio" },
-      { to: "/paciente/perfil", label: "Perfil"},
+      { to: "/paciente/perfil", label: "Perfil" },
     ],
     Medico: [
       { to: "/medico", label: "Panel Medico" },
@@ -17,35 +18,50 @@ function NavBar() {
     Administrador: [
       { to: "/admin/postas", label: "Postas" },
       { to: "/admin/medicos", label: "Médicos" },
-      { to: "/admin/consultorios", label: "Consultorios" },
     ],
   };
 
   // Enlaces que se mostraran, segun el rol del usuario
   const userLinks = user?.rol ? linksByRole[user.rol] || [] : [];
 
-  return (
-    isAuthenticated ? (
-      <nav>
-        <h1>HealthTech</h1>
-        <ul>
-          {/* Enlaces especificos del rol */}
-          {userLinks.map((link) => (
-            <li key={link.to}>
-              <Link to={link.to}>{link.label}</Link>
-            </li>
-          ))}
-          {/* Enlace de logout */}
-          <li>
-            <Link to="/" onClick={() => logout()}>
+  return isAuthenticated ? (
+    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+      <div className="container-fluid">
+        <span className="navbar-brand mb-0 h1">HealthTech</span>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNavAltMarkup"
+          aria-controls="navbarNavAltMarkup"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div className="navbar-nav">
+            {/* Enlaces especificos del rol */}
+            {userLinks.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className={`nav-link ${
+                  location.pathname === link.to ? "active" : ""
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link to="/" onClick={() => logout()} className="nav-link">
               Logout
             </Link>
-          </li>
-        </ul>
-      </nav>
-    ) : (
-      <></>
-    )
+          </div>
+        </div>
+      </div>
+    </nav>
+  ) : (
+    <></>
   );
 }
 
