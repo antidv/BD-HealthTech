@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthContext";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "../components/Modal";
+import Logo from "../assets/logo_ht.png";
 
 function Login() {
   const [modal, setModal] = useState({ show: false, message: "" });
@@ -55,43 +56,69 @@ function Login() {
   }, [isAuthenticated]);
 
   return (
-    <div>
-      {modal.show && (
-        <Modal titulo={"Error"} mensaje={modal.message} setModal={setModal} />
-      )}
-      <h1>Iniciar Sesión</h1>
-      <form onSubmit={onSubmit}>
-        <input
-          type="email"
-          placeholder="Correo"
-          {...register("correo", {
-            required: {
-              value: true,
-              message: "Correo es requerido",
-            },
-            pattern: {
-              value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-              message: "Correo no válido",
-            },
-          })}
-        />
-        {errors.correo && <p>{errors.correo.message}</p>}
-        <input
-          type="password"
-          placeholder="Contraseña"
-          {...register("contrasenia", {
-            required: {
-              value: true,
-              message: "Contaseña es requerida",
-            },
-          })}
-        />
-        {errors.contrasenia && <p>{errors.contrasenia.message}</p>}
-        <button type="submit" disabled={loadingLogin}>
-          {loadingLogin ? "Cargando ..." : "Iniciar"}
-        </button>
-      </form>
-    </div>
+    <>
+      <div className="container-fluid containerLogin">
+        <div className="row align-items-center justify-content-center vh-100">
+          <div className="col-6 text-center">
+            <img src={Logo} alt="Logo" className="logo" />
+          </div>
+
+          <div className="col-6 align-items-center justify-content-center text-center">
+            {modal.show && (
+              <Modal
+                titulo={"Error"}
+                mensaje={modal.message}
+                setModal={setModal}
+              />
+            )}
+            <h1>Iniciar Sesión</h1>
+            <form onSubmit={onSubmit}>
+              <div className="d-flex justify-content-center">
+                <input
+                  type="email"
+                  placeholder="Correo"
+                  className="form-control mt-3 mb-3 w-50"
+                  {...register("correo", {
+                    required: {
+                      value: true,
+                      message: "Correo es requerido",
+                    },
+                    pattern: {
+                      value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                      message: "Correo no válido",
+                    },
+                  })}
+                />
+              </div>
+              <div className="d-flex justify-content-center">
+                {errors.correo && <p>{errors.correo.message}</p>}
+                <input
+                  type="password"
+                  placeholder="Contraseña"
+                  className="form-control mt-3 mb-3 w-50"
+                  {...register("contrasenia", {
+                    required: {
+                      value: true,
+                      message: "Contaseña es requerida",
+                    },
+                  })}
+                />
+              </div>
+              <div className="d-flex justify-content-center">
+                {errors.contrasenia && <p>{errors.contrasenia.message}</p>}
+                <button
+                  type="submit"
+                  disabled={loadingLogin}
+                  className="btn btn-warning mt-3 mb-3"
+                >
+                  {loadingLogin ? "Cargando ..." : "Iniciar"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
