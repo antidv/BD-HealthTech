@@ -1,25 +1,27 @@
-import { createContext, useState, useContext, useEffect } from 'react'
-import { loginRequest, verifyTokenRequest } from '../api/auth'
-import Cookies from 'js-cookie'
+import { createContext, useState, useContext, useEffect } from "react";
+import { loginRequest, verifyTokenRequest } from "../api/auth";
+import Cookies from "js-cookie";
 
 const AuthContext = createContext();
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) { 
+  if (!context) {
     throw new Error("useAuth debe usarse dentro de un AuthProvider");
   }
   return context;
-}
+};
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [loadingLogin, setLoadingLogin] = useState(false);
 
   // Iniciar sesion
   const signin = async (user) => {
+    setLoadingLogin(true);
     try {
       const res = await loginRequest(user);
       // console.log(res)
@@ -27,6 +29,8 @@ export const AuthProvider = ({ children }) => {
       setIsAuthenticated(true);
     } catch (error) {
       setError(error.response.data.message);
+    } finally {
+      setLoadingLogin(false);
     }
   };
 
@@ -35,25 +39,18 @@ export const AuthProvider = ({ children }) => {
     Cookies.remove("token");
     setUser(null);
     setIsAuthenticated(false);
-  }
+  };
 
   // Limpiar errores
-  useEffect(() => {
-    if (error != "") {
-      const timer = setTimeout(() => { 
-        setError("");
-      }, 3000)
-      return () => clearTimeout(timer);
-    }
-  }, [error])
+  const clearError = () => setError("");
 
   // Verificar token
   useEffect(() => {
-    async function checkLogin () {
+    async function checkLogin() {
       const cookies = Cookies.get();
       if (!cookies.token) {
         setIsAuthenticated(false);
-        setUser(null)
+        setUser(null);
         setLoading(false);
         return;
       }
@@ -71,20 +68,24 @@ export const AuthProvider = ({ children }) => {
       }
     }
     checkLogin();
-  }, [])
-  
+  }, []);
+
   return (
-    <AuthContext.Provider value={{
-      signin,
-      user,
-      isAuthenticated,
-      error,
-      loading,
-      logout
-    }}>
+    <AuthContext.Provider
+      value={{
+        signin,
+        user,
+        isAuthenticated,
+        error,
+        loading,
+        loadingLogin,
+        logout,
+        clearError,
+      }}
+    >
       {children}
     </AuthContext.Provider>
-  )
-}
+  );
+};
 
 export default AuthContext;

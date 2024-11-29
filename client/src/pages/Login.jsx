@@ -1,11 +1,21 @@
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthContext";
+<<<<<<< HEAD
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Logo from "../assets/logo_ht.png";
 import inic from "../pages/principal.module.css";
 
 function Login() {
+=======
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Modal from "../components/Modal";
+
+function Login() {
+  const [modal, setModal] = useState({ show: false, message: "" });
+
+>>>>>>> baf82e682819684ff2b3fb1ce3625fcb80311075
   const {
     register,
     handleSubmit,
@@ -13,7 +23,12 @@ function Login() {
     setValue,
     reset,
   } = useForm();
+<<<<<<< HEAD
   const { user, signin, error, isAuthenticated } = useAuth();
+=======
+  const { user, signin, error, clearError, loadingLogin, isAuthenticated } =
+    useAuth();
+>>>>>>> baf82e682819684ff2b3fb1ce3625fcb80311075
 
   const navigate = useNavigate();
 
@@ -22,11 +37,15 @@ function Login() {
   });
 
   useEffect(() => {
-    if (error === "Contraseña incorrecta") {
-      setValue("contrasenia", "");
-    } else if (error === "Usuario no encontrado") {
-      reset();
+    if (error) {
+      setModal({ show: true, message: error });
+      if (error === "Contraseña incorrecta") {
+        setValue("contrasenia", "");
+      } else if (error === "Usuario no encontrado") {
+        reset();
+      }
     }
+    clearError();
   }, [error]);
 
   useEffect(() => {
@@ -49,56 +68,42 @@ function Login() {
   }, [isAuthenticated]);
 
   return (
-    <div className={`container-fluid ${inic.containerColor}`}>
-      <div className="row align-items-center justify-content-center vh-100">
-        <div className="col-6 text-center">
-          <img src={Logo} alt="Logo" className={`${inic.logoLogin}`} />
-        </div>
-
-        <div className="col-6 align-items-center justify-content-center text-center">
-          {<div>{error}</div>}
-          <h2>Iniciar sesión</h2>
-          <form onSubmit={onSubmit}>
-            <div className="d-flex justify-content-center">
-              <input
-                type="email"
-                placeholder="Correo"
-                {...register("correo", {
-                  required: {
-                    value: true,
-                    message: "Correo es requerido",
-                  },
-                  pattern: {
-                    value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                    message: "Correo no válido",
-                  },
-                })}
-                className="form-control mt-3 mb-3 w-50"
-              />
-            </div>
-            <div className="d-flex justify-content-center">
-              {errors.correo && <p>{errors.correo.message}</p>}
-              <input
-                type="password"
-                placeholder="Contraseña"
-                {...register("contrasenia", {
-                  required: {
-                    value: true,
-                    message: "Contaseña es requerida",
-                  },
-                })}
-                className="form-control mt-3 mb-3 w-50"
-              />
-            </div>
-            <div className="d-flex justify-content-center">
-              {errors.contrasenia && <p>{errors.contrasenia.message}</p>}
-              <button type="submit" className="btn btn-warning mt-3 mb-3">
-                Iniciar
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+    <div>
+      {modal.show && (
+        <Modal titulo={"Error"} mensaje={modal.message} setModal={setModal} />
+      )}
+      <h1>Iniciar Sesión</h1>
+      <form onSubmit={onSubmit}>
+        <input
+          type="email"
+          placeholder="Correo"
+          {...register("correo", {
+            required: {
+              value: true,
+              message: "Correo es requerido",
+            },
+            pattern: {
+              value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+              message: "Correo no válido",
+            },
+          })}
+        />
+        {errors.correo && <p>{errors.correo.message}</p>}
+        <input
+          type="password"
+          placeholder="Contraseña"
+          {...register("contrasenia", {
+            required: {
+              value: true,
+              message: "Contaseña es requerida",
+            },
+          })}
+        />
+        {errors.contrasenia && <p>{errors.contrasenia.message}</p>}
+        <button type="submit" disabled={loadingLogin}>
+          {loadingLogin ? "Cargando ..." : "Iniciar"}
+        </button>
+      </form>
     </div>
   );
 }

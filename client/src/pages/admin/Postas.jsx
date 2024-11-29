@@ -1,28 +1,50 @@
-import CardPosta from "../../components/CardPosta";
-import postas from "../../json/postas.json";
-import styles from "../../pages/principal.module.css";
+import { useQuery } from "@tanstack/react-query";
+import { getPostasAdmin } from "../../api/postas";
+import Pagination from "../../components/Pagination";
+import usePagination from "../../hooks/usePagination";
+import CardPosta from "../../components/cards/CardPosta";
 
 function Postas() {
+  const { page, setPage } = usePagination();
+
+  const {
+    data: postas,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["postas", { page, limit: 3 }],
+    queryFn: getPostasAdmin,
+    keepPreviousData: true,
+  });
+
+  if (isLoading) return <b>Cargando ...</b>;
+  if (isError) return <b>Ocurrio un error</b>;
+
   return (
     <>
-      <div className={`container-fluid ${styles.containerColor}`}>
-        <div className="row align-items-center justify-content-center" >
-          <div className="col-12">
-            <h2 className="mt-4 ms-3">Postas</h2>
-          </div>
-        </div>
-        <div className="row m-3">
-          {postas.map((posta) => (
-              <CardPosta
-                key={posta.idposta}
-                foto={posta.foto}
-                nombre={posta.nombre}
-                ciudad={posta.ciudad}
-                direccion={posta.direccion}
-              />
-            ))}
-        </div>
+      <h1>Postas</h1>
+
+      {/* Renderizado de cards */}
+      <div className="container">
+        {postas.data.map((posta) => (
+          <CardPosta
+            key={posta.idposta}
+            id={posta.idposta}
+            foto={posta.foto}
+            nombre={posta.nombre}
+            ciudad={posta.ciudad}
+            direccion={posta.direccion}
+            estado={posta.disponible}
+          />
+        ))}
       </div>
+
+      {/* Paginacion */}
+      <Pagination
+        currentPage={page}
+        totalPages={postas.totalPages}
+        onPageChange={setPage}
+      />
     </>
   );
 }
