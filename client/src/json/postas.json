@@ -1,23 +1,31 @@
 [
   {
-    "idposta": 1,
-    "nombre": "Nombre de posta",
-    "ciudad": "Ciudad de posta",
-    "direccion": "Direccion de posta",
-    "foto": "url_fot"
+    "ruta": "./postas/admin",
+    "rol": "admin",
+    "data": [
+      {
+        "idposta": 1,
+        "nombre": "Nombre de posta",
+        "ciudad": "Ciudad de posta",
+        "direccion": "Direccion de posta",
+        "foto": "url_fot",
+        "disponible": true
+      }
+    ]
   },
   {
-    "idposta": 2,
-    "nombre": "Nombre de posta",
-    "ciudad": "Ciudad de posta",
-    "direccion": "Direccion de posta",
-    "foto": "url_fot"
-  },
-  {
-    "idposta": 3,
-    "nombre": "Nombre de posta",
-    "ciudad": "Ciudad de posta",
-    "direccion": "Direccion de posta",
-    "foto": "url_fot"
+    "ruta": "./postas/:idposta",
+    "rol": "admin, medico, paciente",
+    "data": [
+      {
+        "idposta": 1,
+        "nombre": "Nombre de posta",
+        "ciudad": "Ciudad de posta",
+        "direccion": "Direccion de posta",
+        "telefono": "123456789",
+        "foto": "url_fot",
+        "disponible": true
+      }
+    ]
   }
 ]
