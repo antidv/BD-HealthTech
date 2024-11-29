@@ -29,40 +29,40 @@ export const postPosta = async (req, res) => {
 };
 
 export const getPostas = async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const { page = 1, limit = 10 } = req.query;
+    try {
+        const connection = await pool.getConnection();
+        const { page = 1, limit = 10, search = '' } = req.query;
 
-    // Asegurar que page y limit sean números
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
-    const offset = (pageNumber - 1) * limitNumber;
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const offset = (pageNumber - 1) * limitNumber;
 
-    // Consulta principal con límite y desplazamiento
-    const query = `SELECT * FROM posta LIMIT ? OFFSET ?`;
-    const rows = await connection.query(query, [limitNumber, offset]);
+        const query = `
+            SELECT * FROM posta
+            WHERE nombre LIKE ?
+            LIMIT ? OFFSET ?
+        `;
+        const rows = await connection.query(query, [`%${search}%`, limitNumber, offset]);
 
-    // Consulta para contar el total de registros
-    const countQuery = `SELECT COUNT(*) AS total FROM posta`;
-    const [{ total }] = await connection.query(countQuery);
+        const countQuery = `
+            SELECT COUNT(*) AS total FROM posta
+            WHERE nombre LIKE ?
+        `;
+        const [{ total }] = await connection.query(countQuery, [`%${search}%`]);
+        const totalNumber = Number(total);
 
-    // Convertir total de BigInt a Number
-    const totalNumber = Number(total);
+        res.status(200).json({
+            data: rows,
+            total: totalNumber,
+            page: pageNumber,
+            limit: limitNumber
+        });
 
-    const totalPages = Math.ceil(totalNumber / limitNumber);
-
-    connection.release(); // Libera la conexión al pool
-
-    res.status(200).json({
-      data: rows,
-      currentPage: pageNumber,
-      totalPages,
-      total: totalNumber, // Asegura que el total sea un número
-    });
-  } catch (error) {
-    console.error("Error al obtener las postas: ", error);
-    res.status(500).send("Error al obtener las postas");
-  }
+        connection.release();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener las postas');
+    }
 };
 
 export const getPosta = async (req, res) => {
@@ -107,27 +107,5 @@ export const updatePosta = async (req, res) => {
   } catch (error) {
     console.error("Error al actualizar la posta:", error);
     res.status(500).send("Error al actualizar la posta");
-  }
-};
-
-export const deletePosta = async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const { id } = req.params;
-
-    const result = await connection.query(
-      "DELETE FROM posta WHERE idposta = ?",
-      [id]
-    );
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "La posta no existe" });
-    }
-
-    res.json({ message: "Posta eliminada con éxito" });
-    connection.end();
-  } catch (error) {
-    console.error("Error al eliminar la posta:", error);
-    res.status(500).send("Error al eliminar la posta");
   }
 };
