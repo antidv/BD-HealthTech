@@ -78,22 +78,3 @@ export const updatePosta = async (req, res) => {
         res.status(500).send("Error al actualizar la posta");
     }
 };
-
-export const deletePosta = async (req, res) => {
-    try {
-        const connection = await pool.getConnection();
-        const { id } = req.params;
-
-        const result = await connection.query('DELETE FROM posta WHERE idposta = ?', [id]);
-
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ error: "La posta no existe" });
-        }
-
-        res.json({ message: "Posta eliminada con éxito" });
-        connection.end();
-    } catch (error) {
-        console.error("Error al eliminar la posta:", error);
-        res.status(500).send("Error al eliminar la posta");
-    }
-};

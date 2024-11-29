@@ -90,35 +90,3 @@ export const updateMedicos = async (req, res) => {
         res.status(500).send('Error al actualizar el médico');
     }
 };
-  
-export const deleteMedicos = async (req, res) => {
-    try {
-        const connection = await pool.getConnection();
-        await connection.beginTransaction();
-
-        const { id } = req.params;
-
-        const result = await connection.query('SELECT idusuario FROM medico WHERE idmedico = ?', [id]);
-        const medico = result[0];
-
-        if (!medico || medico.length <= 0) {
-            await connection.rollback();
-            return res.status(404).json({ error: "El médico no existe" });
-        }
-
-        const idusuario = medico.idusuario;
-
-        const resultUsuario = await connection.query('DELETE FROM usuario WHERE idusuario = ?', [idusuario]);
-        if (resultUsuario.affectedRows <= 0) {
-            await connection.rollback();
-            return res.status(404).json({ error: "El usuario no existe" });
-        }
-
-        await connection.commit();
-        res.json('Datos de medico y usuario eliminados con éxito');
-        connection.end();
-    } catch (error) {
-        console.error('Error durante la eliminación:', error);
-        res.status(500).send('Error al eliminar el médico');
-    }
-};
