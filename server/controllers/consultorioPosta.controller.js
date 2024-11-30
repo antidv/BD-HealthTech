@@ -1,26 +1,54 @@
 import { pool } from "../src/database.js";
 
 export const postConsultorioPosta = async (req, res) => {
+    const connection = await pool.getConnection();
     try {
-        const { idconsultorio, idposta } = req.body;
+        const { consultorios, nombre, ciudad, direccion, telefono } = req.body;
 
-        const connection = await pool.getConnection();
-        const result = await connection.query(
-            `INSERT INTO consultorio_posta (idconsultorio, idposta) VALUES (?, ?)`,
-            [idconsultorio, idposta]
+        await connection.beginTransaction();
+        const postaResult = await connection.query(
+            `INSERT INTO posta (nombre, ciudad, direccion, telefono) VALUES (?, ?, ?, ?)`,
+            [nombre, ciudad, direccion, telefono]
         );
+        const idposta = postaResult.insertId;
+
+        for (const idconsultorio of consultorios) {
+            await connection.query(
+                `INSERT INTO consultorio_posta (idconsultorio, idposta) VALUES (?, ?)`,
+                [idconsultorio, idposta]
+            );
+        }
+
+        await connection.commit();
 
         res.status(201).json({
-            idconsultorio_posta: result.insertId.toString(),
-            idconsultorio,
-            idposta,
+            idposta: idposta.toString(),
+            nombre,
+            ciudad,
+            direccion,
+            telefono,
+            consultorios
         });
-        connection.end();
     } catch (error) {
-        console.error("Error al crear la relación Consultorio-Posta:", error);
-        res.status(500).send("Error al crear la relación Consultorio-Posta");
+        await connection.rollback();
+        console.error("Error al crear la posta:", error);
+        res.status(500).send("Error al crear la relación posta");
+    } finally {
+        connection.release();
     }
 };
+
+export const getConsultorios = async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const rows = await connection.query(`SELECT idconsultorio, nombre FROM consultorio`);
+        res.status(200).json(rows);
+        connection.end();
+    } catch (error) {
+        console.error("Error al obtener los consultorios:", error);
+        res.status(500).send("Error al obtener los consultorios");
+    }
+}
 
 export const getConsultorioPostas = async (req, res) => {
     try {

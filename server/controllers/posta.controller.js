@@ -1,33 +1,5 @@
 import { pool } from "../src/database.js";
 
-export const postPosta = async (req, res) => {
-  try {
-    const { nombre, ciudad, direccion, telefono, disponible } = req.body;
-
-    const connection = await pool.getConnection();
-    try {
-      await connection.beginTransaction();
-
-      const result = await connection.query(
-        `INSERT INTO posta (nombre, ciudad, direccion, telefono, disponible)
-                 VALUES (?, ?, ?, ?, ?)`,
-        [nombre, ciudad, direccion, telefono, disponible]
-      );
-
-      await connection.commit();
-      res.json({ idposta: result.insertId.toString() });
-    } catch (error) {
-      await connection.rollback();
-      throw error;
-    } finally {
-      connection.release();
-    }
-  } catch (error) {
-    console.error("Error al crear la posta:", error);
-    res.status(500).send("Error al registrar la posta");
-  }
-};
-
 export const getPostas = async (req, res) => {
     try {
         const connection = await pool.getConnection();
