@@ -99,16 +99,15 @@ export const getConsultorioPosta = async (req, res) => {
         `;
 
         const [{ total }] = await connection.query(countQuery, [id]);
-
-        if (rows.length === 0) {
-            return res.status(404).json({ error: "No se encontraron consultorios para la posta especificada" });
-        }
+        const totalNumber = Number(total);
+        const totalPages = Math.ceil(totalNumber / limitNumber);
 
         res.status(200).json({
             data: rows,
-            total: Number(total),
+            total: totalNumber,
             page: pageNumber,
             limit: limitNumber,
+            totalPages: totalPages
         });
 
         connection.release();
