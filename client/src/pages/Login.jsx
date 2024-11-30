@@ -57,7 +57,7 @@ function Login() {
 
   return (
     <>
-      <div className="container-fluid containerLogin">
+      <div className="container-fluid containerColor">
         <div className="row align-items-center justify-content-center vh-100">
           <div className="col-6 text-center">
             <img src={Logo} alt="Logo" className="logo" />

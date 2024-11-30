@@ -3,6 +3,11 @@
   width: 300px;
 }
 
-.containerLogin {
+.containerColor {
   background-color: azure !important;
+}
+
+/* Imagen Cards */
+.imageCard{
+  width: 200px;
 }
