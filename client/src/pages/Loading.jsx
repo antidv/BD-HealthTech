@@ -1,6 +1,10 @@
-function Loading() {
+function Loading(props) {
   return (
-    <h1>Cargando ...</h1>
+    <>
+      <div className="container-fluid d-flex align-items-center justify-content-center vh-100">
+        <h1>Cargando {props.nombre}</h1>
+      </div>
+    </>
   );
 }
 

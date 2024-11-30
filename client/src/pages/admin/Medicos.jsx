@@ -5,6 +5,7 @@ import Pagination from "../../components/Pagination";
 import usePagination from "../../hooks/usePagination";
 import CardMedico from "../../components/cards/CardMedico";
 import SearchBar from "../../components/SearchBar";
+import Loading from "../Loading";
 
 function Medicos() {
   const { page, setPage } = usePagination();
@@ -25,8 +26,8 @@ function Medicos() {
     setPage(1);
   };
 
-  if (isLoading) return <b>Cargando ...</b>;
-  if (isError) return <b>Ocurrio un error</b>;
+  if (isLoading) return <Loading nombre="médicos ..." />;
+  if (isError) return <ErrorPage code={500} message="Ocurrió un error ..." />;
 
   return (
     <>
@@ -39,7 +40,7 @@ function Medicos() {
         <div className="row">
           <div className="col-12">
             {/* Barra de busqueda */}
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onSearch={handleSearch} nombre="médico" url="/"/>
           </div>
         </div>
         <div className="row m-3">
