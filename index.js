@@ -37,10 +37,10 @@ app.use(cookieParser());
 app.use(antecedentesRoutes);
 app.use(authRoutes);
 app.use(consultorioPostaRoutes);
-app.use(pacienteRoutes);
-app.use(antecendetesRoutes);
+app.use(pacientesRoutes);
 app.use(postaRoutes);
 app.use(horarioRoutes);
+app.use(medicosRoutes);
 app.use(consultorioPostaRoutes);
 app.use(medicoConsultorioPostaRoutes);
 app.use(programacionCitaRoutes)
