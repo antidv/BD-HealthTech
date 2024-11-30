@@ -3,7 +3,7 @@ import { pool } from "../src/database.js";
 export const postConsultorioPosta = async (req, res) => {
     const connection = await pool.getConnection();
     try {
-        const { consultorios, nombre, ciudad, direccion, telefono } = req.body;
+        const { consultorios = [], nombre, ciudad, direccion, telefono } = req.body;
 
         await connection.beginTransaction();
         const postaResult = await connection.query(
@@ -12,11 +12,13 @@ export const postConsultorioPosta = async (req, res) => {
         );
         const idposta = postaResult.insertId;
 
-        for (const idconsultorio of consultorios) {
-            await connection.query(
-                `INSERT INTO consultorio_posta (idconsultorio, idposta) VALUES (?, ?)`,
-                [idconsultorio, idposta]
-            );
+        if (consultorios.length > 0) {
+            for (const idconsultorio of consultorios) {
+                await connection.query(
+                    `INSERT INTO consultorio_posta (idconsultorio, idposta) VALUES (?, ?)`,
+                    [idconsultorio, idposta]
+                );
+            }
         }
 
         await connection.commit();
