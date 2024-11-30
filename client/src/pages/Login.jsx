@@ -73,11 +73,11 @@ function Login() {
             )}
             <h1>Iniciar Sesión</h1>
             <form onSubmit={onSubmit}>
-              <div className="d-flex justify-content-center">
+              <div className="d-flex flex-column justify-content-center">
                 <input
                   type="email"
                   placeholder="Correo"
-                  className="form-control mt-3 mb-3 w-50"
+                  className="form-control mt-3 mb-3 w-50 mx-auto"
                   {...register("correo", {
                     required: {
                       value: true,
@@ -89,13 +89,14 @@ function Login() {
                     },
                   })}
                 />
+                {errors.correo && <p className="text-danger">{errors.correo.message}</p>}
               </div>
-              <div className="d-flex justify-content-center">
-                {errors.correo && <p>{errors.correo.message}</p>}
+
+              <div className="d-flex flex-column justify-content-center">
                 <input
                   type="password"
                   placeholder="Contraseña"
-                  className="form-control mt-3 mb-3 w-50"
+                  className="form-control mt-3 mb-3 w-50 mx-auto"
                   {...register("contrasenia", {
                     required: {
                       value: true,
@@ -103,9 +104,9 @@ function Login() {
                     },
                   })}
                 />
+                {errors.contrasenia && <p className="text-danger">{errors.contrasenia.message}</p>}
               </div>
               <div className="d-flex justify-content-center">
-                {errors.contrasenia && <p>{errors.contrasenia.message}</p>}
                 <button
                   type="submit"
                   disabled={loadingLogin}
