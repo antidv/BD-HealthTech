@@ -20,10 +20,8 @@ function SearchBar({ onSearch, nombre, url }) {
       <button className="btn btn-primary ms-3" onClick={handleSearch}>
         Buscar
       </button>
-      <Link to={url}>
-        <button className="btn btn-primary ms-3" onClick={handleSearch}>
-          Agregar {nombre}
-        </button>
+      <Link to={url} className="btn btn-primary ms-3">
+        Agregar {nombre}
       </Link>
       
     </div>
