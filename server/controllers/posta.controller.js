@@ -50,12 +50,14 @@ export const getPostas = async (req, res) => {
         `;
         const [{ total }] = await connection.query(countQuery, [`%${search}%`]);
         const totalNumber = Number(total);
+        const totalPages = Math.ceil(totalNumber / limitNumber);
 
         res.status(200).json({
             data: rows,
             total: totalNumber,
             page: pageNumber,
-            limit: limitNumber
+            limit: limitNumber,
+            totalPages: totalPages
         });
 
         connection.release();
