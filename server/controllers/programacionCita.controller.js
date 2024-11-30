@@ -42,12 +42,30 @@ export const postProgramacionCita = async (req, res) => {
 export const getProgramacionesCita = async (req, res) => {
     try {
       const connection = await pool.getConnection();
-      const { page = 1, limit = 10, search = "" } = req.query;
+      const { page = 1, limit = 10, nombre = '', especialidad = '', consultorio= '' } = req.query;
   
       const pageNumber = Number(page);
       const limitNumber = Number(limit);
       const offset = (pageNumber - 1) * limitNumber;
-  
+      
+      const conditions = [];
+      const params = [];
+
+      if (nombre) {
+          conditions.push('m.nombre LIKE ?');
+          params.push(`%${nombre}%`);
+      }
+      if (especialidad) {
+          conditions.push('m.especialidad LIKE ?');
+          params.push(`%${especialidad}%`);
+      }
+      if (consultorio) {
+          conditions.push('c.nombre LIKE ?');
+          params.push(`%${consultorio}%`);
+      }
+
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
+
       const query = `
         SELECT pc.idprogramacion_cita,
                m.nombre AS medico, 
@@ -63,19 +81,13 @@ export const getProgramacionesCita = async (req, res) => {
         INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
         INNER JOIN posta p ON cp.idposta = p.idposta
         INNER JOIN horario h ON pc.idhorario = h.idhorario
-        WHERE (m.nombre LIKE ? OR ? = '')
-            AND (m.especialidad LIKE ? OR ? = '')
-            AND (c.nombre LIKE ? OR ? = '')
+        ${whereClause}
         LIMIT ? OFFSET ?;
       `;
-      const rows = await connection.query(query, [
-        `%${search}%`, search,
-        `%${search}%`, search,
-        `%${search}%`, search,
-        limitNumber,
-        offset,
-      ]);
-  
+
+      params.push(limitNumber, offset);
+      const rows = await connection.query(query, params);
+
       const countQuery = `
         SELECT COUNT(*) AS total
         FROM programacion_cita pc
@@ -83,21 +95,14 @@ export const getProgramacionesCita = async (req, res) => {
         INNER JOIN medico m ON mcp.idmedico = m.idmedico
         INNER JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
         INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
-        WHERE (m.nombre LIKE ? OR ? = '')
-            AND (m.especialidad LIKE ? OR ? = '')
-            AND (c.nombre LIKE ? OR ? = '')
+        ${whereClause}
       `;
-      const [{ total }] = await connection.query(countQuery, [
-        `%${search}%`, search,
-        `%${search}%`, search,
-        `%${search}%`, search,
-      ]);
-
-      const totalNumber = Number(total);
   
+      const [{ total }] = await connection.query(countQuery, params.slice(0, -2));
+
       res.status(200).json({
         data: rows,
-        total: totalNumber,
+        total: Number(total),
         page: pageNumber,
         limit: limitNumber,
       });
