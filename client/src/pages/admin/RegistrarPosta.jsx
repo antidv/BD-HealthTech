@@ -1,55 +1,93 @@
-import React from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-// import { useQuery, useMutation } from "@tanstack/react-query";
-// import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation } from "@tanstack/react-query";
+import { getConsultorios } from "../../api/consultorios";
+import { createPostaConsultorios } from "../../api/postas";
+import Modal from "../../components/Modal";
 
-const RegistrarPosta = () => {
+function RegistrarPosta() {
+  // Estados del modal
+  const [modal, setModal] = useState({
+    show: false,
+    estado: true,
+    titulo: "",
+    message: "",
+  });
+
+  // Navegacion
+  const navigate = useNavigate();
+
+  // Manejo del formulario
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm({
     defaultValues: {
       consultorios: [],
     },
   });
 
-  // // Fetch consultorios disponibles
-  // const { data: consultorios, isLoading } = useQuery(
-  //   ["consultorios"],
-  //   async () => {
-  //     const response = await axios.get("/api/consultorios");
-  //     return response.data;
-  //   }
-  // );
-
-  // // Registrar nueva posta y consultorios asociados
-  // const mutation = useMutation((data) => axios.post("/api/postas", data), {
-  //   onSuccess: () => {
-  //     alert("Posta registrada con éxito");
-  //     reset();
-  //   },
-  //   onError: (error) => {
-  //     console.error(error);
-  //     alert("Hubo un error al registrar la posta");
-  //   },
-  // });
-
-  const onSubmit = handleSubmit((data) => {
-    //mutation.mutate(data);
-    console.log("Data entregada: ", data);
+  // Peticion de consultorios
+  const {
+    data: consultorios,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["consultorios"],
+    queryFn: getConsultorios,
   });
 
-  // if (isLoading) return <p>Cargando consultorios...</p>;
-  // if (isError) return <p>Cargando consultorios...</p>;
+  // Registrar nueva posta y consultorios asociados
+  const mutation = useMutation({
+    mutationFn: createPostaConsultorios,
+    onSuccess: (data) => {
+      setModal({
+        show: true,
+        estado: true,
+        titulo: "Registro exitoso",
+        message: `La posta ${data.nombre} se ha creado con éxito.`,
+      });
+      console.log("Posta creada con éxito:", data);
+      navigate("/admin/postas");
+    },
+    onError: (error) => {
+      setModal({
+        show: true,
+        estado: false,
+        titulo: "Ocurrio un error",
+        message: "Error: No se pudo crear la posta. Inténtalo de nuevo.",
+      });
+      console.error("Error al crear la posta:", error);
+    },
+  });
+
+  const onSubmit = handleSubmit((data) => {
+    mutation.mutate(data);
+    reset();
+  });
+
+  if (isLoading) return <b>Cargando ...</b>;
+  if (isError) return <b>Ocurrio un error</b>;
 
   return (
     <>
+      {modal.show && (
+        <Modal
+          titulo={modal.titulo}
+          estado={modal.estado}
+          mensaje={modal.message}
+          setModal={setModal}
+        />
+      )}
       <h2>Registrar Nueva Posta</h2>
       <form onSubmit={onSubmit} style={{ maxWidth: "600px", margin: "0 auto" }}>
         <div>
-          <label>Nombre</label>
+          <label htmlFor="nombre">Nombre</label>
           <input
+            id="nombre"
             type="text"
             {...register("nombre", {
               required: "El nombre es obligatorio",
@@ -59,8 +97,9 @@ const RegistrarPosta = () => {
         </div>
 
         <div>
-          <label>Ciudad</label>
+          <label htmlFor="ciudad">Ciudad</label>
           <input
+            id="ciudad"
             type="text"
             {...register("ciudad", {
               required: "La ciudad es obligatoria",
@@ -70,8 +109,9 @@ const RegistrarPosta = () => {
         </div>
 
         <div>
-          <label>Dirección</label>
+          <label htmlFor="direccion">Dirección</label>
           <input
+            id="direccion"
             type="text"
             {...register("direccion", {
               required: "La dirección es obligatoria",
@@ -81,8 +121,9 @@ const RegistrarPosta = () => {
         </div>
 
         <div>
-          <label>Teléfono</label>
+          <label htmlFor="telefono">Teléfono</label>
           <input
+            id="telefono"
             type="text"
             {...register("telefono", {
               pattern: {
@@ -96,34 +137,24 @@ const RegistrarPosta = () => {
 
         <div>
           <h3>Consultorios Disponibles</h3>
-          <div>
-            <input type="checkbox" value={1} {...register("consultorios")} />
-            <label>consultorio 1</label>
-          </div>
-          <div>
-            <input type="checkbox" value={2} {...register("consultorios")} />
-            <label>consultorio 2</label>
-          </div>
-          <div>
-            <input type="checkbox" value={3} {...register("consultorios")} />
-            <label>consultorio 3</label>
-          </div>
-          {/* {consultorios.map((consultorio) => (
-          <div key={consultorio.idconsultorio}>
-            <input
-              type="checkbox"
-              value={consultorio.idconsultorio}
-              {...register("consultorios")}
-            />
-            <label>{consultorio.nombre}</label>
-          </div>
-        ))} */}
+          {consultorios.map((consultorio) => (
+            <div key={consultorio.idconsultorio}>
+              <input
+                type="checkbox"
+                value={consultorio.idconsultorio}
+                {...register("consultorios")}
+              />
+              <label>{consultorio.nombre}</label>
+            </div>
+          ))}
         </div>
 
-        <button type="submit">Registrar</button>
+        <button type="submit" disabled={mutation.isPending}>
+          {mutation.isPending ? "Registrando..." : "Registrar"}
+        </button>
       </form>
     </>
   );
-};
+}
 
 export default RegistrarPosta;

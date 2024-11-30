@@ -6,7 +6,12 @@ import Modal from "../components/Modal";
 import Logo from "../assets/logo_ht.png";
 
 function Login() {
-  const [modal, setModal] = useState({ show: false, message: "" });
+  const [modal, setModal] = useState({
+    show: false,
+    estado: true,
+    titulo: "",
+    message: "",
+  });
 
   const {
     register,
@@ -26,7 +31,7 @@ function Login() {
 
   useEffect(() => {
     if (error) {
-      setModal({ show: true, message: error });
+      setModal({ show: true, titulo: "Error", estado: false, message: error });
       if (error === "Contraseña incorrecta") {
         setValue("contrasenia", "");
       } else if (error === "Usuario no encontrado") {
@@ -66,7 +71,8 @@ function Login() {
           <div className="col-6 align-items-center justify-content-center text-center">
             {modal.show && (
               <Modal
-                titulo={"Error"}
+                titulo={modal.titulo}
+                estado={modal.estado}
                 mensaje={modal.message}
                 setModal={setModal}
               />
@@ -89,7 +95,9 @@ function Login() {
                     },
                   })}
                 />
-                {errors.correo && <p className="text-danger">{errors.correo.message}</p>}
+                {errors.correo && (
+                  <p className="text-danger">{errors.correo.message}</p>
+                )}
               </div>
 
               <div className="d-flex flex-column justify-content-center">
@@ -104,7 +112,9 @@ function Login() {
                     },
                   })}
                 />
-                {errors.contrasenia && <p className="text-danger">{errors.contrasenia.message}</p>}
+                {errors.contrasenia && (
+                  <p className="text-danger">{errors.contrasenia.message}</p>
+                )}
               </div>
               <div className="d-flex justify-content-center">
                 <button

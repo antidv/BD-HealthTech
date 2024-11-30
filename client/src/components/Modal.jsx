@@ -1,4 +1,4 @@
-function Modal({ titulo, mensaje, setModal }) {
+function Modal({ estado, titulo, mensaje, setModal }) {
   return (
     <div
       className="modal fade show d-block"
@@ -11,17 +11,22 @@ function Modal({ titulo, mensaje, setModal }) {
             <button
               type="button"
               className="btn-close"
-              onClick={() => setModal({ show: false, message: "" })}
+              onClick={() =>
+                setModal({ show: false, estado: true, titulo: "", message: "" })
+              }
             ></button>
           </div>
           <div className="modal-body">
             <p>{mensaje}</p>
+            <p>{`El estado es: ${estado}`}</p>
           </div>
           <div className="modal-footer">
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() => setModal({ show: false, message: "" })}
+              onClick={() =>
+                setModal({ show: false, estado: true, titulo: "", message: "" })
+              }
             >
               Cerrar
             </button>
