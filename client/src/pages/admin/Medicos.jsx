@@ -40,7 +40,7 @@ function Medicos() {
         <div className="row">
           <div className="col-12">
             {/* Barra de busqueda */}
-            <SearchBar onSearch={handleSearch} nombre="médico" url="/"/>
+            <SearchBar onSearch={handleSearch} nombre="médico" url="registrar/medico"/>
           </div>
         </div>
         <div className="row m-3">

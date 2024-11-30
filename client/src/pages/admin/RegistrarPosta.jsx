@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { getConsultorios } from "../../api/consultorios";
 import { createPostaConsultorios } from "../../api/postas";
 import Modal from "../../components/Modal";
@@ -74,85 +75,114 @@ function RegistrarPosta() {
 
   return (
     <>
-      {modal.show && (
-        <Modal
-          titulo={modal.titulo}
-          estado={modal.estado}
-          mensaje={modal.message}
-          setModal={setModal}
-        />
-      )}
-      <h2>Registrar Nueva Posta</h2>
-      <form onSubmit={onSubmit} style={{ maxWidth: "600px", margin: "0 auto" }}>
-        <div>
-          <label htmlFor="nombre">Nombre</label>
-          <input
-            id="nombre"
-            type="text"
-            {...register("nombre", {
-              required: "El nombre es obligatorio",
-            })}
-          />
-          {errors.nombre && <p>{errors.nombre.message}</p>}
+      <div className="container-fluid containerColor vh-100">
+        <div className="row align-items-center justify-content-center">
+          <div className="col-12">
+            {modal.show && (
+            <Modal
+              titulo={modal.titulo}
+              estado={modal.estado}
+              mensaje={modal.message}
+              setModal={setModal}
+            />
+          )}
+            <h2 className="m-3">Registrar nueva posta</h2>
+          </div>
         </div>
 
-        <div>
-          <label htmlFor="ciudad">Ciudad</label>
-          <input
-            id="ciudad"
-            type="text"
-            {...register("ciudad", {
-              required: "La ciudad es obligatoria",
-            })}
-          />
-          {errors.ciudad && <p>{errors.ciudad.message}</p>}
-        </div>
+        <div className="row m-3">
+          <form onSubmit={onSubmit}>
+            <div className="row">
+              <div className="col-6 mb-3">
+                <label htmlFor="nombre" className="form-label">Nombre</label>
+                <input
+                  id="nombre"
+                  type="text"
+                  className="form-control"
+                  {...register("nombre", {
+                    required: "El nombre es obligatorio",
+                  })}
+                />
+                {errors.nombre && <p>{errors.nombre.message}</p>}
+              </div>
 
-        <div>
-          <label htmlFor="direccion">Dirección</label>
-          <input
-            id="direccion"
-            type="text"
-            {...register("direccion", {
-              required: "La dirección es obligatoria",
-            })}
-          />
-          {errors.direccion && <p>{errors.direccion.message}</p>}
-        </div>
-
-        <div>
-          <label htmlFor="telefono">Teléfono</label>
-          <input
-            id="telefono"
-            type="text"
-            {...register("telefono", {
-              pattern: {
-                value: /^\d{7}$/,
-                message: "Ingrese un telefono valido",
-              },
-            })}
-          />
-          {errors.telefono && <p>{errors.telefono.message}</p>}
-        </div>
-
-        <div>
-          <h3>Consultorios Disponibles</h3>
-          {consultorios.map((consultorio) => (
-            <div key={consultorio.idconsultorio}>
-              <input
-                type="checkbox"
-                value={consultorio.idconsultorio}
-                {...register("consultorios")}
-              />
-              <label>{consultorio.nombre}</label>
+              <div className="col-6 mb-3">
+                <label htmlFor="ciudad" className="form-label">Ciudad</label>
+                <input
+                  id="ciudad"
+                  type="text"
+                  className="form-control"
+                  {...register("ciudad", {
+                    required: "La ciudad es obligatoria",
+                  })}
+                />
+                {errors.ciudad && <p>{errors.ciudad.message}</p>}
+              </div>
             </div>
-          ))}
-        </div>
+            
+            <div className="row">
+              <div className="col-6 mb-3">
+                <label htmlFor="direccion" className="form-label">Dirección</label>
+                <input
+                  id="direccion"
+                  type="text"
+                  className="form-control"
+                  {...register("direccion", {
+                    required: "La dirección es obligatoria",
+                  })}
+                />
+                {errors.direccion && <p>{errors.direccion.message}</p>}
+              </div>
 
-        <button type="submit" disabled={mutation.isPending}>
-          {mutation.isPending ? "Registrando..." : "Registrar"}
-        </button>
-      </form>
+              <div className="col-6 mb-3">
+                <label htmlFor="telefono" className="form-label">Teléfono</label>
+                <input
+                  id="telefono"
+                  type="text"
+                  className="form-control"
+                  {...register("telefono", {
+                    pattern: {
+                      value: /^\d{7}$/,
+                      message: "Ingrese un telefono valido",
+                    },
+                  })}
+                />
+                {errors.telefono && <p>{errors.telefono.message}</p>}
+              </div>
+            </div>
+
+            <div className="row">
+              <div className="col-12 mb-3">
+                <h4>Consultorios disponibles</h4>
+              </div>
+              {consultorios.map((consultorio) => (
+                  <div className="col-3 mb-3">
+                    <div key={consultorio.idconsultorio} className="form-check">
+                      <input
+                        type="checkbox"
+                        value={consultorio.idconsultorio}
+                        className="form-check-input"
+                        {...register("consultorios")}
+                      />
+                      <label className="form-check-label">{consultorio.nombre}</label>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            <div className="row">
+              <div className="col-12 d-flex justify-content-end">
+                <Link to="/admin/postas" className="btn btn-secondary me-3">
+                  Volver
+                </Link>
+                <button type="submit" disabled={mutation.isPending} className="btn btn-primary">
+                    {mutation.isPending ? "Registrando..." : "Registrar"}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
     </>
   );
 }
