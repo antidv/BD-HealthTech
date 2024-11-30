@@ -38,7 +38,7 @@ function Postas() {
           <div className="col-12">
             <h1 className="m-3">Postas</h1>
             {/* Barra de busqueda */}
-            <SearchBar onSearch={handleSearch} nombre="posta" url="/"/>
+            <SearchBar onSearch={handleSearch} nombre="posta" url="/admin/registrar/posta"/>
           </div>
         </div>
         
