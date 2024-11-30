@@ -22,28 +22,32 @@ function Medicos() {
 
   return (
     <>
-      <h1>Medicos</h1>
-
-      {/* Renderizado de cards */}
-      <div className="container">
-        {medicos.data.map((medico) => (
-          <CardMedico
-            key={medico.idmedico}
-            id={medico.idmedico}
-            foto={medico.foto}
-            nombre={`${medico.nombre} ${medico.apellidoP}`}
-            especialidad={medico.especialidad}
-            estado={medico.disponible}
+      <div className="container-fluid containerColor vh-100">
+        <div className="row align-items-center justify-content-center">
+          <div className="col-12">
+            <h1 className="mt-4 ms-3">Médicos</h1>
+          </div>
+        </div>
+        <div className="row m-3">
+          {/* Renderizado de cards */}
+          {medicos.data.map((medico) => (
+            <CardMedico
+              key={medico.idmedico}
+              id={medico.idmedico}
+              foto={medico.foto}
+              nombre={`${medico.nombre} ${medico.apellidoP}`}
+              especialidad={medico.especialidad}
+              estado={medico.disponible}
+            />
+          ))}
+          {/* Paginacion */}
+          <Pagination
+            currentPage={page}
+            totalPages={medicos.totalPages}
+            onPageChange={setPage}
           />
-        ))}
+        </div>
       </div>
-
-      {/* Paginacion */}
-      <Pagination
-        currentPage={page}
-        totalPages={medicos.totalPages}
-        onPageChange={setPage}
-      />
     </>
   );
 }
