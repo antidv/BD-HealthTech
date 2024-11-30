@@ -34,11 +34,12 @@ function Postas() {
       <div className="container-fluid containerColor vh-100">
         <div className="row align-items-center justify-content-center">
           <div className="col-12">
-            <h1 className="mt-4 ms-3">Postas</h1>
+            <h1 className="m-3">Postas</h1>
+            {/* Barra de busqueda */}
+            <SearchBar onSearch={handleSearch} nombre="doctor" url="/"/>
           </div>
         </div>
-        {/* Barra de busqueda */}
-        <SearchBar onSearch={handleSearch} />
+        
         <div className="row m-3">
           {/* Renderizado de cards */}
           {postas.data.length === 0 ? (
