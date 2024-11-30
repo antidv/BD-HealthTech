@@ -24,13 +24,12 @@ const app = express();
 // Middlewares
 app.use(morgan('dev'));
 app.use(cors({
-  origin: 'http://localhost:5173', // Ajusta esto si es necesario
+  origin: 'http://localhost:5173',
   credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Registrar rutas existentes sin prefijo
 app.use(antecedentesRoutes);
 app.use(authRoutes);
 app.use(consultorioPostaRoutes);
@@ -38,8 +37,6 @@ app.use(horarioRoutes);
 app.use(medicosRoutes);
 app.use(pacientesRoutes);
 app.use(postaRoutes);
-
-// Registrar nuevas rutas sin prefijo
 app.use(citaRoutes);
 app.use(diagnosticoRoutes);
 app.use(recetaRoutes);

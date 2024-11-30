@@ -14,8 +14,6 @@ import medicoPostaRoutes from '../routes/medicoPosta.routes.js';
 import medicosRoutes from '../routes/medicos.routes.js';
 import pacientesRoutes from '../routes/pacientes.routes.js';
 import postaRoutes from '../routes/posta.routes.js';
-
-// Importar nuevas rutas
 import citaRoutes from '../routes/cita.routes.js';
 import diagnosticoRoutes from '../routes/diagnostico.routes.js';
 import recetaRoutes from '../routes/receta.routes.js';
@@ -37,8 +35,6 @@ app.use('/api', medicoPostaRoutes);
 app.use('/api', medicosRoutes);
 app.use('/api', pacientesRoutes);
 app.use('/api', postaRoutes);
-
-// Usar nuevas rutas
 app.use('/api', citaRoutes);
 app.use('/api', diagnosticoRoutes);
 app.use('/api', recetaRoutes);
