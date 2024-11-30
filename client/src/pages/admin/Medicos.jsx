@@ -36,6 +36,12 @@ function Medicos() {
             <h1 className="mt-4 ms-3">Médicos</h1>
           </div>
         </div>
+        <div className="row">
+          <div className="col-12">
+            {/* Barra de busqueda */}
+            <SearchBar onSearch={handleSearch} />
+          </div>
+        </div>
         <div className="row m-3">
           {/* Renderizado de cards */}
           {medicos.data.map((medico) => (
