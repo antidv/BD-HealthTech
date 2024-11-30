@@ -1,10 +1,8 @@
 import axios from "./axios";
 
-export const getPostasAdmin = async ({ queryKey }) => {
-  // Descomponer desde el 2° elemento del query
-  const [{ page, limit }] = queryKey.slice(1);
+export const getPostasAdmin = async ({ page, limit, search }) => {
   const { data } = await axios.get("/postas", {
-    params: { page, limit },
+    params: { page, limit, search },
   });
   return data;
 };
