@@ -8,6 +8,8 @@ import antecendetesRoutes from './server/routes/antecedentes.routes.js';
 import postaRoutes from './server/routes/posta.routes.js';
 import horarioRoutes from './server/routes/horario.routes.js';
 import consultorioPosta from './server/routes/consultorioPosta.routes.js';
+import medicoConsultorioPosta from './server/routes/medicoConsultorioPosta.routes.js'
+import programacionCita from './server/routes/programacionCita.routes.js'
 
 const app = express();
 app.use(express.json());
@@ -22,9 +24,11 @@ app.use(authRoutes);
 app.use(medicosRoutes);
 app.use(pacienteRoutes);
 app.use(antecendetesRoutes);
-app.use(postaRoutes)
-app.use(horarioRoutes)
-app.use(consultorioPosta)
+app.use(postaRoutes);
+app.use(horarioRoutes);
+app.use(consultorioPosta);
+app.use(medicoConsultorioPosta);
+app.use(programacionCita)
 
 app.listen(3000)
 console.log('Server on port', 3000);

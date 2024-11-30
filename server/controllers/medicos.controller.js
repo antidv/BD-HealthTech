@@ -9,7 +9,7 @@ export const postMedico = async (req, res, next) => {
       apellidoP,
       apellidoM,
       especialidad,
-      estado,
+      disponible,
     } = req.body;
 
     const connection = await pool.getConnection();
@@ -34,9 +34,9 @@ export const postMedico = async (req, res, next) => {
       const idusuario = usuarioResult.insertId;
 
       const medicoResult = await connection.query(
-        `INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, especialidad, estado)
+        `INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, especialidad, disponible)
                  VALUES (?, ?, ?, ?, ?, ?)`,
-        [idusuario, nombre, apellidoP, apellidoM, especialidad, estado]
+        [idusuario, nombre, apellidoP, apellidoM, especialidad, disponible]
       );
 
       await connection.commit();
@@ -118,10 +118,10 @@ export const updateMedicos = async (req, res) => {
   try {
     const connection = await pool.getConnection();
     const { id } = req.params;
-    const { estado } = req.body;
+    const { disponible } = req.body;
     const result = await connection.query(
-      "UPDATE medico SET estado = ? WHERE idmedico = ?",
-      [estado, id]
+      "UPDATE medico SET disponible = ? WHERE idmedico = ?",
+      [disponible, id]
     );
     if (result.affectedRows === 0) {
       return res.status(404).json({ error: "El médico no existe" });
