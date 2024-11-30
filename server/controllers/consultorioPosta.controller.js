@@ -33,8 +33,8 @@ export const postConsultorioPosta = async (req, res) => {
         });
     } catch (error) {
         await connection.rollback();
-        console.error("Error al crear la posta:", error);
-        res.status(500).send("Error al crear la relación posta");
+        console.error("Error al crear la relación Consultorio-Posta:", error);
+        res.status(500).send("Error al crear la relación Consultorio-Posta");
     } finally {
         connection.release();
     }

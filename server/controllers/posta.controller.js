@@ -3,7 +3,7 @@ import { pool } from "../src/database.js";
 export const getPostas = async (req, res) => {
     try {
         const connection = await pool.getConnection();
-        const { page = 1, limit = 10, search = '' } = req.query;
+        const { page = 1, limit = 10, search = '', city = '' } = req.query;
 
         const pageNumber = Number(page);
         const limitNumber = Number(limit);
@@ -11,16 +11,16 @@ export const getPostas = async (req, res) => {
 
         const query = `
             SELECT * FROM posta
-            WHERE nombre LIKE ?
+            WHERE nombre LIKE ? AND ciudad = ?
             LIMIT ? OFFSET ?
         `;
-        const rows = await connection.query(query, [`%${search}%`, limitNumber, offset]);
+        const rows = await connection.query(query, [`%${search}%`, `%${city}%`, limitNumber, offset]);
 
         const countQuery = `
             SELECT COUNT(*) AS total FROM posta
-            WHERE nombre LIKE ?
+            WHERE nombre LIKE ? AND ciudad = ?
         `;
-        const [{ total }] = await connection.query(countQuery, [`%${search}%`]);
+        const [{ total }] = await connection.query(countQuery, [`%${search}%`, `%${city}%`]);
         const totalNumber = Number(total);
         const totalPages = Math.ceil(totalNumber / limitNumber);
 
