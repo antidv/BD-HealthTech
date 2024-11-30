@@ -2,16 +2,16 @@ import { pool } from "../src/database.js";
 
 export const postPosta = async (req, res) => {
   try {
-    const { nombre, ciudad, direccion, telefono, estado } = req.body;
+    const { nombre, ciudad, direccion, telefono, disponible } = req.body;
 
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
 
       const result = await connection.query(
-        `INSERT INTO posta (nombre, ciudad, direccion, telefono, estado)
+        `INSERT INTO posta (nombre, ciudad, direccion, telefono, disponible)
                  VALUES (?, ?, ?, ?, ?)`,
-        [nombre, ciudad, direccion, telefono, estado]
+        [nombre, ciudad, direccion, telefono, disponible]
       );
 
       await connection.commit();
@@ -89,11 +89,11 @@ export const updatePosta = async (req, res) => {
   try {
     const connection = await pool.getConnection();
     const { id } = req.params;
-    const { estado } = req.body;
+    const { disponible } = req.body;
 
     const result = await connection.query(
-      `UPDATE posta SET estado = ? WHERE idposta = ?`,
-      [estado, id]
+      `UPDATE posta SET disponible = ? WHERE idposta = ?`,
+      [disponible, id]
     );
 
     if (result.affectedRows === 0) {

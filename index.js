@@ -9,9 +9,13 @@ import antecedentesRoutes from './server/routes/antecedentes.routes.js';
 import authRoutes from './server/routes/auth.routes.js';
 import consultorioPostaRoutes from './server/routes/consultorioPosta.routes.js';
 import horarioRoutes from './server/routes/horario.routes.js';
+import consultorioPostaRoutes from './server/routes/consultorioPosta.routes.js';
+import medicoConsultorioPostaRoutes from './server/routes/medicoConsultorioPosta.routes.js'
+import programacionCitaRoutes from './server/routes/programacionCita.routes.js'
 import medicosRoutes from './server/routes/medicos.routes.js';
 import pacientesRoutes from './server/routes/pacientes.routes.js';
 import postaRoutes from './server/routes/posta.routes.js';
+
 
 // Importar nuevas rutas
 import citaRoutes from './server/routes/cita.routes.js';
@@ -33,10 +37,13 @@ app.use(cookieParser());
 app.use(antecedentesRoutes);
 app.use(authRoutes);
 app.use(consultorioPostaRoutes);
-app.use(horarioRoutes);
-app.use(medicosRoutes);
-app.use(pacientesRoutes);
+app.use(pacienteRoutes);
+app.use(antecendetesRoutes);
 app.use(postaRoutes);
+app.use(horarioRoutes);
+app.use(consultorioPostaRoutes);
+app.use(medicoConsultorioPostaRoutes);
+app.use(programacionCitaRoutes)
 app.use(citaRoutes);
 app.use(diagnosticoRoutes);
 app.use(recetaRoutes);
