@@ -1,9 +1,14 @@
 import axios from "./axios";
 
-export const getPostasAdmin = async ({ page, limit, search }) => {
+export const getPostasAdmin = async ({ page, limit, search, city }) => {
   const { data } = await axios.get("/postas", {
-    params: { page, limit, search },
+    params: { page, limit, search, city },
   });
+  return data;
+};
+
+export const getPosta = async (idposta) => {
+  const { data } = await axios.get(`/postas/${idposta}`);
   return data;
 };
 

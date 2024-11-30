@@ -18,8 +18,8 @@ function Postas() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["postas", { page, limit: 3, search: filter }],
-    queryFn: () => getPostasAdmin({ page, limit: 3, search: filter }),
+    queryKey: ["postas", { page, limit: 9, search: filter, city: "" }],
+    queryFn: () => getPostasAdmin({ page, limit: 9, search: filter, city: "" }),
     keepPreviousData: true,
   });
 
@@ -29,7 +29,7 @@ function Postas() {
   };
 
   if (isLoading) return <Loading nombre="postas ..." />;
-  if (isError) return <ErrorPage code={500} message="Ocurrió un error ..." />; 
+  if (isError) return <ErrorPage code={500} message="Ocurrió un error ..." />;
 
   return (
     <>
@@ -38,10 +38,14 @@ function Postas() {
           <div className="col-12">
             <h1 className="m-3">Postas</h1>
             {/* Barra de busqueda */}
-            <SearchBar onSearch={handleSearch} nombre="posta" url="/admin/registrar/posta"/>
+            <SearchBar
+              onSearch={handleSearch}
+              nombre="posta"
+              url="/admin/registrar/posta"
+            />
           </div>
         </div>
-        
+
         <div className="row m-3">
           {/* Renderizado de cards */}
           {postas.data.length === 0 ? (
