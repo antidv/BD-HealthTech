@@ -2,7 +2,7 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
   const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   return (
-    <nav aria-label="Page navigation">
+    <nav aria-label="Page navigation" className="mt-3">
       <ul className="pagination justify-content-center">
         {/* Botón anterior */}
         <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
@@ -34,12 +34,12 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         {/* Botón siguiente */}
         <li
           className={`page-item ${
-            currentPage === totalPages ? "disabled" : ""
+            totalPages === 0 || currentPage === totalPages ? "disabled" : ""
           }`}
         >
           <button
             onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={totalPages === 0 || currentPage === totalPages}
             className="page-link"
           >
             Siguiente
