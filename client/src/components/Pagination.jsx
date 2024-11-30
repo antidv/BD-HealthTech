@@ -34,12 +34,12 @@ function Pagination({ currentPage, totalPages, onPageChange }) {
         {/* Botón siguiente */}
         <li
           className={`page-item ${
-            currentPage === totalPages ? "disabled" : ""
+            totalPages === 0 || currentPage === totalPages ? "disabled" : ""
           }`}
         >
           <button
             onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={totalPages === 0 || currentPage === totalPages}
             className="page-link"
           >
             Siguiente

@@ -1,34 +1,48 @@
+// index.js
 import express from 'express';
+import morgan from 'morgan';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import medicosRoutes from './server/routes/medicos.routes.js';
-import pacienteRoutes from './server/routes/pacientes.routes.js';
+
+// Importar rutas existentes
+import antecedentesRoutes from './server/routes/antecedentes.routes.js';
 import authRoutes from './server/routes/auth.routes.js';
-import antecendetesRoutes from './server/routes/antecedentes.routes.js';
-import postaRoutes from './server/routes/posta.routes.js'
-import horarioRoutes from './server/routes/horario.routes.js'
-import conMediPosta from './server/routes/conMediPosta.routes.js'
-import medicoPosta from './server/routes/medicoPosta.routes.js';
-import consultorioPosta from './server/routes/consultorioPosta.routes.js';
+import consultorioPostaRoutes from './server/routes/consultorioPosta.routes.js';
+import horarioRoutes from './server/routes/horario.routes.js';
+import medicosRoutes from './server/routes/medicos.routes.js';
+import pacientesRoutes from './server/routes/pacientes.routes.js';
+import postaRoutes from './server/routes/posta.routes.js';
 
+// Importar nuevas rutas
+import citaRoutes from './server/routes/cita.routes.js';
+import diagnosticoRoutes from './server/routes/diagnostico.routes.js';
+import recetaRoutes from './server/routes/receta.routes.js';
+
+// Crear instancia de Express
 const app = express();
-app.use(express.json());
-app.use(cookieParser());
 
+// Middlewares
+app.use(morgan('dev'));
 app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true
 }));
+app.use(express.json());
+app.use(cookieParser());
 
+app.use(antecedentesRoutes);
 app.use(authRoutes);
+app.use(consultorioPostaRoutes);
+app.use(horarioRoutes);
 app.use(medicosRoutes);
-app.use(pacienteRoutes);
-app.use(antecendetesRoutes);
-app.use(postaRoutes)
-app.use(horarioRoutes)
-app.use(conMediPosta)
-app.use(medicoPosta)
-app.use(consultorioPosta)
+app.use(pacientesRoutes);
+app.use(postaRoutes);
+app.use(citaRoutes);
+app.use(diagnosticoRoutes);
+app.use(recetaRoutes);
 
-app.listen(3000)
-console.log('Server on port', 3000);
+// Iniciar el servidor
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log('Servidor corriendo en el puerto', PORT);
+});

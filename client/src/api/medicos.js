@@ -1,9 +1,8 @@
 import axios from "./axios";
 
-export const getMedicosAdmin = async ({ queryKey }) => {
-  const [{ page, limit }] = queryKey.slice(1);
+export const getMedicosAdmin = async ({ page, limit, search }) => {
   const { data } = await axios.get("/medicos", {
-    params: { page, limit },
+    params: { page, limit, search },
   });
   return data;
 };

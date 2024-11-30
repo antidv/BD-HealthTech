@@ -58,35 +58,42 @@ export const postMedico = async (req, res, next) => {
 };
 
 export const getMedicos = async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const { page = 1, limit = 10 } = req.query;
+    try {
+        const connection = await pool.getConnection();
+        const { page = 1, limit = 10, search = '' } = req.query;
 
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
-    const offset = (pageNumber - 1) * limitNumber;
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const offset = (pageNumber - 1) * limitNumber;
 
-    const query = `SELECT * FROM medico LIMIT ? OFFSET ?`;
-    const rows = await connection.query(query, [limitNumber, offset]);
+        const query = `
+            SELECT * FROM medico
+            WHERE nombre LIKE ?
+            LIMIT ? OFFSET ?
+        `;
+        const rows = await connection.query(query, [`%${search}%`, limitNumber, offset]);
 
-    const countQuery = `SELECT COUNT(*) AS total FROM medico`;
-    const [{ total }] = await connection.query(countQuery);
+        const countQuery = `
+            SELECT COUNT(*) AS total FROM medico
+            WHERE nombre LIKE ?
+        `;
+        const [{ total }] = await connection.query(countQuery, [`%${search}%`]);
+        const totalNumber = Number(total);
+        const totalPages = Math.ceil(totalNumber / limitNumber);
 
-    const totalNumber = Number(total);
-    const totalPages = Math.ceil(totalNumber / limitNumber);
+        res.status(200).json({
+            data: rows,
+            total: totalNumber,
+            page: pageNumber,
+            limit: limitNumber,
+            totalPages: totalPages
+        });
 
-    connection.release();
-
-    res.status(200).json({
-      data: rows,
-      currentPage: pageNumber,
-      totalPages,
-      total: totalNumber,
-    });
-  } catch (error) {
-    console.error("Error al obtener los medicos: ", error);
-    res.status(500).send("Error al obtener los médico");
-  }
+        connection.release();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Error al obtener los médicos');
+    }
 };
 
 export const getMedico = async (req, res) => {
@@ -128,43 +135,5 @@ export const updateMedicos = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).send("Error al actualizar el médico");
-  }
-};
-
-export const deleteMedicos = async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    await connection.beginTransaction();
-
-    const { id } = req.params;
-
-    const result = await connection.query(
-      "SELECT idusuario FROM medico WHERE idmedico = ?",
-      [id]
-    );
-    const medico = result[0];
-
-    if (!medico || medico.length <= 0) {
-      await connection.rollback();
-      return res.status(404).json({ error: "El médico no existe" });
-    }
-
-    const idusuario = medico.idusuario;
-
-    const resultUsuario = await connection.query(
-      "DELETE FROM usuario WHERE idusuario = ?",
-      [idusuario]
-    );
-    if (resultUsuario.affectedRows <= 0) {
-      await connection.rollback();
-      return res.status(404).json({ error: "El usuario no existe" });
-    }
-
-    await connection.commit();
-    res.json("Datos de medico y usuario eliminados con éxito");
-    connection.end();
-  } catch (error) {
-    console.error("Error durante la eliminación:", error);
-    res.status(500).send("Error al eliminar el médico");
   }
 };
