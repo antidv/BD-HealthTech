@@ -30,18 +30,15 @@ function Medicos() {
 
   return (
     <>
-      <h1>Medicos</h1>
-
-      {/* Campo de busqueda */}
-      <SearchBar onSearch={handleSearch} />
-      {console.log("Renderizando")}
-
-      {/* Renderizado de cards */}
-      <div className="container">
-        {medicos.data.length === 0 ? (
-          <p>No hay datos para mostrar</p>
-        ) : (
-          medicos.data.map((medico) => (
+      <div className="container-fluid containerColor vh-100">
+        <div className="row align-items-center justify-content-center">
+          <div className="col-12">
+            <h1 className="mt-4 ms-3">Médicos</h1>
+          </div>
+        </div>
+        <div className="row m-3">
+          {/* Renderizado de cards */}
+          {medicos.data.map((medico) => (
             <CardMedico
               key={medico.idmedico}
               id={medico.idmedico}
@@ -50,16 +47,15 @@ function Medicos() {
               especialidad={medico.especialidad}
               estado={medico.disponible}
             />
-          ))
-        )}
+          ))}
+          {/* Paginacion */}
+          <Pagination
+            currentPage={page}
+            totalPages={medicos.totalPages}
+            onPageChange={setPage}
+          />
+        </div>
       </div>
-
-      {/* Paginacion */}
-      <Pagination
-        currentPage={page}
-        totalPages={medicos.totalPages}
-        onPageChange={setPage}
-      />
     </>
   );
 }
