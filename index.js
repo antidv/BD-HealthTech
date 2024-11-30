@@ -5,10 +5,8 @@ import medicosRoutes from './server/routes/medicos.routes.js';
 import pacienteRoutes from './server/routes/pacientes.routes.js';
 import authRoutes from './server/routes/auth.routes.js';
 import antecendetesRoutes from './server/routes/antecedentes.routes.js';
-import postaRoutes from './server/routes/posta.routes.js'
-import horarioRoutes from './server/routes/horario.routes.js'
-import conMediPosta from './server/routes/conMediPosta.routes.js'
-import medicoPosta from './server/routes/medicoPosta.routes.js';
+import postaRoutes from './server/routes/posta.routes.js';
+import horarioRoutes from './server/routes/horario.routes.js';
 import consultorioPosta from './server/routes/consultorioPosta.routes.js';
 
 const app = express();
@@ -26,8 +24,6 @@ app.use(pacienteRoutes);
 app.use(antecendetesRoutes);
 app.use(postaRoutes)
 app.use(horarioRoutes)
-app.use(conMediPosta)
-app.use(medicoPosta)
 app.use(consultorioPosta)
 
 app.listen(3000)
