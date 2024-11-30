@@ -9,7 +9,6 @@ import antecedentesRoutes from './server/routes/antecedentes.routes.js';
 import authRoutes from './server/routes/auth.routes.js';
 import consultorioPostaRoutes from './server/routes/consultorioPosta.routes.js';
 import horarioRoutes from './server/routes/horario.routes.js';
-import consultorioPostaRoutes from './server/routes/consultorioPosta.routes.js';
 import medicoConsultorioPostaRoutes from './server/routes/medicoConsultorioPosta.routes.js'
 import programacionCitaRoutes from './server/routes/programacionCita.routes.js'
 import medicosRoutes from './server/routes/medicos.routes.js';
@@ -41,7 +40,6 @@ app.use(pacientesRoutes);
 app.use(postaRoutes);
 app.use(horarioRoutes);
 app.use(medicosRoutes);
-app.use(consultorioPostaRoutes);
 app.use(medicoConsultorioPostaRoutes);
 app.use(programacionCitaRoutes)
 app.use(citaRoutes);
