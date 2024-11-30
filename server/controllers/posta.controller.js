@@ -1,42 +1,43 @@
 import { pool } from "../src/database.js";
 
 export const getPostas = async (req, res) => {
-    try {
-        const connection = await pool.getConnection();
-        const { page = 1, limit = 10, search = '', city = '' } = req.query;
+  try {
+    const connection = await pool.getConnection();
+    const { page = 1, limit = 10, search = '', city = '' } = req.query;
 
-        const pageNumber = Number(page);
-        const limitNumber = Number(limit);
-        const offset = (pageNumber - 1) * limitNumber;
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const offset = (pageNumber - 1) * limitNumber;
 
-        const query = `
-            SELECT * FROM posta
-            WHERE nombre LIKE ? AND ciudad = ?
-            LIMIT ? OFFSET ?
-        `;
-        const rows = await connection.query(query, [`%${search}%`, `%${city}%`, limitNumber, offset]);
+    const query = `
+        SELECT * FROM posta
+        WHERE nombre LIKE ? AND ciudad LIKE ?
+        LIMIT ? OFFSET ?
+    `;
+    const rows = await connection.query(query, [`%${search}%`, `%${city}%`, limitNumber, offset]);
 
-        const countQuery = `
-            SELECT COUNT(*) AS total FROM posta
-            WHERE nombre LIKE ? AND ciudad = ?
-        `;
-        const [{ total }] = await connection.query(countQuery, [`%${search}%`, `%${city}%`]);
-        const totalNumber = Number(total);
-        const totalPages = Math.ceil(totalNumber / limitNumber);
+    const countQuery = `
+        SELECT COUNT(*) AS total FROM posta
+        WHERE nombre LIKE ? AND ciudad LIKE ?
+    `;
+    const [{ total }] = await connection.query(countQuery, [`%${search}%`, `%${city}%`]);
 
-        res.status(200).json({
-            data: rows,
-            total: totalNumber,
-            page: pageNumber,
-            limit: limitNumber,
-            totalPages: totalPages
-        });
+    const totalNumber = Number(total);
+    const totalPages = Math.ceil(totalNumber / limitNumber);
 
-        connection.release();
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al obtener las postas');
-    }
+    res.status(200).json({
+        data: rows,
+        total: totalNumber,
+        page: pageNumber,
+        limit: limitNumber,
+        totalPages: totalPages
+    });
+
+    connection.release();
+} catch (error) {
+    console.error(error);
+    res.status(500).send('Error al obtener las postas');
+}
 };
 
 export const getPosta = async (req, res) => {
