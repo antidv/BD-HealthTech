@@ -66,22 +66,55 @@ export const getConsultorioPostas = async (req, res) => {
 
 export const getConsultorioPosta = async (req, res) => {
     try {
-        const { id } = req.params;
         const connection = await pool.getConnection();
-        const rows = await connection.query(
-            `SELECT * FROM consultorio_posta WHERE idconsultorio_posta = ?`,
-            [id]
-        );
+        const { page = 1, limit = 10 } = req.query;
+        const { id } = req.params;
 
-        if (rows.length <= 0) {
-            return res.status(404).json({ error: "La relación Consultorio-Posta no existe" });
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const offset = (pageNumber - 1) * limitNumber;
+
+        if (!id) {
+            return res.status(400).json({ error: "Se requiere el id de la posta" });
         }
 
-        res.status(200).json(rows[0]);
-        connection.end();
+        const query = `
+            SELECT 
+                c.idconsultorio, 
+                c.nombre AS consultorio_nombre, 
+                c.foto AS consultorio_foto
+            FROM consultorio_posta cp
+            INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+            WHERE cp.idposta = ?
+            LIMIT ? OFFSET ?;
+        `;
+
+        const params = [id, limitNumber, offset];
+        const rows = await connection.query(query, params);
+
+        const countQuery = `
+            SELECT COUNT(*) AS total
+            FROM consultorio_posta cp
+            WHERE cp.idposta = ?;
+        `;
+
+        const [{ total }] = await connection.query(countQuery, [id]);
+
+        if (rows.length === 0) {
+            return res.status(404).json({ error: "No se encontraron consultorios para la posta especificada" });
+        }
+
+        res.status(200).json({
+            data: rows,
+            total: Number(total),
+            page: pageNumber,
+            limit: limitNumber,
+        });
+
+        connection.release();
     } catch (error) {
-        console.error("Error al obtener la relación Consultorio-Posta:", error);
-        res.status(500).send("Error al obtener la relación Consultorio-Posta");
+        console.error("Error al obtener los consultorios por posta:", error);
+        res.status(500).send("Error al obtener los consultorios por posta");
     }
 };
 
