@@ -5,6 +5,8 @@ import Pagination from "../../components/Pagination";
 import usePagination from "../../hooks/usePagination";
 import CardPosta from "../../components/cards/CardPosta";
 import SearchBar from "../../components/SearchBar";
+import Loading from "../Loading";
+import ErrorPage from "../ErrorPage";
 //import PostaFoto from "../../assets/posta.jpg";
 
 function Postas() {
@@ -26,19 +28,20 @@ function Postas() {
     setPage(1);
   };
 
-  if (isLoading) return <b>Cargando ...</b>;
-  if (isError) return <b>Ocurrio un error</b>;
+  if (isLoading) return <Loading nombre="postas ..." />;
+  if (isError) return <ErrorPage code={500} message="Ocurrió un error ..." />; 
 
   return (
     <>
       <div className="container-fluid containerColor vh-100">
         <div className="row align-items-center justify-content-center">
           <div className="col-12">
-            <h1 className="mt-4 ms-3">Postas</h1>
+            <h1 className="m-3">Postas</h1>
+            {/* Barra de busqueda */}
+            <SearchBar onSearch={handleSearch} nombre="posta" url="/"/>
           </div>
         </div>
-        {/* Barra de busqueda */}
-        <SearchBar onSearch={handleSearch} />
+        
         <div className="row m-3">
           {/* Renderizado de cards */}
           {postas.data.length === 0 ? (
