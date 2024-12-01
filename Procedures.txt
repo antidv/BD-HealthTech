@@ -1,0 +1,105 @@
+//Crear medicos con usuario
+
+DELIMITER //
+CREATE PROCEDURE sp_insertar_medico (
+    IN i_correo VARCHAR(100),
+    IN i_contrasenia VARCHAR(100),
+    IN i_nombre VARCHAR(50),
+    IN i_apellidoP VARCHAR(20),
+    IN i_apellidoM VARCHAR(20),
+    IN i_dni VARCHAR(8),
+    IN i_especialidad VARCHAR(50)
+)
+BEGIN
+    DECLARE existe_correo INT DEFAULT 0;
+    DECLARE usuario_id INT DEFAULT 0;
+    DECLARE especialidad_id INT DEFAULT 0;
+
+    START TRANSACTION;
+
+    SELECT COUNT(*) INTO existe_correo
+    FROM usuario
+    WHERE correo = i_correo;
+
+    IF existe_correo > 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El correo ingresado ya existe';
+    ELSE
+        SELECT idespecialidad INTO especialidad_id
+        FROM especialidad
+        WHERE nombre = i_especialidad;
+
+        IF especialidad_id IS NULL THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La especialidad ingresada no existe';
+        ELSE
+            INSERT INTO usuario (rol, correo, contrasenia)
+            VALUES ('Medico', i_correo, i_contrasenia);
+
+            SET usuario_id = LAST_INSERT_ID();
+
+            INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, dni, idespecialidad)
+            VALUES (usuario_id, i_nombre, i_apellidoP, i_apellidoM, i_dni, especialidad_id);
+
+            COMMIT;
+
+            SELECT 'Médico registrado con éxito' AS mensaje;
+        END IF;
+    END IF;
+END//
+DELIMITER ;
+
+delimiter $$
+
+//Trigger para establecer una hora aproximada de cita
+
+create function f_calcular_hora_aprox(
+    p_num_cupo int,
+    p_idprogramacion_cita int
+)
+returns time
+begin
+    declare hora_inicio time;
+    declare hora_fin time;
+    declare num_total_cupos int;
+    declare intervalo int;
+    declare hora_aprox_seconds int;
+
+    select h.hora_inicio, h.hora_fin, pc.cupos_totales
+    into hora_inicio, hora_fin, num_total_cupos
+    from programacion_cita pc
+    join horario h on pc.idhorario = h.idhorario
+    where pc.idprogramacion_cita = p_idprogramacion_cita
+    limit 1;
+
+    if hora_inicio is null or hora_fin is null or num_total_cupos is null or num_total_cupos = 0 then
+        return null;
+    end if;
+
+    set intervalo = (time_to_sec(hora_fin) - time_to_sec(hora_inicio)) / num_total_cupos;
+    set hora_aprox_seconds = time_to_sec(hora_inicio) + ((p_num_cupo - 1) * intervalo);
+
+    return sec_to_time(hora_aprox_seconds);
+end$$
+
+delimiter $$
+
+create trigger trg_calculate_hora_aprox_before_insert
+before insert on cita
+for each row
+begin
+    set new.hora_aprox = f_calcular_hora_aprox(new.num_cupo, new.idprogramacion_cita);
+end$$
+
+create trigger trg_calculate_hora_aprox_before_update
+before update on cita
+for each row
+begin
+    if new.num_cupo <> old.num_cupo or new.idprogramacion_cita <> old.idprogramacion_cita then
+        set new.hora_aprox = f_calcular_hora_aprox(new.num_cupo, new.idprogramacion_cita);
+    end if;
+end$$
+
+delimiter ;
