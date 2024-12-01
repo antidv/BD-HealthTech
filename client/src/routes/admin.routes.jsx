@@ -4,6 +4,8 @@ import Medicos from "../pages/admin/Medicos";
 import RegistrarPosta from "../pages/admin/RegistrarPosta";
 import RegistrarMedico from "../pages/admin/RegistrarMedico";
 import ConsultoriosPosta from "../pages/admin/ConsultoriosPosta";
+import EditarPosta from "../pages/admin/EditarPosta";
+import ConsultoriosMedico from "../pages/admin/ConsultoriosMedico";
 
 export default function RutasAdmin() {
   return (
@@ -15,14 +17,14 @@ export default function RutasAdmin() {
       <Route path="postas" element={<Postas />} />
       <Route path="postas/:idposta" element={<ConsultoriosPosta />} />
       <Route path="registrar/posta" element={<RegistrarPosta />} />
-      <Route path="editar/posta/:id" element={<h1>Editar Posta elegida</h1>} />
+      <Route path="editar/posta/:idposta" element={<EditarPosta />} />
 
       {/* Rutas relacionadas al manejo de medicos */}
       <Route path="medicos" element={<Medicos />} />
-      <Route path="medicos/:idmedico" element={<h1>Medico elegido</h1>} />
+      <Route path="medicos/:idmedico" element={<ConsultoriosMedico />} />
       <Route path="registrar/medico" element={<RegistrarMedico />} />
       <Route
-        path="editar/medico/:id"
+        path="editar/medico/:idmedico"
         element={<h1>Editar MEdico elegida</h1>}
       />
     </Route>
