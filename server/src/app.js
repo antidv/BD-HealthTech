@@ -15,6 +15,7 @@ import postaRoutes from '../routes/posta.routes.js';
 import citaRoutes from '../routes/cita.routes.js';
 import diagnosticoRoutes from '../routes/diagnostico.routes.js';
 import recetaRoutes from '../routes/receta.routes.js';
+import especialidadConsultorioRoutes from '../routes/especialidadConsultorio.routes.js'
 
 const app = express();
 
@@ -38,5 +39,6 @@ app.use(programacionCitaRoutes)
 app.use(citaRoutes);
 app.use(diagnosticoRoutes);
 app.use(recetaRoutes);
+app.use(especialidadConsultorioRoutes);
 
 export default app;
