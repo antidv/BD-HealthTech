@@ -100,6 +100,7 @@ export const getProgramacionesCita = async (req, res) => {
         INNER JOIN medico m ON mcp.idmedico = m.idmedico
         INNER JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
         INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+        INNER JOIN posta p ON cp.idposta = p.idposta
         ${whereClause}
       `;
   
