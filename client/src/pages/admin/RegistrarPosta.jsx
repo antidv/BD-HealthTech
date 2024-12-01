@@ -96,7 +96,7 @@ function RegistrarPosta() {
 
         <div className="row m-3">
           <form onSubmit={onSubmit}>
-            <div className="row">
+            <div className="row m-3">
               <div className="col-6 mb-3">
                 <label htmlFor="nombre" className="form-label">
                   Nombre
@@ -128,7 +128,7 @@ function RegistrarPosta() {
               </div>
             </div>
 
-            <div className="row">
+            <div className="row m-3">
               <div className="col-6 mb-3">
                 <label htmlFor="direccion" className="form-label">
                   Dirección
@@ -163,7 +163,7 @@ function RegistrarPosta() {
               </div>
             </div>
 
-            <div className="row">
+            <div className="row m-3">
               <div className="col-12 mb-3">
                 <h4>Consultorios disponibles</h4>
               </div>
@@ -184,7 +184,7 @@ function RegistrarPosta() {
               ))}
             </div>
 
-            <div className="row">
+            <div className="row m-3">
               <div className="col-12 d-flex justify-content-end">
                 <Link to="/admin/postas" className="btn btn-secondary me-3">
                   Volver
