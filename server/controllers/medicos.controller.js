@@ -8,52 +8,34 @@ export const postMedico = async (req, res, next) => {
       nombre,
       apellidoP,
       apellidoM,
+      dni,
       especialidad,
-      disponible,
     } = req.body;
 
     const connection = await pool.getConnection();
     try {
       await connection.beginTransaction();
 
-      const resultadoCorreo = await connection.query(
-        "SELECT 1 FROM usuario WHERE correo = ?",
-        [correo]
+      const [result] = await connection.query(
+        `CALL sp_insertar_medico(?, ?, ?, ?, ?, ?, ?)`,
+        [correo, contrasenia, nombre, apellidoP, apellidoM, dni, especialidad]
       );
 
-      if (resultadoCorreo.length > 0) {
-        return res.status(400).json({ error: "El correo ingresado ya existe" });
+      if (result[0] && result[0].mensaje === 'Médico registrado con éxito') {
+        await connection.commit();
+        res.status(201).json({ message: result[0].mensaje });
+      } else {
+        await connection.rollback();
+        res.status(400).json({ error: result[0].mensaje });
       }
-
-      const usuarioResult = await connection.query(
-        `INSERT INTO usuario (rol, correo, contrasenia)
-                 VALUES ('medico', ?, ?)`,
-        [correo, contrasenia]
-      );
-
-      const idusuario = usuarioResult.insertId;
-
-      const medicoResult = await connection.query(
-        `INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, especialidad, disponible)
-                 VALUES (?, ?, ?, ?, ?, ?)`,
-        [idusuario, nombre, apellidoP, apellidoM, especialidad, disponible]
-      );
-
-      await connection.commit();
-
-      res.json({
-        idusuario: idusuario.toString(),
-        idmedico: medicoResult.insertId.toString(),
-      });
     } catch (error) {
       await connection.rollback();
-      throw error;
+      res.status(500).send("Error al registrar el médico");
     } finally {
       connection.release();
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error al registrar el médico");
+    res.status(500).send("Error en la conexión a la base de datos");
   }
 };
 

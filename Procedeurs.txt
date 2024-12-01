@@ -1,0 +1,40 @@
+//Crear medicos con usuario
+
+CREATE PROCEDURE sp_insertar_medico (
+    IN i_correo VARCHAR(100),
+    IN i_contrasenia VARCHAR(100),
+    IN i_nombre VARCHAR(50),
+    IN i_apellidoP VARCHAR(20),
+    IN i_apellidoM VARCHAR(20),
+    IN i_dni VARCHAR(8),
+    IN i_especialidad VARCHAR(50)
+)
+BEGIN
+    DECLARE existe_correo INT DEFAULT 0;
+    DECLARE usuario_id INT DEFAULT 0;
+
+    START TRANSACTION;
+
+    SELECT COUNT(*) INTO existe_correo
+    FROM usuario
+    WHERE correo = i_correo;
+
+    IF existe_correo > 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El correo ingresado ya existe';
+    ELSE
+        INSERT INTO usuario (rol, correo, contrasenia)
+        VALUES ('Medico', i_correo, i_contrasenia);
+
+        SET usuario_id = LAST_INSERT_ID();
+
+        INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, dni, especialidad)
+        VALUES (usuario_id, i_nombre, i_apellidoP, i_apellidoM, i_dni, i_especialidad);
+
+        COMMIT;
+
+        SELECT 'Médico registrado con éxito' AS mensaje;
+    END IF;
+END//
+DELIMITER ;
