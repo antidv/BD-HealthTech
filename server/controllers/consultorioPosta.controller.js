@@ -190,7 +190,7 @@ export const updateConsultorioPosta = async (req, res) => {
         connection.release();
 
         res.status(200).json({
-            posta: updatedPosta[0],
+            posta: updatedPosta,
             consultorios: updatedConsultorios,
         });
     } catch (error) {
