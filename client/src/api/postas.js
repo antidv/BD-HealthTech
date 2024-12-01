@@ -16,3 +16,8 @@ export const createPostaConsultorios = async (data) => {
   const response = await axios.post("/consultorio-posta", data);
   return response.data;
 };
+
+export const updateConsultoriosPosta = async (idposta, data) => {
+  const response = await axios.put(`/consultorio-posta/${idposta}`, data);
+  return response.data;
+};
