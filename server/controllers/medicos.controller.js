@@ -9,7 +9,7 @@ export const postMedico = async (req, res, next) => {
       apellidoP,
       apellidoM,
       especialidad,
-      disponible,
+      dni,
     } = req.body;
 
     const connection = await pool.getConnection();
@@ -34,9 +34,9 @@ export const postMedico = async (req, res, next) => {
       const idusuario = usuarioResult.insertId;
 
       const medicoResult = await connection.query(
-        `INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, especialidad, disponible)
+        `INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, especialidad, dni)
                  VALUES (?, ?, ?, ?, ?, ?)`,
-        [idusuario, nombre, apellidoP, apellidoM, especialidad, disponible]
+        [idusuario, nombre, apellidoP, apellidoM, especialidad, dni]
       );
 
       await connection.commit();
@@ -58,42 +58,46 @@ export const postMedico = async (req, res, next) => {
 };
 
 export const getMedicos = async (req, res) => {
-    try {
-        const connection = await pool.getConnection();
-        const { page = 1, limit = 10, search = '' } = req.query;
+  try {
+    const connection = await pool.getConnection();
+    const { page = 1, limit = 10, search = "" } = req.query;
 
-        const pageNumber = Number(page);
-        const limitNumber = Number(limit);
-        const offset = (pageNumber - 1) * limitNumber;
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const offset = (pageNumber - 1) * limitNumber;
 
-        const query = `
+    const query = `
             SELECT * FROM medico
             WHERE nombre LIKE ?
             LIMIT ? OFFSET ?
         `;
-        const rows = await connection.query(query, [`%${search}%`, limitNumber, offset]);
+    const rows = await connection.query(query, [
+      `%${search}%`,
+      limitNumber,
+      offset,
+    ]);
 
-        const countQuery = `
+    const countQuery = `
             SELECT COUNT(*) AS total FROM medico
             WHERE nombre LIKE ?
         `;
-        const [{ total }] = await connection.query(countQuery, [`%${search}%`]);
-        const totalNumber = Number(total);
-        const totalPages = Math.ceil(totalNumber / limitNumber);
+    const [{ total }] = await connection.query(countQuery, [`%${search}%`]);
+    const totalNumber = Number(total);
+    const totalPages = Math.ceil(totalNumber / limitNumber);
 
-        res.status(200).json({
-            data: rows,
-            total: totalNumber,
-            page: pageNumber,
-            limit: limitNumber,
-            totalPages: totalPages
-        });
+    res.status(200).json({
+      data: rows,
+      total: totalNumber,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages: totalPages,
+    });
 
-        connection.release();
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al obtener los médicos');
-    }
+    connection.release();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al obtener los médicos");
+  }
 };
 
 export const getMedico = async (req, res) => {
