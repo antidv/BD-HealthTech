@@ -7,8 +7,11 @@ import ConsultoriosPosta from "../pages/admin/ConsultoriosPosta";
 import EditarPosta from "../pages/admin/EditarPosta";
 import ConsultoriosMedico from "../pages/admin/ConsultoriosMedico";
 import EditarMedico from "../pages/admin/EditarMedico";
+<<<<<<< HEAD
 import ProgramarCita from "../pages/admin/ProgramarCita";
 import CitasProgramadas from "../pages/admin/CitasProgramadas";
+=======
+>>>>>>> obando
 
 export default function RutasAdmin() {
   return (
@@ -30,8 +33,13 @@ export default function RutasAdmin() {
 
       {/* Ruta para programacion de citas */}
       <Route
+<<<<<<< HEAD
         path="programacion-citas/:idconsultorio_posta"
         element={<ProgramarCita />}
+=======
+        path="editar/medico/:idmedico"
+        element={<EditarMedico />}
+>>>>>>> obando
       />
       <Route path="programacion-citas" element={<CitasProgramadas />} />
     </Route>

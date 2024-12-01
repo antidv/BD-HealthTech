@@ -61,7 +61,7 @@ function EditarPosta() {
       setModal({
         show: true,
         estado: true,
-        titulo: "Actualizacion exitosa",
+        titulo: "Actualización exitosa",
         message: `La posta se ha actualizado con éxito.`,
       });
       console.log("Posta actualizada: ", data);
@@ -70,7 +70,7 @@ function EditarPosta() {
       setModal({
         show: true,
         estado: false,
-        titulo: "Ocurrio un error",
+        titulo: "Ocurrió un error",
         message: "Error: No se pudo actualizar la posta.",
       });
       console.error("Error al actualizar: ", error);
@@ -218,7 +218,7 @@ function EditarPosta() {
                     {...register("telefono", {
                       pattern: {
                         value: /^\d{7}$/,
-                        message: "Ingrese un telefono valido",
+                        message: "Ingrese un teléfono válido",
                       },
                     })}
                   />

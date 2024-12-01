@@ -17,7 +17,7 @@
   width: 500px;
 }
 
-.cardConsultorioMedico{
+.cardConsultorioMedico, .cardPaciente{
   width: 350px;
 }
 
