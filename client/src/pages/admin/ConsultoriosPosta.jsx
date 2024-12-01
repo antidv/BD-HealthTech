@@ -7,7 +7,7 @@ import Loading from "../Loading";
 import ErrorPage from "../ErrorPage";
 import Pagination from "../../components/Pagination";
 
-function ConsultoriosPosta(props) {
+function ConsultoriosPosta() {
   const { idposta } = useParams();
 
   const { page, setPage } = usePagination();
@@ -48,12 +48,21 @@ function ConsultoriosPosta(props) {
             <div className="card m-5 cardConsultorioPosta">
               <h2 className="m-3 text-center">{posta.nombre}</h2>
               <div className="d-flex justify-content-center">
-                <img src={posta.foto} alt="posta" width={200}/>
+                <img src={posta.foto} alt="posta" width={200} />
               </div>
               <div className="card-body">
-                <p><b>Ciudad: </b>{posta.ciudad}</p>
-                <p><b>Dirección: </b>{posta.direccion}</p>
-                <p><b>Estado: </b>{`${posta.disponible ? "Disponible" : "No disponible"}`}</p>
+                <p>
+                  <b>Ciudad: </b>
+                  {posta.ciudad}
+                </p>
+                <p>
+                  <b>Dirección: </b>
+                  {posta.direccion}
+                </p>
+                <p>
+                  <b>Estado: </b>
+                  {`${posta.disponible ? "Disponible" : "No disponible"}`}
+                </p>
               </div>
               <div className="card-body text-center">
                 <a
@@ -65,10 +74,10 @@ function ConsultoriosPosta(props) {
                 <a
                   href="#"
                   className={`card-link btn ${
-                    props.estado ? "btn-danger" : "btn-success"
+                    posta.disponible ? "btn-danger" : "btn-success"
                   }`}
                 >
-                  {props.estado ? "Deshabilitar" : "Habilitar"}
+                  {posta.disponible ? "Deshabilitar" : "Habilitar"}
                 </a>
               </div>
             </div>
@@ -82,23 +91,30 @@ function ConsultoriosPosta(props) {
             </div>
             <div className="row me-3">
               {consultorios?.data?.length === 0 ? (
-                    <p>No hay consultorios disponibles</p>
-                  ) : (
-                    consultorios?.data?.map((consultorio) => (
-                      <div key={consultorio.idconsultorio} className="col-12 col-md-4 mb-4">
-                        <div className="card">
-                          <div className="d-flex justify-content-center">
-                            <img src={consultorio.consultorio_foto} alt="consultorio" className="imageConsultorio mt-1" />
-                          </div>
-                          <div className="card-body">
-                            <p>{`${consultorio.consultorio_nombre}`}</p>
-                          </div>
-                        </div>
+                <p>No hay consultorios disponibles</p>
+              ) : (
+                consultorios?.data?.map((consultorio) => (
+                  <div
+                    key={consultorio.idconsultorio}
+                    className="col-12 col-md-4 mb-4"
+                  >
+                    <div className="card">
+                      <div className="d-flex justify-content-center">
+                        <img
+                          src={consultorio.consultorio_foto}
+                          alt="consultorio"
+                          className="imageConsultorio mt-1"
+                        />
                       </div>
-                    ))
-                  )}
+                      <div className="card-body">
+                        <p>{`${consultorio.consultorio_nombre}`}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-            
+
             {/* Paginacion de consultorios */}
             <Pagination
               currentPage={page}
@@ -108,8 +124,6 @@ function ConsultoriosPosta(props) {
           </div>
         </div>
       </div>
-      
-      
     </>
   );
 }

@@ -135,11 +135,15 @@ export const getConsultorioPosta = async (req, res) => {
             return res.status(404).json({ error: "No se encontraron consultorios para la posta especificada" });
         }
 
+        const totalNumber = Number(total);
+        const totalPages = limit === "all" ? 1 : Math.ceil(totalNumber / Number(limit));
+
         res.status(200).json({
             data: rows,
-            total: Number(total),
+            total: totalNumber,
             page: page ? Number(page) : null,
             limit: limit ? Number(limit) : null,
+            totalPages: totalPages
         });
 
         connection.release();
@@ -150,24 +154,53 @@ export const getConsultorioPosta = async (req, res) => {
 };
 
 export const updateConsultorioPosta = async (req, res) => {
+    const connection = await pool.getConnection();
     try {
         const { id } = req.params;
-        const { disponible } = req.body;
+        const {
+            nombre,
+            ciudad,
+            direccion,
+            telefono,
+            estado,
+            consultorios,
+            nuevos_consultorios,
+        } = req.body;
 
-        const connection = await pool.getConnection();
-        await connection.query(
-            `UPDATE consultorio_posta SET disponible = ? WHERE idconsultorio_posta = ?`,
-            [disponible, id]
-        );
+        const consultoriosJSON = JSON.stringify(consultorios || []);
+        const nuevosConsultoriosJSON = JSON.stringify(nuevos_consultorios || []);
 
-        const updatedRelation = await connection.query(
-            `SELECT * FROM consultorio_posta WHERE idconsultorio_posta = ?`,
+        await connection.query('CALL actualizarPostaYConsultorios(?, ?, ?, ?, ?, ?, ?, ?)', [
+            id,
+            nombre,
+            ciudad,
+            direccion,
+            telefono,
+            estado,
+            consultoriosJSON,
+            nuevosConsultoriosJSON,
+        ]);
+
+        const [updatedPosta] = await connection.query('SELECT * FROM posta WHERE idposta = ?', [id]);
+
+        const updatedConsultorios = await connection.query(
+            `SELECT cp.idconsultorio_posta, cp.idposta, cp.idconsultorio, cp.disponible, c.nombre AS consultorio_nombre
+             FROM consultorio_posta cp
+             INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+             WHERE cp.idposta = ?`,
             [id]
         );
-        res.json(updatedRelation[0]);
-        connection.end();
+
+        connection.release();
+
+        res.status(200).json({
+            posta: updatedPosta[0],
+            consultorios: updatedConsultorios,
+        });
     } catch (error) {
-        console.error("Error al actualizar la relación Consultorio-Posta:", error);
-        res.status(500).send("Error al actualizar la relación Consultorio-Posta");
+        console.error('Error al actualizar los datos de la posta y sus consultorios:', error);
+        res.status(500).send('Error al actualizar los datos de la posta y sus consultorios');
+    } finally {
+        connection.release();
     }
 };
