@@ -50,18 +50,6 @@ export const postMedico = async (req, res, next) => {
   }
 };
 
-export const getEspecialidades = async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const rows = await connection.query(`SELECT idespecialidad, nombre FROM especialidad`);
-    res.status(200).json(rows);
-    connection.release();
-  } catch (error) {
-    console.error("Error al obtener las especialidades:", error);
-    res.status(500).send("Error al obtener las especialidades");
-  }
-}
-
 export const getMedicos = async (req, res) => {
   try {
     const connection = await pool.getConnection();
@@ -190,7 +178,7 @@ export const getMedico = async (req, res) => {
       dni: medico.dni,
       especialidad: medico.especialidad,
       foto: medico.foto,
-      estado: medico.disponible,
+      disponible: medico.disponible,
       postas: postas
     };
 
@@ -202,25 +190,74 @@ export const getMedico = async (req, res) => {
 };
 
 export const updateMedicos = async (req, res) => {
+  let connection;
   try {
-    const connection = await pool.getConnection();
+    connection = await pool.getConnection();
     const { id } = req.params;
-    const { disponible } = req.body;
-    const result = await connection.query(
-      "UPDATE medico SET disponible = ? WHERE idmedico = ?",
-      [disponible, id]
-    );
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "El médico no existe" });
+    const {
+      nombre,
+      apellidoP,
+      apellidoM,
+      dni,
+      especialidad,
+      idconsultorio_posta,
+      correo,
+      disponible,
+      contrasenia,
+    } = req.body;
+
+    await connection.beginTransaction();
+
+    const updateMedicoQuery = `
+      UPDATE medico
+      SET nombre = COALESCE(?, nombre),
+          apellidoP = COALESCE(?, apellidoP),
+          apellidoM = COALESCE(?, apellidoM),
+          dni = COALESCE(?, dni),
+          idespecialidad = COALESCE(?, idespecialidad),
+          disponible = COALESCE(?, disponible)
+      WHERE idmedico = ?
+    `;
+    const updateMedicoParams = [
+      nombre,
+      apellidoP,
+      apellidoM,
+      dni,
+      especialidad,
+      disponible,
+      id,
+    ];
+    await connection.query(updateMedicoQuery, updateMedicoParams);
+
+    const updateUserQuery = `
+      UPDATE usuario
+      SET correo = COALESCE(?, correo),
+          contrasenia = COALESCE(?, contrasenia)
+      WHERE idusuario = (SELECT idusuario FROM medico WHERE idmedico = ?)
+    `;
+    const updateUserParams = [correo, contrasenia, id];
+    await connection.query(updateUserQuery, updateUserParams);
+
+    if (idconsultorio_posta && idconsultorio_posta.length > 0) {
+      for (const idconsultorioPosta of idconsultorio_posta) {
+        await connection.query(
+          `INSERT INTO medico_consultorio_posta (idmedico, idconsultorio_posta)
+           VALUES (?, ?)`,
+          [id, idconsultorioPosta]
+        );
+      }
     }
-    const rows = await connection.query(
-      "SELECT * FROM medico WHERE idmedico = ?",
-      [id]
-    );
-    res.json(rows[0]);
-    connection.end();
+
+    await connection.commit();
+    connection.release();
+
+    res.status(200).json({ message: "Médico actualizado exitosamente" });
   } catch (error) {
-    console.error(error);
+    if (connection) {
+      await connection.rollback();
+      connection.release();
+    }
+    console.error("Error al actualizar el médico:", error);
     res.status(500).send("Error al actualizar el médico");
   }
 };

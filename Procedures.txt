@@ -1,0 +1,162 @@
+//Actualizar la disponiblidad de la posta y consultorio en orden creciente
+
+CREATE PROCEDURE `actualizarPostaYConsultorios`(
+    IN p_idposta INT,
+    IN p_nombre VARCHAR(100),
+    IN p_ciudad VARCHAR(50),
+    IN p_direccion VARCHAR(255),
+    IN p_telefono VARCHAR(9),
+    IN p_estado TINYINT(1),
+    IN p_consultorios JSON,
+    IN p_nuevos_consultorios JSON
+)
+BEGIN
+    DECLARE idx INT DEFAULT 0;
+    DECLARE total INT DEFAULT 0;
+    DECLARE v_idconsultorio INT;
+    DECLARE v_disponible TINYINT(1);
+
+    -- 1. Actualizar la tabla 'posta'
+    UPDATE posta
+    SET nombre = p_nombre,
+        ciudad = p_ciudad,
+        direccion = p_direccion,
+        telefono = p_telefono,
+        disponible = p_estado
+    WHERE idposta = p_idposta;
+
+    -- 2. Actualizar relaciones existentes en 'consultorio_posta'
+    IF p_consultorios IS NOT NULL THEN
+        SET total = JSON_LENGTH(p_consultorios);
+        WHILE idx < total DO
+            SET v_idconsultorio = JSON_VALUE(JSON_EXTRACT(p_consultorios, CONCAT('$[', idx, ']')), '$.idconsultorio');
+            SET v_disponible = JSON_VALUE(JSON_EXTRACT(p_consultorios, CONCAT('$[', idx, ']')), '$.disponible');
+
+            UPDATE consultorio_posta
+            SET disponible = v_disponible
+            WHERE idposta = p_idposta AND idconsultorio = v_idconsultorio;
+
+            SET idx = idx + 1;
+        END WHILE;
+    END IF;
+
+    -- 3. Insertar nuevas relaciones en 'consultorio_posta'
+    SET idx = 0;
+    IF p_nuevos_consultorios IS NOT NULL THEN
+        SET total = JSON_LENGTH(p_nuevos_consultorios);
+        WHILE idx < total DO
+            SET v_idconsultorio = JSON_VALUE(JSON_EXTRACT(p_nuevos_consultorios, CONCAT('$[', idx, ']')), '$');
+
+            INSERT INTO consultorio_posta (idposta, idconsultorio, disponible)
+            VALUES (p_idposta, v_idconsultorio, 1);
+
+            SET idx = idx + 1;
+        END WHILE;
+    END IF;
+END
+
+//Crear medicos con usuario
+
+DELIMITER //
+CREATE PROCEDURE sp_insertar_medico (
+    IN i_correo VARCHAR(100),
+    IN i_contrasenia VARCHAR(100),
+    IN i_nombre VARCHAR(50),
+    IN i_apellidoP VARCHAR(20),
+    IN i_apellidoM VARCHAR(20),
+    IN i_dni VARCHAR(8),
+    IN i_especialidad VARCHAR(50)
+)
+BEGIN
+    DECLARE existe_correo INT DEFAULT 0;
+    DECLARE usuario_id INT DEFAULT 0;
+    DECLARE especialidad_id INT DEFAULT 0;
+
+    START TRANSACTION;
+
+    SELECT COUNT(*) INTO existe_correo
+    FROM usuario
+    WHERE correo = i_correo;
+
+    IF existe_correo > 0 THEN
+        ROLLBACK;
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'El correo ingresado ya existe';
+    ELSE
+        SELECT idespecialidad INTO especialidad_id
+        FROM especialidad
+        WHERE nombre = i_especialidad;
+
+        IF especialidad_id IS NULL THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La especialidad ingresada no existe';
+        ELSE
+            INSERT INTO usuario (rol, correo, contrasenia)
+            VALUES ('Medico', i_correo, i_contrasenia);
+
+            SET usuario_id = LAST_INSERT_ID();
+
+            INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, dni, idespecialidad)
+            VALUES (usuario_id, i_nombre, i_apellidoP, i_apellidoM, i_dni, especialidad_id);
+
+            COMMIT;
+
+            SELECT 'Médico registrado con éxito' AS mensaje;
+        END IF;
+    END IF;
+END//
+DELIMITER ;
+
+delimiter $$
+
+//Trigger para establecer una hora aproximada de cita
+
+create function f_calcular_hora_aprox(
+    p_num_cupo int,
+    p_idprogramacion_cita int
+)
+returns time
+begin
+    declare hora_inicio time;
+    declare hora_fin time;
+    declare num_total_cupos int;
+    declare intervalo int;
+    declare hora_aprox_seconds int;
+
+    select h.hora_inicio, h.hora_fin, pc.cupos_totales
+    into hora_inicio, hora_fin, num_total_cupos
+    from programacion_cita pc
+    join horario h on pc.idhorario = h.idhorario
+    where pc.idprogramacion_cita = p_idprogramacion_cita
+    limit 1;
+
+    if hora_inicio is null or hora_fin is null or num_total_cupos is null or num_total_cupos = 0 then
+        return null;
+    end if;
+
+    set intervalo = (time_to_sec(hora_fin) - time_to_sec(hora_inicio)) / num_total_cupos;
+    set hora_aprox_seconds = time_to_sec(hora_inicio) + ((p_num_cupo - 1) * intervalo);
+
+    return sec_to_time(hora_aprox_seconds);
+end$$
+
+delimiter $$
+
+create trigger trg_calculate_hora_aprox_before_insert
+before insert on cita
+for each row
+begin
+    set new.hora_aprox = f_calcular_hora_aprox(new.num_cupo, new.idprogramacion_cita);
+end$$
+
+create trigger trg_calculate_hora_aprox_before_update
+before update on cita
+for each row
+begin
+    if new.num_cupo <> old.num_cupo or new.idprogramacion_cita <> old.idprogramacion_cita then
+        set new.hora_aprox = f_calcular_hora_aprox(new.num_cupo, new.idprogramacion_cita);
+    end if;
+end$$
+
+delimiter ;

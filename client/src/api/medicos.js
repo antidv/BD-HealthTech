@@ -21,3 +21,13 @@ export const getEspecialidades = async () => {
   const { data } = await axios.get("/especialidades");
   return data;
 };
+
+export const getDatosActualizarMedico = async (idmedico) => {
+  const { data } = await axios.get(`/especialidad-consultorio/${idmedico}`);
+  return data;
+};
+
+export const updateMedico = async (idmedico, data) => {
+  const response = await axios.put(`/medicos/${idmedico}`, data);
+  return response.data;
+};
