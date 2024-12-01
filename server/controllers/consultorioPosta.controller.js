@@ -52,6 +52,32 @@ export const getConsultorios = async (req, res) => {
     }
 }
 
+export const getConsultoriosFaltantes = async (req, res) => {
+    try {
+        const connection = await pool.getConnection();
+        const { idposta } = req.params;
+
+        const query = `
+            SELECT c.idconsultorio, c.nombre
+            FROM consultorio c
+            WHERE c.idconsultorio NOT IN (
+                SELECT cp.idconsultorio
+                FROM consultorio_posta cp
+                WHERE cp.idposta = ?
+            )
+        `;
+        
+        const rows = await connection.query(query, [idposta]);
+
+        connection.release();
+
+        res.status(200).json(rows);
+    } catch (error) {
+        console.error("Error al obtener los consultorios faltantes:", error);
+        res.status(500).send("Error al obtener los consultorios faltantes");
+    }
+};
+
 export const getConsultorioPostas = async (req, res) => {
     try {
         const connection = await pool.getConnection();
@@ -82,7 +108,8 @@ export const getConsultorioPosta = async (req, res) => {
             SELECT 
                 c.idconsultorio, 
                 c.nombre AS consultorio_nombre, 
-                c.foto AS consultorio_foto
+                c.foto AS consultorio_foto,
+                cp.disponible
             FROM consultorio_posta cp
             INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
             WHERE cp.idposta = ?
