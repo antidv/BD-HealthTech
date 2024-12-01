@@ -1,6 +1,23 @@
+import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
+import { Link, useNavigate } from "react-router-dom";
+import { createMedico } from "../../api/medicos";
+import Modal from "../../components/Modal";
 
 function RegistrarMedico() {
+  // Estado del modal
+  const [modal, setModal] = useState({
+    show: false,
+    estado: true,
+    titulo: "",
+    message: "",
+  });
+
+  // Navegacion
+  const navigate = useNavigate();
+
+  // Manejo del formulario
   const {
     register,
     handleSubmit,
@@ -8,12 +25,50 @@ function RegistrarMedico() {
     getValues,
   } = useForm();
 
-  const onSubmit = handleSubmit((data) => {
-    console.log("Registrar medico: ", data);
+  // Registrar nuevo medico
+  const mutation = useMutation({
+    mutationFn: createMedico,
+    onSuccess: (data) => {
+      setModal({
+        show: true,
+        estado: true,
+        titulo: "Registro exitoso",
+        message: `El medico se ha creado con éxito.`,
+      });
+      console.log("Medico registrado: ", data);
+    },
+    onError: (error) => {
+      setModal({
+        show: true,
+        estado: false,
+        titulo: "Ocurrio un error",
+        message: "Error: No se pudo crear el medico. Inténtalo de nuevo.",
+      });
+      console.error("Error al crear el medico: ", error);
+    },
   });
+
+  const onSubmit = handleSubmit((data) => {
+    mutation.mutate(data);
+  });
+
+  // Navegar al cerrar el modal
+  const handleModalClose = () => {
+    setModal({ ...modal, show: false });
+    navigate("/admin/medicos");
+  };
 
   return (
     <>
+      {modal.show && (
+        <Modal
+          titulo={modal.titulo}
+          estado={modal.estado}
+          mensaje={modal.message}
+          setModal={setModal}
+          onClose={handleModalClose}
+        />
+      )}
       <h1>Registrar Medico</h1>
       <form onSubmit={onSubmit}>
         <div>
@@ -46,6 +101,21 @@ function RegistrarMedico() {
             })}
           />
           {errors.apellidoM && <p>{errors.apellidoM.message}</p>}
+        </div>
+        <div>
+          <label htmlFor="dni">DNI</label>
+          <input
+            id="dni"
+            type="text"
+            {...register("dni", {
+              required: "El dni es obligatorio",
+              pattern: {
+                value: /^\d{8}$/,
+                message: "Numero de dni no válido (8 digitos)",
+              },
+            })}
+          />
+          {errors.dni && <p>{errors.dni.message}</p>}
         </div>
         <div>
           <label htmlFor="especialidad">Especialidad</label>
@@ -102,7 +172,16 @@ function RegistrarMedico() {
           />
           {errors.confirmarContra && <p>{errors.confirmarContra.message}</p>}
         </div>
-        <button type="submit">Registrar</button>
+        <Link to="/admin/medicos" className="btn btn-secondary me-3">
+          Volver
+        </Link>
+        <button
+          type="submit"
+          disabled={mutation.isPending}
+          className="btn btn-primary"
+        >
+          {mutation.isPending ? "Registrando ..." : "Registrar"}
+        </button>
       </form>
     </>
   );
