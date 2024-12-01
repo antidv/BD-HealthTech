@@ -23,7 +23,18 @@ export const postMedico = async (req, res, next) => {
 
       if (result[0] && result[0].mensaje === 'Médico registrado con éxito') {
         await connection.commit();
-        res.status(201).json({ message: result[0].mensaje });
+        res.status(201).json({
+          message: result[0].mensaje,
+          data: {
+            idusuario: result[0].usuario_id,
+            correo: result[0].correo,
+            nombre: result[0].nombre,
+            apellidoP: result[0].apellidoP,
+            apellidoM: result[0].apellidoM,
+            dni: result[0].dni,
+            especialidad: result[0].especialidad
+          }
+        });
       } else {
         await connection.rollback();
         res.status(400).json({ error: result[0].mensaje });
