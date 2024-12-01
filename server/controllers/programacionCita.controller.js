@@ -166,30 +166,43 @@ export const getProgramacionCita = async (req, res) => {
   }
 };
 
-export const updateProgramacionCita = async (req, res) => {
-  try {
-    const connection = await pool.getConnection();
-    const { id } = req.params;
-    const { cupos_totales, idhorario } = req.body;
+export const deleteProgramacionCita = async (req, res) => {
+  let connection;
+    try {
+        connection = await pool.getConnection();
+        const { id } = req.params;
+        const rows = await connection.query(
+            `SELECT cupos_disponibles, cupos_totales 
+             FROM programacion_cita 
+             WHERE idprogramacion_cita = ?`,
+            [id]
+        );
 
-    const result = await connection.query(
-      "UPDATE programacion_cita SET cupos_totales = ?, idhorario = ? WHERE idprogramacion_cita = ?",
-      [cupos_totales, idhorario, id]
-    );
+        if (rows.length === 0) {
+            connection.release();
+            return res.status(404).json({ message: "Programación de cita no encontrada" });
+        }
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: "La programación de cita no existe" });
+        const { cupos_disponibles, cupos_totales } = rows[0];
+
+        if (cupos_disponibles !== cupos_totales) {
+            connection.release();
+            return res.status(400).json({ message: "No se puede eliminar la programación de cita porque ya hay pacientes que han programado una cita para esa fecha" });
+        }
+
+        await connection.query(
+            `DELETE FROM programacion_cita 
+             WHERE idprogramacion_cita = ?`,
+            [id]
+        );
+
+        connection.release();
+        res.status(200).json({ message: "Programación de cita eliminada exitosamente" });
+    } catch (error) {
+        if (connection) {
+            connection.release();
+        }
+        console.error("Error al eliminar la programación de cita:", error);
+        res.status(500).send("Error al eliminar la programación de cita");
     }
-
-    const rows = await connection.query(
-      "SELECT * FROM programacion_cita WHERE idprogramacion_cita = ?",
-      [id]
-    );
-
-    res.status(200).json(rows[0]);
-    connection.release();
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Error al actualizar la programación de cita");
-  }
-};
+}
