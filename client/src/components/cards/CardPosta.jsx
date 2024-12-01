@@ -1,7 +1,7 @@
 function CardPosta(props) {
   return (
     <div className="col-4 justify-content-center">
-      <div className="card">
+      <div className="card mb-4">
         <div className="d-flex justify-content-center">
           <img
             src={props.foto}
