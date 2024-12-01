@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { getPosta } from "../../api/postas";
 import { useQuery } from "@tanstack/react-query";
 import { getConsultoriosPosta } from "../../api/consultorios";
@@ -48,7 +48,7 @@ function ConsultoriosPosta() {
             <div className="card m-5 cardConsultorioPosta">
               <h2 className="m-3 text-center">{posta.nombre}</h2>
               <div className="d-flex justify-content-center">
-                <img src={posta.foto} alt="posta" width={200}/>
+                <img src={posta.foto} alt="posta" width={200} />
               </div>
               <div className="card-body">
                 <p className="card-text">
@@ -98,7 +98,11 @@ function ConsultoriosPosta() {
                     key={consultorio.idconsultorio}
                     className="col-12 col-md-4 mb-4"
                   >
-                    <div className={`card ${consultorio.disponible === 0 ? "cardRed" : "cardGreen"}`}>
+                    <div
+                      className={`card ${
+                        consultorio.disponible === 0 ? "cardRed" : "cardGreen"
+                      }`}
+                    >
                       <div className="d-flex justify-content-center">
                         <img
                           src={consultorio.consultorio_foto}
@@ -108,6 +112,16 @@ function ConsultoriosPosta() {
                       </div>
                       <div className="card-body">
                         <p>{`${consultorio.consultorio_nombre}`}</p>
+                      </div>
+                      <div className="card-body text-center">
+                        <Link
+                          to={`/admin/programacion-citas/${consultorio.idconsultorio_posta}`}
+                          className={`card-link btn btn-warning ${
+                            consultorio.disponible ? "" : "disabled"
+                          } `}
+                        >
+                          Programar cita
+                        </Link>
                       </div>
                     </div>
                   </div>

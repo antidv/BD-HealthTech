@@ -61,7 +61,7 @@ function EditarPosta() {
       setModal({
         show: true,
         estado: true,
-        titulo: "Actualizacion exitosa",
+        titulo: "Actualización exitosa",
         message: `La posta se ha actualizado con éxito.`,
       });
       console.log("Posta actualizada: ", data);
@@ -70,7 +70,7 @@ function EditarPosta() {
       setModal({
         show: true,
         estado: false,
-        titulo: "Ocurrio un error",
+        titulo: "Ocurrió un error",
         message: "Error: No se pudo actualizar la posta.",
       });
       console.error("Error al actualizar: ", error);
@@ -104,7 +104,7 @@ function EditarPosta() {
     setModal({ ...modal, show: false });
     if (modal.estado) {
       // Navegar solo si la operación fue exitosa
-      navigate("/admin/postas");
+      navigate(`/admin/postas/${idposta}`);
     }
   };
 
@@ -131,25 +131,31 @@ function EditarPosta() {
             <div className="card m-5 cardConsultorioPosta">
               <h2 className="m-3 text-center">{posta.nombre}</h2>
               <div className="d-flex justify-content-center">
-                <img src={posta.foto} alt="posta" width={200}/>
+                <img src={posta.foto} alt="posta" width={200} />
               </div>
               <div className="card-body">
-                <p className="card-text"><b>Ciudad: </b>{posta.ciudad}</p>
-                <p className="card-text"><b>Dirección: </b>{posta.direccion}</p>
+                <p className="card-text">
+                  <b>Ciudad: </b>
+                  {posta.ciudad}
+                </p>
+                <p className="card-text">
+                  <b>Dirección: </b>
+                  {posta.direccion}
+                </p>
               </div>
             </div>
           </div>
           <div className="col-7 d-flex flex-column">
             {/* Modal */}
             {modal.show && (
-                <Modal
-                  titulo={modal.titulo}
-                  estado={modal.estado}
-                  mensaje={modal.message}
-                  setModal={setModal}
-                  onClose={handleModalClose}
-                />
-              )}
+              <Modal
+                titulo={modal.titulo}
+                estado={modal.estado}
+                mensaje={modal.message}
+                setModal={setModal}
+                onClose={handleModalClose}
+              />
+            )}
             <h2 className="mt-5 me-5">Editar posta</h2>
             {/* Formulario */}
             <form onSubmit={onSubmit}>
@@ -212,18 +218,25 @@ function EditarPosta() {
                     {...register("telefono", {
                       pattern: {
                         value: /^\d{7}$/,
-                        message: "Ingrese un telefono valido",
+                        message: "Ingrese un teléfono válido",
                       },
                     })}
                   />
                   {errors.telefono && <p>{errors.telefono.message}</p>}
                 </div>
                 <div className="col-6 d-flex">
-                  <label htmlFor="estado" className="form-label">Estado</label>
-                  <input type="checkbox" id="estado" className="form-check ms-2" {...register("estado")} />
+                  <label htmlFor="estado" className="form-label">
+                    Estado
+                  </label>
+                  <input
+                    type="checkbox"
+                    id="estado"
+                    className="form-check ms-2"
+                    {...register("estado")}
+                  />
                 </div>
               </div>
-              
+
               <div className="row me-5 mt-2">
                 <div className="col-12">
                   <h4>Consultorios de la posta</h4>
@@ -257,7 +270,7 @@ function EditarPosta() {
                   ))
                 )}
               </div>
-              
+
               <div className="row me-5 mt-2">
                 <div className="col-12">
                   <h4>Consultorios faltantes</h4>
@@ -287,19 +300,26 @@ function EditarPosta() {
               </div>
               <div className="row me-5">
                 <div className="col-12 d-flex justify-content-end">
-                  <Link to={`/admin/postas/${idposta}`} className="btn btn-secondary me-3">
+                  <Link
+                    to={`/admin/postas/${idposta}`}
+                    className="btn btn-secondary me-3"
+                  >
                     Volver
                   </Link>
-                  <button type="submit" disabled={mutation.isPending} className="btn btn-primary"> {mutation.isPending ? "Actualizando ..." : "Actualizar"}</button>
+                  <button
+                    type="submit"
+                    disabled={mutation.isPending}
+                    className="btn btn-primary"
+                  >
+                    {" "}
+                    {mutation.isPending ? "Actualizando ..." : "Actualizar"}
+                  </button>
                 </div>
               </div>
             </form>
           </div>
         </div>
       </div>
-      
-      
-      
     </>
   );
 }

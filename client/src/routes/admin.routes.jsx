@@ -6,6 +6,9 @@ import RegistrarMedico from "../pages/admin/RegistrarMedico";
 import ConsultoriosPosta from "../pages/admin/ConsultoriosPosta";
 import EditarPosta from "../pages/admin/EditarPosta";
 import ConsultoriosMedico from "../pages/admin/ConsultoriosMedico";
+import EditarMedico from "../pages/admin/EditarMedico";
+import ProgramarCita from "../pages/admin/ProgramarCita";
+import CitasProgramadas from "../pages/admin/CitasProgramadas";
 
 export default function RutasAdmin() {
   return (
@@ -23,10 +26,14 @@ export default function RutasAdmin() {
       <Route path="medicos" element={<Medicos />} />
       <Route path="medicos/:idmedico" element={<ConsultoriosMedico />} />
       <Route path="registrar/medico" element={<RegistrarMedico />} />
+      <Route path="editar/medico/:idmedico" element={<EditarMedico />} />
+
+      {/* Ruta para programacion de citas */}
       <Route
-        path="editar/medico/:idmedico"
-        element={<h1>Editar MEdico elegida</h1>}
+        path="programacion-citas/:idconsultorio_posta"
+        element={<ProgramarCita />}
       />
+      <Route path="programacion-citas" element={<CitasProgramadas />} />
     </Route>
   );
 }
