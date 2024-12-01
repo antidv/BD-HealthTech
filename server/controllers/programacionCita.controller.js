@@ -14,8 +14,8 @@ export const postProgramacionCita = async (req, res) => {
 
       const cuposDisponibles = cupos_totales;
       const result = await connection.query(
-        `INSERT INTO programacion_cita (idmedconposta, idhorario, fecha, cupos_totales, cupos_disponibles)
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO programacion_cita (idmedconposta, idhorario, fecha, cupos_totales)
+         VALUES (?, ?, ?, ?)`,
         [idmedconposta, idhorario, fecha, cupos_totales, cuposDisponibles]
       );
 
@@ -27,6 +27,13 @@ export const postProgramacionCita = async (req, res) => {
       });
     } catch (error) {
       await connection.rollback();
+
+      if (error.code === "ER_DUP_ENTRY") {
+        return res.status(409).json({
+          error: "Esta programación de cita ya existe",
+        });
+      }
+      
       throw error;
     } finally {
       connection.release();
