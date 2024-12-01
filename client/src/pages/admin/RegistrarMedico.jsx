@@ -45,18 +45,18 @@ function RegistrarMedico() {
         show: true,
         estado: true,
         titulo: "Registro exitoso",
-        message: `El medico se ha creado con éxito.`,
+        message: `El médico se ha creado con éxito.`,
       });
-      console.log("Medico registrado: ", data);
+      console.log("Médico registrado: ", data);
     },
     onError: (error) => {
       setModal({
         show: true,
         estado: false,
-        titulo: "Ocurrio un error",
-        message: "Error: No se pudo crear el medico. Inténtalo de nuevo.",
+        titulo: "Ocurrió un error",
+        message: "Error: No se pudo crear el médico. Inténtalo de nuevo.",
       });
-      console.error("Error al crear el medico: ", error);
+      console.error("Error al crear el médico: ", error);
     },
   });
 
@@ -149,7 +149,7 @@ function RegistrarMedico() {
                     required: "El dni es obligatorio",
                     pattern: {
                       value: /^\d{8}$/,
-                      message: "Numero de dni no válido (8 digitos)",
+                      message: "Número de DNI no válido (8 dígitos)",
                     },
                   })}
                 />

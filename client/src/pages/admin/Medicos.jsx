@@ -31,7 +31,7 @@ function Medicos() {
 
   return (
     <>
-      <div className="container-fluid containerColor vh-100">
+      <div className="container-fluid containerColor">
         <div className="row align-items-center justify-content-center">
           <div className="col-12">
             <h1 className="mt-4 ms-3">Médicos</h1>
