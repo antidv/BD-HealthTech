@@ -30,7 +30,7 @@ export const postProgramacionCita = async (req, res) => {
 
       if (error.code === "ER_DUP_ENTRY") {
         return res.status(409).json({
-          error: "Ya existe una programación con la misma combinación de médico, horario y fecha",
+          error: "Esta programación de cita ya existe",
         });
       }
       
