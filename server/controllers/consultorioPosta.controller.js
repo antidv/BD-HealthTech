@@ -96,27 +96,40 @@ export const getConsultorioPosta = async (req, res) => {
         const { page = 1, limit = 10 } = req.query;
         const { id } = req.params;
 
-        const pageNumber = Number(page);
-        const limitNumber = Number(limit);
-        const offset = (pageNumber - 1) * limitNumber;
+        let query;
+        let params;
 
-        if (!id) {
-            return res.status(400).json({ error: "Se requiere el id de la posta" });
+        if(limit === 'all') {
+            query = `
+                SELECT 
+                    c.idconsultorio, 
+                    c.nombre AS consultorio_nombre, 
+                    c.foto AS consultorio_foto,
+                    cp.disponible
+                FROM consultorio_posta cp
+                INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+                WHERE cp.idposta = ?;
+            `;
+            params = [id];
+        } else {
+            const pageNumber = Number(page);
+            const limitNumber = Number(limit);
+            const offset = (pageNumber - 1) * limitNumber;
+
+            query = `
+                SELECT 
+                    c.idconsultorio, 
+                    c.nombre AS consultorio_nombre, 
+                    c.foto AS consultorio_foto,
+                    cp.disponible
+                FROM consultorio_posta cp
+                INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+                WHERE cp.idposta = ?
+                LIMIT ? OFFSET ?;
+            `;
+            params = [id, limitNumber, offset];
         }
 
-        const query = `
-            SELECT 
-                c.idconsultorio, 
-                c.nombre AS consultorio_nombre, 
-                c.foto AS consultorio_foto,
-                cp.disponible
-            FROM consultorio_posta cp
-            INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
-            WHERE cp.idposta = ?
-            LIMIT ? OFFSET ?;
-        `;
-
-        const params = [id, limitNumber, offset];
         const rows = await connection.query(query, params);
 
         const countQuery = `
@@ -126,15 +139,13 @@ export const getConsultorioPosta = async (req, res) => {
         `;
 
         const [{ total }] = await connection.query(countQuery, [id]);
-        const totalNumber = Number(total);
-        const totalPages = Math.ceil(totalNumber / limitNumber);
 
         res.status(200).json({
             data: rows,
-            total: totalNumber,
-            page: pageNumber,
-            limit: limitNumber,
-            totalPages: totalPages
+            total: total,
+            page: limit === "all" ? 1 : Number(page),
+            limit: limit === "all" ? total : Number(limit),
+            totalPages: limit === "all" ? 1 : Math.ceil(total / Number(limit))
         });
 
         connection.release();
