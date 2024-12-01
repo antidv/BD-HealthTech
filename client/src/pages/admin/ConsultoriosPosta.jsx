@@ -7,7 +7,7 @@ import Loading from "../Loading";
 import ErrorPage from "../ErrorPage";
 import Pagination from "../../components/Pagination";
 
-function ConsultoriosPosta() {
+function ConsultoriosPosta(props) {
   const { idposta } = useParams();
 
   const { page, setPage } = usePagination();
@@ -41,35 +41,75 @@ function ConsultoriosPosta() {
 
   return (
     <>
-      {/* Posta */}
-      <div>
-        <h1>{posta.nombre}</h1>
-        <img src={posta.foto} alt="posta" width={200} />
-        <p>{posta.ciudad}</p>
-        <p>{posta.direccion}</p>
-        <p>{`Estado: ${posta.disponible ? "Disponible" : "No disponible"}`}</p>
-      </div>
-
-      {/* Consultorios */}
-      <div>
-        <h2>Consultorios</h2>
-        {consultorios?.data?.length === 0 ? (
-          <p>No hay consultorios disponibles</p>
-        ) : (
-          consultorios?.data?.map((consultorio) => (
-            <div key={consultorio.idconsultorio} className="container">
-              <img src={consultorio.consultorio_foto} alt="consultorio" />
-              <p>{`Consultorio: ${consultorio.consultorio_nombre}`}</p>
+      <div className="container-fluid containerColor">
+        <div className="row justify-content-center">
+          <div className="col-6 d-flex justify-content-center">
+            {/* Posta */}
+            <div className="card m-5 cardConsultorioPosta">
+              <h2 className="m-3 text-center">{posta.nombre}</h2>
+              <div className="d-flex justify-content-center">
+                <img src={posta.foto} alt="posta" width={200}/>
+              </div>
+              <div className="card-body">
+                <p><b>Ciudad: </b>{posta.ciudad}</p>
+                <p><b>Dirección: </b>{posta.direccion}</p>
+                <p><b>Estado: </b>{`${posta.disponible ? "Disponible" : "No disponible"}`}</p>
+              </div>
+              <div className="card-body text-center">
+                <a
+                  href={`/admin/editar/posta/${posta.idposta}`}
+                  className="card-link btn btn-warning"
+                >
+                  Editar
+                </a>
+                <a
+                  href="#"
+                  className={`card-link btn ${
+                    props.estado ? "btn-danger" : "btn-success"
+                  }`}
+                >
+                  {props.estado ? "Deshabilitar" : "Habilitar"}
+                </a>
+              </div>
             </div>
-          ))
-        )}
+          </div>
+          <div className="col-6 d-flex flex-column">
+            {/* Consultorios */}
+            <div className="row mt-5">
+              <div className="col-12">
+                <h2 className="mb-3">Consultorios</h2>
+              </div>
+            </div>
+            <div className="row me-3">
+              {consultorios?.data?.length === 0 ? (
+                    <p>No hay consultorios disponibles</p>
+                  ) : (
+                    consultorios?.data?.map((consultorio) => (
+                      <div key={consultorio.idconsultorio} className="col-12 col-md-4 mb-4">
+                        <div className="card">
+                          <div className="d-flex justify-content-center">
+                            <img src={consultorio.consultorio_foto} alt="consultorio" className="imageConsultorio mt-1" />
+                          </div>
+                          <div className="card-body">
+                            <p>{`${consultorio.consultorio_nombre}`}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  )}
+            </div>
+            
+            {/* Paginacion de consultorios */}
+            <Pagination
+              currentPage={page}
+              totalPages={consultorios.totalPages}
+              onPageChange={setPage}
+            />
+          </div>
+        </div>
       </div>
-      {/* Paginacion de consultorios */}
-      <Pagination
-        currentPage={page}
-        totalPages={consultorios.totalPages}
-        onPageChange={setPage}
-      />
+      
+      
     </>
   );
 }
