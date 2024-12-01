@@ -2,9 +2,9 @@ import { pool } from "../src/database.js";
 
 export const postProgramacionCita = async (req, res) => {
   try {
-    const { idmedconposta, idhorario, cupos_totales } = req.body;
+    const { idmedconposta, idhorario, fecha, cupos_totales } = req.body;
 
-    if (!idmedconposta || !idhorario || !cupos_totales) {
+    if (!idmedconposta || !idhorario || !cupos_totales || !fecha) {
       return res.status(400).json({ error: "Todos los campos son requeridos" });
     }
 
@@ -14,9 +14,9 @@ export const postProgramacionCita = async (req, res) => {
 
       const cuposDisponibles = cupos_totales;
       const result = await connection.query(
-        `INSERT INTO programacion_cita (idmedconposta, idhorario, cupos_totales, cupos_disponibles)
-         VALUES (?, ?, ?, ?)`,
-        [idmedconposta, idhorario, cupos_totales, cuposDisponibles]
+        `INSERT INTO programacion_cita (idmedconposta, idhorario, fecha, cupos_totales, cupos_disponibles)
+         VALUES (?, ?, ?, ?, ?)`,
+        [idmedconposta, idhorario, fecha, cupos_totales, cuposDisponibles]
       );
 
       await connection.commit();
