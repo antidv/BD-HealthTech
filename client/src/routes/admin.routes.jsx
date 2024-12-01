@@ -6,6 +6,7 @@ import RegistrarMedico from "../pages/admin/RegistrarMedico";
 import ConsultoriosPosta from "../pages/admin/ConsultoriosPosta";
 import EditarPosta from "../pages/admin/EditarPosta";
 import ConsultoriosMedico from "../pages/admin/ConsultoriosMedico";
+import EditarMedico from "../pages/admin/EditarMedico";
 
 export default function RutasAdmin() {
   return (
@@ -25,7 +26,7 @@ export default function RutasAdmin() {
       <Route path="registrar/medico" element={<RegistrarMedico />} />
       <Route
         path="editar/medico/:idmedico"
-        element={<h1>Editar MEdico elegida</h1>}
+        element={<EditarMedico />}
       />
     </Route>
   );
