@@ -60,9 +60,18 @@ export const getMedicos = async (req, res) => {
     const offset = (pageNumber - 1) * limitNumber;
 
     const query = `
-            SELECT * FROM medico
-            WHERE nombre LIKE ?
-            LIMIT ? OFFSET ?
+          SELECT 
+            m.idmedico, 
+            m.nombre, 
+            m.apellidoP, 
+            m.dni, 
+            e.nombre AS especialidad, 
+            m.foto, 
+            m.disponible
+          FROM medico m
+          JOIN especialidad e ON m.idespecialidad = e.idespecialidad
+          WHERE m.nombre LIKE ?
+          LIMIT ? OFFSET ?
         `;
     const rows = await connection.query(query, [
       `%${search}%`,
@@ -71,8 +80,10 @@ export const getMedicos = async (req, res) => {
     ]);
 
     const countQuery = `
-            SELECT COUNT(*) AS total FROM medico
-            WHERE nombre LIKE ?
+            SELECT COUNT(*) AS total
+            FROM medico m
+            JOIN especialidad e ON m.idespecialidad = e.idespecialidad
+            WHERE m.nombre LIKE ?
         `;
     const [{ total }] = await connection.query(countQuery, [`%${search}%`]);
     const totalNumber = Number(total);
@@ -104,10 +115,11 @@ export const getMedico = async (req, res) => {
         m.nombre, 
         m.apellidoP, 
         m.dni, 
-        m.especialidad, 
+        e.nombre AS especialidad, 
         m.foto, 
         m.disponible
       FROM medico m
+      JOIN especialidad e ON m.idespecialidad = e.idespecialidad
       WHERE m.idmedico = ?
     `;
     const medicoRows = await connection.query(medicoQuery, [id]);
