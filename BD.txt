@@ -284,3 +284,16 @@ begin
 end$$
 
 delimiter ;
+
+DELIMITER $$
+
+CREATE TRIGGER update_cupos_disponibles
+AFTER INSERT ON cita
+FOR EACH ROW
+BEGIN
+  UPDATE programacion_cita
+  SET cupos_disponibles = cupos_disponibles - 1
+  WHERE idprogramacion_cita = NEW.idprogramacion_cita;
+END$$
+
+DELIMITER ;
