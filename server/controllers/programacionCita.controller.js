@@ -27,6 +27,13 @@ export const postProgramacionCita = async (req, res) => {
       });
     } catch (error) {
       await connection.rollback();
+
+      if (error.code === "ER_DUP_ENTRY") {
+        return res.status(409).json({
+          error: "Ya existe una programación con la misma combinación de médico, horario y fecha",
+        });
+      }
+      
       throw error;
     } finally {
       connection.release();
