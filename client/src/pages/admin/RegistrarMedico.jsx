@@ -55,7 +55,9 @@ function RegistrarMedico() {
   // Navegar al cerrar el modal
   const handleModalClose = () => {
     setModal({ ...modal, show: false });
-    navigate("/admin/medicos");
+    if (modal.estado) {
+      navigate("/admin/medicos");
+    }
   };
 
   return (
@@ -79,17 +81,23 @@ function RegistrarMedico() {
           <form onSubmit={onSubmit}>
             <div className="row m-3">
               <div className="col-3 mb-3">
-                <label htmlFor="nombre" className="form-label">Nombres</label>
+                <label htmlFor="nombre" className="form-label">
+                  Nombres
+                </label>
                 <input
                   id="nombre"
                   type="text"
                   className="form-control"
-                  {...register("nombre", { required: "El nombre es obligatorio" })}
+                  {...register("nombre", {
+                    required: "El nombre es obligatorio",
+                  })}
                 />
                 {errors.nombre && <p>{errors.nombre.message}</p>}
               </div>
               <div className="col-3 mb-3">
-                <label htmlFor="apellidoP" className="form-label">Apellido paterno</label>
+                <label htmlFor="apellidoP" className="form-label">
+                  Apellido paterno
+                </label>
                 <input
                   id="apellidoP"
                   type="text"
@@ -101,7 +109,9 @@ function RegistrarMedico() {
                 {errors.apellidoP && <p>{errors.apellidoP.message}</p>}
               </div>
               <div className="col-3 mb-3">
-                <label htmlFor="apellidoM" className="form-label">Apellido materno</label>
+                <label htmlFor="apellidoM" className="form-label">
+                  Apellido materno
+                </label>
                 <input
                   id="apellidoM"
                   type="text"
@@ -113,7 +123,9 @@ function RegistrarMedico() {
                 {errors.apellidoM && <p>{errors.apellidoM.message}</p>}
               </div>
               <div className="col-3 mb-3">
-                <label htmlFor="dni" className="form-label">DNI</label>
+                <label htmlFor="dni" className="form-label">
+                  DNI
+                </label>
                 <input
                   id="dni"
                   type="text"
@@ -131,7 +143,9 @@ function RegistrarMedico() {
             </div>
             <div className="row m-3">
               <div className="col-3 mb-3">
-                <label htmlFor="especialidad" className="form-label">Especialidad</label>
+                <label htmlFor="especialidad" className="form-label">
+                  Especialidad
+                </label>
                 <input
                   id="especialidad"
                   type="text"
@@ -143,7 +157,9 @@ function RegistrarMedico() {
                 {errors.especialidad && <p>{errors.especialidad.message}</p>}
               </div>
               <div className="col-3 mb-3">
-                <label htmlFor="correo" className="form-label">Correo</label>
+                <label htmlFor="correo" className="form-label">
+                  Correo
+                </label>
                 <input
                   id="correo"
                   type="text"
@@ -159,7 +175,9 @@ function RegistrarMedico() {
                 {errors.correo && <p>{errors.correo.message}</p>}
               </div>
               <div className="col-3 mb-3">
-                <label htmlFor="contrasenia" className="form-label">Contraseña</label>
+                <label htmlFor="contrasenia" className="form-label">
+                  Contraseña
+                </label>
                 <input
                   id="contrasenia"
                   type="password"
@@ -175,7 +193,9 @@ function RegistrarMedico() {
                 {errors.contrasenia && <p>{errors.contrasenia.message}</p>}
               </div>
               <div className="col-3 mb-3">
-                <label htmlFor="confirmarContra" className="form-label">Confirmar contraseña</label>
+                <label htmlFor="confirmarContra" className="form-label">
+                  Confirmar contraseña
+                </label>
                 <input
                   id="confirmarContra"
                   type="password"
@@ -187,7 +207,9 @@ function RegistrarMedico() {
                       "Las contraseñas no coinciden",
                   })}
                 />
-                {errors.confirmarContra && <p>{errors.confirmarContra.message}</p>}
+                {errors.confirmarContra && (
+                  <p>{errors.confirmarContra.message}</p>
+                )}
               </div>
             </div>
             <div className="row m-3">

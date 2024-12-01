@@ -70,7 +70,9 @@ function RegistrarPosta() {
   // Navegar al cerrar el modal
   const handleModalClose = () => {
     setModal({ ...modal, show: false });
-    navigate("/admin/postas");
+    if (modal.estado) {
+      navigate("/admin/postas");
+    }
   };
 
   if (isLoading) return <b>Cargando ...</b>;
