@@ -8,11 +8,11 @@ function NavBar() {
   // Opciones de navegacion basadas en el rol
   const linksByRole = {
     Paciente: [
-      { to: "/paciente", label: "Inicio" },
-      { to: "/paciente/perfil", label: "Perfil" },
+      { to: "/paciente", label: "Solicitar cita" },
+      { to: "/paciente/perfil", label: "Antecedentes médicos" },
     ],
     Medico: [
-      { to: "/medico", label: "Panel Medico" },
+      { to: "/medico", label: "Pacientes" },
       { to: "/medico/citas", label: "Citas" },
     ],
     Administrador: [
