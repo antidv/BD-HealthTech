@@ -56,7 +56,7 @@ function RegistrarPosta() {
       setModal({
         show: true,
         estado: false,
-        titulo: "Ocurrio un error",
+        titulo: "Ocurrió un error",
         message: "Error: No se pudo crear la posta. Inténtalo de nuevo.",
       });
       console.error("Error al crear la posta:", error);
@@ -76,7 +76,7 @@ function RegistrarPosta() {
   };
 
   if (isLoading) return <b>Cargando ...</b>;
-  if (isError) return <b>Ocurrio un error</b>;
+  if (isError) return <b>Ocurrió un error</b>;
 
   return (
     <>
@@ -157,7 +157,7 @@ function RegistrarPosta() {
                   {...register("telefono", {
                     pattern: {
                       value: /^\d{7}$/,
-                      message: "Ingrese un telefono valido",
+                      message: "Ingrese un teléfono válido",
                     },
                   })}
                 />

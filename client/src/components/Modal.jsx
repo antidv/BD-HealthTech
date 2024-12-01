@@ -14,7 +14,7 @@ function Modal({ estado, titulo, mensaje, setModal, onClose }) {
       <div className="modal-dialog">
         <div className="modal-content">
           <div className="modal-header">
-            <h5 className="modal-title">{titulo}</h5>
+            <h5 className="modal-title"><b>{titulo}</b></h5>
             <button
               type="button"
               className="btn-close"
@@ -23,7 +23,7 @@ function Modal({ estado, titulo, mensaje, setModal, onClose }) {
           </div>
           <div className="modal-body">
             <p>{mensaje}</p>
-            <p>{`El estado es: ${estado}`}</p>
+            <p><b>Estado: </b>{`${estado}`}</p>
           </div>
           <div className="modal-footer">
             <button
