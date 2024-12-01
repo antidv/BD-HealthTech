@@ -1,5 +1,17 @@
 import { pool } from "../src/database.js";
 
+export const getEspecialidades = async (req, res) => {
+    try {
+      const connection = await pool.getConnection();
+      const rows = await connection.query(`SELECT idespecialidad, nombre FROM especialidad`);
+      res.status(200).json(rows);
+      connection.release();
+    } catch (error) {
+      console.error("Error al obtener las especialidades:", error);
+      res.status(500).send("Error al obtener las especialidades");
+    }
+  }
+
 export const getConsultoriosFaltantes = async (req, res) => {
     try {
         const connection = await pool.getConnection();
