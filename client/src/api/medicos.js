@@ -6,3 +6,8 @@ export const getMedicosAdmin = async ({ page, limit, search }) => {
   });
   return data;
 };
+
+export const createMedico = async (data) => {
+  const respones = await axios.post("/medicos", data);
+  return respones.data;
+};

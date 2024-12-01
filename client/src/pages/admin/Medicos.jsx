@@ -16,8 +16,8 @@ function Medicos() {
     isLoading,
     isError,
   } = useQuery({
-    queryKey: ["medicos", { page, limit: 3, search: filter }],
-    queryFn: () => getMedicosAdmin({ page, limit: 3, search: filter }),
+    queryKey: ["medicos", { page, limit: 9, search: filter }],
+    queryFn: () => getMedicosAdmin({ page, limit: 9, search: filter }),
     keepPreviousData: true,
   });
 
@@ -40,7 +40,11 @@ function Medicos() {
         <div className="row">
           <div className="col-12">
             {/* Barra de busqueda */}
-            <SearchBar onSearch={handleSearch} nombre="médico" url="registrar/medico"/>
+            <SearchBar
+              onSearch={handleSearch}
+              nombre="médico"
+              url="/admin/registrar/medico"
+            />
           </div>
         </div>
         <div className="row m-3">

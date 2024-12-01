@@ -1,4 +1,11 @@
-function Modal({ estado, titulo, mensaje, setModal }) {
+function Modal({ estado, titulo, mensaje, setModal, onClose }) {
+  const handleClose = () => {
+    setModal({ show: false, estado: true, titulo: "", message: "" });
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
     <div
       className="modal fade show d-block"
@@ -11,9 +18,7 @@ function Modal({ estado, titulo, mensaje, setModal }) {
             <button
               type="button"
               className="btn-close"
-              onClick={() =>
-                setModal({ show: false, estado: true, titulo: "", message: "" })
-              }
+              onClick={handleClose}
             ></button>
           </div>
           <div className="modal-body">
@@ -24,9 +29,7 @@ function Modal({ estado, titulo, mensaje, setModal }) {
             <button
               type="button"
               className="btn btn-secondary"
-              onClick={() =>
-                setModal({ show: false, estado: true, titulo: "", message: "" })
-              }
+              onClick={handleClose}
             >
               Cerrar
             </button>
