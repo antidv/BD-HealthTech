@@ -135,11 +135,12 @@ export const getConsultorioPosta = async (req, res) => {
             return res.status(404).json({ error: "No se encontraron consultorios para la posta especificada" });
         }
 
-        const totalPages = limit === "all" ? 1 : Math.ceil(total / Number(limit));
+        const totalNumber = Number(total);
+        const totalPages = limit === "all" ? 1 : Math.ceil(totalNumber / Number(limit));
 
         res.status(200).json({
             data: rows,
-            total: Number(total),
+            total: totalNumber,
             page: page ? Number(page) : null,
             limit: limit ? Number(limit) : null,
             totalPages: totalPages
