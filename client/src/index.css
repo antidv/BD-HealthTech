@@ -17,6 +17,18 @@
   width: 500px;
 }
 
+.cardConsultorioMedico{
+  width: 350px;
+}
+
+.cardGreen{
+  background-color: rgba(125, 232, 129,0.5);
+}
+
+.cardRed{
+  background-color: rgba(232, 125, 125,0.5);
+}
+
 .imageConsultorio{
   width: 150px;
 }
