@@ -1,5 +1,6 @@
 //Crear medicos con usuario
 
+DELIMITER //
 CREATE PROCEDURE sp_insertar_medico (
     IN i_correo VARCHAR(100),
     IN i_contrasenia VARCHAR(100),
@@ -12,6 +13,7 @@ CREATE PROCEDURE sp_insertar_medico (
 BEGIN
     DECLARE existe_correo INT DEFAULT 0;
     DECLARE usuario_id INT DEFAULT 0;
+    DECLARE especialidad_id INT DEFAULT 0;
 
     START TRANSACTION;
 
@@ -24,17 +26,27 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'El correo ingresado ya existe';
     ELSE
-        INSERT INTO usuario (rol, correo, contrasenia)
-        VALUES ('Medico', i_correo, i_contrasenia);
+        SELECT idespecialidad INTO especialidad_id
+        FROM especialidad
+        WHERE nombre = i_especialidad;
 
-        SET usuario_id = LAST_INSERT_ID();
+        IF especialidad_id IS NULL THEN
+            ROLLBACK;
+            SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'La especialidad ingresada no existe';
+        ELSE
+            INSERT INTO usuario (rol, correo, contrasenia)
+            VALUES ('Medico', i_correo, i_contrasenia);
 
-        INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, dni, especialidad)
-        VALUES (usuario_id, i_nombre, i_apellidoP, i_apellidoM, i_dni, i_especialidad);
+            SET usuario_id = LAST_INSERT_ID();
 
-        COMMIT;
+            INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, dni, idespecialidad)
+            VALUES (usuario_id, i_nombre, i_apellidoP, i_apellidoM, i_dni, especialidad_id);
 
-        SELECT 'Médico registrado con éxito' AS mensaje;
+            COMMIT;
+
+            SELECT 'Médico registrado con éxito' AS mensaje;
+        END IF;
     END IF;
 END//
 DELIMITER ;
