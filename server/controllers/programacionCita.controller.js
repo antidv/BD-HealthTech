@@ -27,6 +27,13 @@ export const postProgramacionCita = async (req, res) => {
       });
     } catch (error) {
       await connection.rollback();
+
+      if (error.code === "ER_DUP_ENTRY") {
+        return res.status(409).json({
+          error: "Esta programación de cita ya existe",
+        });
+      }
+      
       throw error;
     } finally {
       connection.release();
