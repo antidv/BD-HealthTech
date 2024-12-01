@@ -29,7 +29,11 @@ function ConsultoriosMedico() {
             <div className="card m-5 cardConsultorioMedico">
               <h2 className="m-3 text-center">{`${medico.nombre} ${medico.apellidoP}`}</h2>
               <div className="d-flex justify-content-center">
-                <img src={medico.foto} alt="medico" className="card-img-top imageCard" />
+                <img
+                  src={medico.foto}
+                  alt="medico"
+                  className="card-img-top imageCard"
+                />
               </div>
               <div className="card-body">
                 <p className="card-text">
@@ -65,10 +69,10 @@ function ConsultoriosMedico() {
             </div>
           </div>
           <div className="col-8">
-            {medico.postas.length === 0 ? (
+            {medico?.postas?.length === 0 ? (
               <p>El medico no esta asignado a una posta</p>
             ) : (
-              medico.postas.map((posta, index) => (
+              medico?.postas?.map((posta, index) => (
                 <div key={index} className="row mt-5">
                   <div className="col-12">
                     <h2 className="mb-3">{posta.nombre_posta}</h2>
@@ -94,10 +98,14 @@ function ConsultoriosMedico() {
                               <button
                                 type="button"
                                 className={`btn ${
-                                  consultorio.estado ? "btn-danger" : "btn-success"
+                                  consultorio.estado
+                                    ? "btn-danger"
+                                    : "btn-success"
                                 }`}
                               >
-                                {consultorio.estado ? "Deshabilitar" : "Habilitar"}
+                                {consultorio.estado
+                                  ? "Deshabilitar"
+                                  : "Habilitar"}
                               </button>
                             </div>
                           </div>
