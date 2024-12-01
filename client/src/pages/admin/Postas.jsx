@@ -33,7 +33,7 @@ function Postas() {
 
   return (
     <>
-      <div className="container-fluid containerColor vh-100">
+      <div className="container-fluid containerColor">
         <div className="row align-items-center justify-content-center">
           <div className="col-12">
             <h1 className="m-3">Postas</h1>

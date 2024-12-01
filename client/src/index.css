@@ -5,9 +5,18 @@
 
 .containerColor {
   background-color: azure !important;
+  min-height: 100vh;
 }
 
 /* Imagen Cards */
 .imageCard{
   width: 200px;
+}
+
+.cardConsultorioPosta{
+  width: 500px;
+}
+
+.imageConsultorio{
+  width: 150px;
 }
