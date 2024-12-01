@@ -1,3 +1,60 @@
+//Actualizar la disponiblidad de la posta y consultorio en orden creciente
+
+CREATE PROCEDURE `actualizarPostaYConsultorios`(
+    IN p_idposta INT,
+    IN p_nombre VARCHAR(100),
+    IN p_ciudad VARCHAR(50),
+    IN p_direccion VARCHAR(255),
+    IN p_telefono VARCHAR(9),
+    IN p_estado TINYINT(1),
+    IN p_consultorios JSON,
+    IN p_nuevos_consultorios JSON
+)
+BEGIN
+    DECLARE idx INT DEFAULT 0;
+    DECLARE total INT DEFAULT 0;
+    DECLARE v_idconsultorio INT;
+    DECLARE v_disponible TINYINT(1);
+
+    -- 1. Actualizar la tabla 'posta'
+    UPDATE posta
+    SET nombre = p_nombre,
+        ciudad = p_ciudad,
+        direccion = p_direccion,
+        telefono = p_telefono,
+        disponible = p_estado
+    WHERE idposta = p_idposta;
+
+    -- 2. Actualizar relaciones existentes en 'consultorio_posta'
+    IF p_consultorios IS NOT NULL THEN
+        SET total = JSON_LENGTH(p_consultorios);
+        WHILE idx < total DO
+            SET v_idconsultorio = JSON_VALUE(JSON_EXTRACT(p_consultorios, CONCAT('$[', idx, ']')), '$.idconsultorio');
+            SET v_disponible = JSON_VALUE(JSON_EXTRACT(p_consultorios, CONCAT('$[', idx, ']')), '$.disponible');
+
+            UPDATE consultorio_posta
+            SET disponible = v_disponible
+            WHERE idposta = p_idposta AND idconsultorio = v_idconsultorio;
+
+            SET idx = idx + 1;
+        END WHILE;
+    END IF;
+
+    -- 3. Insertar nuevas relaciones en 'consultorio_posta'
+    SET idx = 0;
+    IF p_nuevos_consultorios IS NOT NULL THEN
+        SET total = JSON_LENGTH(p_nuevos_consultorios);
+        WHILE idx < total DO
+            SET v_idconsultorio = JSON_VALUE(JSON_EXTRACT(p_nuevos_consultorios, CONCAT('$[', idx, ']')), '$');
+
+            INSERT INTO consultorio_posta (idposta, idconsultorio, disponible)
+            VALUES (p_idposta, v_idconsultorio, 1);
+
+            SET idx = idx + 1;
+        END WHILE;
+    END IF;
+END
+
 //Crear medicos con usuario
 
 DELIMITER //
