@@ -14,8 +14,8 @@ export const postProgramacionCita = async (req, res) => {
 
       const cuposDisponibles = cupos_totales;
       const result = await connection.query(
-        `INSERT INTO programacion_cita (idmedconposta, idhorario, fecha, cupos_totales, cupos_disponibles)
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO programacion_cita (idmedconposta, idhorario, fecha, cupos_totales)
+         VALUES (?, ?, ?, ?)`,
         [idmedconposta, idhorario, fecha, cupos_totales, cuposDisponibles]
       );
 
