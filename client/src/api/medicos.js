@@ -11,3 +11,8 @@ export const createMedico = async (data) => {
   const respones = await axios.post("/medicos", data);
   return respones.data;
 };
+
+export const getMedico = async (idmedico) => {
+  const { data } = await axios.get(`/medicos/${idmedico}`);
+  return data;
+};

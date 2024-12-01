@@ -65,48 +65,45 @@ function ConsultoriosMedico() {
             </div>
           </div>
           <div className="col-6">
-            <div className="row mt-5">
-              <div className="col-12">
-                <h2 className="mb-3">Posta 1</h2>
-              </div>
-            </div>
-            <div className="row me-3">
-              <div>
-                <p>Nombre consultorio</p>
-                <p>estado consultorio</p>
-                <button type="button" className="btn btn-success">
-                  Habilitar
-                </button>
-              </div>
-              <div>
-                <p>Nombre consultorio 2</p>
-                <p>estado consultorio 2</p>
-                <button type="button" className="btn btn-danger">
-                  Deshabilitar
-                </button>
-              </div>
-            </div>
-            <div className="row mt-5">
-              <div className="col-12">
-                <h2 className="mb-3">Posta 2</h2>
-              </div>
-            </div>
-            <div className="row me-3">
-              <div>
-                <p>Nombre consultorio</p>
-                <p>estado consultorio</p>
-                <button type="button" className="btn btn-success">
-                  Habilitar
-                </button>
-              </div>
-              <div>
-                <p>Nombre consultorio 2</p>
-                <p>estado consultorio 2</p>
-                <button type="button" className="btn btn-danger">
-                  Deshabilitar
-                </button>
-              </div>
-            </div>
+            {medico.postas.length === 0 ? (
+              <p>El medico no esta asignado a una posta</p>
+            ) : (
+              medico.postas.map((posta, index) => (
+                <div key={index} className="row mt-5">
+                  <div className="col-12">
+                    <h2 className="mb-3">{posta.nombre_posta}</h2>
+                  </div>
+                  <div className="row me-3">
+                    {posta.consultorios.length === 0 ? (
+                      <p>El medico no tiene asignado un consultorio</p>
+                    ) : (
+                      posta.consultorios.map((consultorio, index) => (
+                        <div key={index} className="card">
+                          <p>
+                            <b>Nombre: </b>
+                            {consultorio.nombre_consultorio}
+                          </p>
+                          <p>
+                            <b>Estado: </b>
+                            {consultorio.estado
+                              ? "Disponible"
+                              : "No disponible"}
+                          </p>
+                          <button
+                            type="button"
+                            className={`btn ${
+                              consultorio.estado ? "btn-danger" : "btn-success"
+                            }`}
+                          >
+                            {consultorio.estado ? "Deshabilitar" : "Habilitar"}
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
