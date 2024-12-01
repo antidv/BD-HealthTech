@@ -1,6 +1,6 @@
 import FotoPaciente from "../../assets/paciente.png"
 
-function CardMedico(props) {
+function CardPaciente(props) {
     return (
         <div className="card m-5 cardPaciente">
           <h2 className="m-3 text-center">Enmanuel Jose Obando Salinas</h2>

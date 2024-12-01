@@ -113,14 +113,16 @@ function ConsultoriosPosta() {
                       <div className="card-body">
                         <p>{`${consultorio.consultorio_nombre}`}</p>
                       </div>
-                      <Link
-                        to={`/admin/programacion-citas/${consultorio.idconsultorio_posta}`}
-                        className={`card-link btn btn-warning ${
-                          consultorio.disponible ? "" : "disabled"
-                        } `}
-                      >
-                        Programar cita
-                      </Link>
+                      <div className="card-body text-center">
+                        <Link
+                          to={`/admin/programacion-citas/${consultorio.idconsultorio_posta}`}
+                          className={`card-link btn btn-warning ${
+                            consultorio.disponible ? "" : "disabled"
+                          } `}
+                        >
+                          Programar cita
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 ))

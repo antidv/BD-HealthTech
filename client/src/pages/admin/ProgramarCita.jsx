@@ -92,122 +92,128 @@ function ProgramarCita() {
 
   return (
     <>
-      <h1>Programar cita</h1>
-      <h2>Nombre de posta</h2>
-      <p>{data?.posta?.nombre}</p>
-      <h2>Nombre de Consultorio</h2>
-      <p>{data?.consultorio?.nombre}</p>
-      <h2>Doctores</h2>
-      {data?.doctores?.length === 0 ? (
-        <p>No existen doctores disponibles para programar una cita</p>
-      ) : (
-        <div>
-          {modal.show && (
-            <Modal
-              titulo={modal.titulo}
-              estado={modal.estado}
-              mensaje={modal.message}
-              setModal={setModal}
-              onClose={handleModalClose}
-            />
-          )}
-          <form onSubmit={onSubmit}>
-            <select
-              className="form-select"
-              {...register("idmedconposta", {
-                required: "El doctor es requerido",
-              })}
-            >
-              <option value="">Seleccione un doctor</option>
-              {data?.doctores?.map((doctor) => (
-                <option
-                  key={doctor.iddoctor}
-                  value={doctor.idconsultorio_medico_posta}
-                >
-                  {doctor.nombre}
-                </option>
-              ))}
-            </select>
-            {errors.idmedconposta && (
-              <p className="text-danger">{errors.idmedconposta.message}</p>
-            )}
-            <h2>Horarios</h2>
-            <select
-              className="form-select"
-              {...register("idhorario", {
-                required: "El horario es requerido",
-              })}
-            >
-              <option value="">Seleccione un horario</option>
-              {horarios?.map((horario) => (
-                <option key={horario.idhorario} value={horario.idhorario}>
-                  {horario.hora}
-                </option>
-              ))}
-            </select>
-            {errors.idhorario && (
-              <p className="text-danger">{errors.idhorario.message}</p>
-            )}
-            <h2>Calendario</h2>
-            <label htmlFor="calendario">Calendario</label>
-            <input
-              type="date"
-              {...register("fecha", {
-                required: "La fecha es requerida",
-                validate: {
-                  futureDate: (value) => {
-                    const today = new Date().toISOString().split("T")[0]; // Obtiene la fecha de hoy en formato 'YYYY-MM-DD'
-                    if (value <= today) {
-                      return "La fecha debe ser posterior al día de hoy";
-                    }
-                    return true;
-                  },
-                },
-              })}
-            />
-            {errors.fecha && (
-              <p className="text-danger">{errors.fecha.message}</p>
-            )}
-            <h2>Cupos disponibles</h2>
-            <label htmlFor="calendario">Cupos</label>
-            <input
-              type="number"
-              {...register("cupos_totales", {
-                required: "Ingrese los cupos de la cita",
-                min: {
-                  value: 1,
-                  message: "El número de cupos debe ser mayor que 0",
-                },
-                max: {
-                  value: 20,
-                  message: "El número de cupos no puede ser mayor a 20",
-                },
-              })}
-            />
-            {errors.cupos_totales && (
-              <p className="text-danger">{errors.cupos_totales.message}</p>
-            )}
-            <div className="row m-3">
-              <div className="col-12 d-flex justify-content-end">
-                <button
-                  type="submit"
-                  className="btn btn-primary"
-                  disabled={mutation.isPending}
-                >
-                  {mutation.isPending ? "Programando ..." : "Programar"}
-                </button>
+      <div className="container-fluid containerColor">
+        <div className="row align-items-center justify-content-center">
+          <div className="col-12">
+            <h1>Programar cita</h1>
+            <h2>Nombre de posta</h2>
+            <p>{data?.posta?.nombre}</p>
+            <h2>Nombre de Consultorio</h2>
+            <p>{data?.consultorio?.nombre}</p>
+            <h2>Doctores</h2>
+            {data?.doctores?.length === 0 ? (
+              <p>No existen doctores disponibles para programar una cita</p>
+            ) : (
+              <div>
+                {modal.show && (
+                  <Modal
+                    titulo={modal.titulo}
+                    estado={modal.estado}
+                    mensaje={modal.message}
+                    setModal={setModal}
+                    onClose={handleModalClose}
+                  />
+                )}
+                <form onSubmit={onSubmit}>
+                  <select
+                    className="form-select"
+                    {...register("idmedconposta", {
+                      required: "El doctor es requerido",
+                    })}
+                  >
+                    <option value="">Seleccione un doctor</option>
+                    {data?.doctores?.map((doctor) => (
+                      <option
+                        key={doctor.iddoctor}
+                        value={doctor.idconsultorio_medico_posta}
+                      >
+                        {doctor.nombre}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.idmedconposta && (
+                    <p className="text-danger">{errors.idmedconposta.message}</p>
+                  )}
+                  <h2>Horarios</h2>
+                  <select
+                    className="form-select"
+                    {...register("idhorario", {
+                      required: "El horario es requerido",
+                    })}
+                  >
+                    <option value="">Seleccione un horario</option>
+                    {horarios?.map((horario) => (
+                      <option key={horario.idhorario} value={horario.idhorario}>
+                        {horario.hora}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.idhorario && (
+                    <p className="text-danger">{errors.idhorario.message}</p>
+                  )}
+                  <h2>Calendario</h2>
+                  <label htmlFor="calendario">Calendario</label>
+                  <input
+                    type="date"
+                    {...register("fecha", {
+                      required: "La fecha es requerida",
+                      validate: {
+                        futureDate: (value) => {
+                          const today = new Date().toISOString().split("T")[0]; // Obtiene la fecha de hoy en formato 'YYYY-MM-DD'
+                          if (value <= today) {
+                            return "La fecha debe ser posterior al día de hoy";
+                          }
+                          return true;
+                        },
+                      },
+                    })}
+                  />
+                  {errors.fecha && (
+                    <p className="text-danger">{errors.fecha.message}</p>
+                  )}
+                  <h2>Cupos disponibles</h2>
+                  <label htmlFor="calendario">Cupos</label>
+                  <input
+                    type="number"
+                    {...register("cupos_totales", {
+                      required: "Ingrese los cupos de la cita",
+                      min: {
+                        value: 1,
+                        message: "El número de cupos debe ser mayor que 0",
+                      },
+                      max: {
+                        value: 20,
+                        message: "El número de cupos no puede ser mayor a 20",
+                      },
+                    })}
+                  />
+                  {errors.cupos_totales && (
+                    <p className="text-danger">{errors.cupos_totales.message}</p>
+                  )}
+                  <div className="row m-3">
+                    <div className="col-12 d-flex justify-content-end">
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        disabled={mutation.isPending}
+                      >
+                        {mutation.isPending ? "Programando ..." : "Programar"}
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
-            </div>
-          </form>
+            )}
+            {/* Fuera del form, xq si no hay medico el from no se renderiza */}
+            <Link
+              to={`/admin/postas/${data?.posta?.idposta}`}
+              className="btn btn-secondary me-3"
+            >
+              Volver
+            </Link>
+          </div>
         </div>
-      )}
-      {/* Fuera del form, xq si no hay medico el from no se renderiza */}
-      <Link
-        to={`/admin/postas/${data?.posta?.idposta}`}
-        className="btn btn-secondary me-3"
-      >
-        Volver
-      </Link>
+      </div>
     </>
   );
 }
