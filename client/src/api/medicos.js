@@ -16,3 +16,8 @@ export const getMedico = async (idmedico) => {
   const { data } = await axios.get(`/medicos/${idmedico}`);
   return data;
 };
+
+export const getEspecialidades = async () => {
+  const { data } = await axios.get("/especialidades");
+  return data;
+};

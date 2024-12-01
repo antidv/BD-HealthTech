@@ -1,9 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { createMedico } from "../../api/medicos";
+import { createMedico, getEspecialidades } from "../../api/medicos";
 import Modal from "../../components/Modal";
+import Loading from "../Loading";
+import ErrorPage from "../ErrorPage";
 
 function RegistrarMedico() {
   // Estado del modal
@@ -24,6 +26,16 @@ function RegistrarMedico() {
     formState: { errors },
     getValues,
   } = useForm();
+
+  // Obtener las especialidades
+  const {
+    data: especialidades,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["especialidades"],
+    queryFn: getEspecialidades,
+  });
 
   // Registrar nuevo medico
   const mutation = useMutation({
@@ -59,6 +71,9 @@ function RegistrarMedico() {
       navigate("/admin/medicos");
     }
   };
+
+  if (isLoading) return <Loading nombre="especialidades ..." />;
+  if (isError) return <ErrorPage code={500} message="Ocurrió un error ..." />;
 
   return (
     <>
@@ -146,14 +161,20 @@ function RegistrarMedico() {
                 <label htmlFor="especialidad" className="form-label">
                   Especialidad
                 </label>
-                <input
-                  id="especialidad"
-                  type="text"
-                  className="form-control"
+                {/* select */}
+                <select
+                  className="form-select"
                   {...register("especialidad", {
-                    required: "La especialidad es obligatoria",
+                    required: "La especialidad es requerida",
                   })}
-                />
+                >
+                  <option value="">Seleccione una especialidad</option>
+                  {especialidades?.map((esp) => (
+                    <option key={esp.idespecialidad} value={esp.nombre}>
+                      {esp.nombre}
+                    </option>
+                  ))}
+                </select>
                 {errors.especialidad && <p>{errors.especialidad.message}</p>}
               </div>
               <div className="col-3 mb-3">
