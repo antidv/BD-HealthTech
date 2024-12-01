@@ -102,7 +102,8 @@ export const getConsultorioPosta = async (req, res) => {
 
         let query = `
             SELECT 
-                c.idconsultorio, 
+                c.idconsultorio,
+                cp.idconsultorio_posta, 
                 c.nombre AS consultorio_nombre, 
                 c.foto AS consultorio_foto,
                 cp.disponible
