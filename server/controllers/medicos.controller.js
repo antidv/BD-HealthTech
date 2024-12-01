@@ -166,7 +166,7 @@ export const getMedico = async (req, res) => {
       dni: medico.dni,
       especialidad: medico.especialidad,
       foto: medico.foto,
-      estado: medico.estado,
+      estado: medico.disponible,
       postas: postas
     };
 
