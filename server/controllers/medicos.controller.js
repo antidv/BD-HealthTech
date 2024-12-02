@@ -159,6 +159,7 @@ export const getMedico = async (req, res) => {
           consultorios: [
             {
               nombre_consultorio: row.nombre_consultorio,
+              id_consultorio: row.id_mcp,
               estado: row.estado_consultorio,
             },
           ],
