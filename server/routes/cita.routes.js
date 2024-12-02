@@ -1,20 +1,20 @@
 // routes/cita.routes.js
 import { Router } from 'express';
 import {
-  getCitas,
+  getCitasPaciente,
+  getCitasMedico,
   getCita,
   postCita,
   updateCita,
-  deleteCita,
 } from '../controllers/cita.controller.js';
-import { verifyToken, isAdmin } from '../libs/auth.middleware.js';
+import { verifyToken, isMedico, isPaciente } from '../libs/auth.middleware.js';
 
 const router = Router();
 
-router.get('/citas', verifyToken, isAdmin, getCitas);
-router.get('/citas/:id', verifyToken, isAdmin, getCita);
-router.post('/citas', verifyToken, isAdmin, postCita);
-router.put('/citas/:id', verifyToken, isAdmin, updateCita);
-router.delete('/citas/:id', verifyToken, isAdmin, deleteCita);
+router.get('/citas_paciente', verifyToken, isPaciente, getCitasPaciente);
+router.get('/citas_medico', verifyToken, isMedico, getCitasMedico);
+router.get('/citas/:id', verifyToken, isMedico, getCita);
+router.post('/citas', verifyToken, isPaciente, postCita);
+router.put('/citas/:id', verifyToken, isMedico, updateCita);
 
 export default router;

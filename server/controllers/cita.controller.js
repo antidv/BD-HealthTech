@@ -1,23 +1,50 @@
-// controllers/cita.controller.js
 import { pool } from "../src/database.js";
 
-// Función para convertir BigInt a string en las respuestas JSON
 const replacer = (key, value) => (typeof value === 'bigint' ? value.toString() : value);
 
-// Obtener todas las citas
-export const getCitas = async (req, res) => {
+export const getCitasPaciente = async (req, res) => {
     try {
+        const idusuario = req.userId;
         const connection = await pool.getConnection();
-        const citas = await connection.query('SELECT * FROM cita');
+        const pacienteRows = await connection.query('SELECT idpaciente FROM paciente WHERE idusuario = ?', [idusuario]);
+
+        const idpaciente = pacienteRows[0].idpaciente;
+        const citas = await connection.query('SELECT * FROM cita WHERE idpaciente = ?', [idpaciente]);
         connection.release();
-        res.status(200).json(JSON.parse(JSON.stringify(citas, replacer)));
+
+        if (citas.length === 0) {
+            return res.status(404).json({ error: "El paciente no cuenta con citas." });
+        }
+
+        res.status(200).json(citas);
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al obtener las citas');
+        console.error("Error al obtener las citas del paciente:", error);
+        res.status(500).send("Error al obtener las citas del paciente");
     }
 };
 
-// Obtener una cita por ID
+export const getCitasMedico = async (req, res) => {
+    try {
+        const idusuario = req.userId;
+        const connection = await pool.getConnection();
+
+        const medicoRows = await connection.query('SELECT idmedico FROM medico WHERE idusuario = ?', [idusuario]);
+
+        const idmedico = medicoRows[0].idmedico;
+        const citas = await connection.query('SELECT * FROM cita WHERE idmedico = ?', [idmedico]);
+        connection.release();
+
+        if (citas.length === 0) {
+            return res.status(404).json({ error: "El médico no cuenta con citas." });
+        }
+
+        res.status(200).json(citas);
+    } catch (error) {
+        console.error("Error al obtener las citas del médico:", error);
+        res.status(500).send("Error al obtener las citas del médico");
+    }
+};
+
 export const getCita = async (req, res) => {
     try {
         const { id } = req.params;
@@ -35,7 +62,6 @@ export const getCita = async (req, res) => {
     }
 };
 
-// Crear una nueva cita
 export const postCita = async (req, res) => {
     try {
         const {
@@ -88,7 +114,7 @@ export const postCita = async (req, res) => {
 
             await connection.commit();
             connection.release();
-            res.status(201).json({ idcita: result.insertId.toString() }); // Convertir BigInt a string
+            res.status(201).json({ idcita: result.insertId.toString() });
         } catch (error) {
             await connection.rollback();
             connection.release();
@@ -101,7 +127,6 @@ export const postCita = async (req, res) => {
     }
 };
 
-// Actualizar una cita existente
 export const updateCita = async (req, res) => {
     try {
         const { id } = req.params;
@@ -136,30 +161,5 @@ export const updateCita = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al actualizar la cita');
-    }
-};
-
-// Eliminar una cita
-export const deleteCita = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const connection = await pool.getConnection();
-
-        const result = await connection.query('DELETE FROM cita WHERE idcita = ?', [id]);
-
-        if (result.affectedRows === 0) {
-            connection.release();
-            return res.status(404).json({ error: "La cita no existe" });
-        }
-
-        connection.release();
-        res.json({ message: 'Cita eliminada con éxito' });
-    } catch (error) {
-        console.error(error);
-        if (error.code === 'ER_ROW_IS_REFERENCED_2') {
-            res.status(400).send('No se puede eliminar la cita porque está referenciada en otros registros.');
-        } else {
-            res.status(500).send('Error al eliminar la cita');
-        }
     }
 };
