@@ -14,10 +14,15 @@ export const getCitasPaciente = async (req, res) => {
         const offset = (pageNumber - 1) * limitNumber;
 
         const query = `
-            SELECT c.idcita, c.fecha, c.hora_aprox, c.num_cupo, c.motivo, c.consultorio, 
+            SELECT c.idcita, c.fecha, c.hora_aprox, c.num_cupo, c.motivo, c.consultorio, p.nombre as posta_nombre,
             m.nombre AS medico_nombre, m.apellidoP AS medico_apellido, c.estado
             FROM cita c
-            INNER JOIN medico m ON c.idmedico = m.idmedico
+            INNER JOIN programacion_cita pc ON c.idprogramacion_cita = pc.idprogramacion_cita
+            INNER JOIN medico_consultorio_posta mcp ON pc.idmedconposta = mcp.idmedconposta
+            INNER JOIN medico m ON mcp.idmedico = m.idmedico
+            INNER JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
+            INNER JOIN consultorio co ON cp.idconsultorio = co.idconsultorio
+            INNER JOIN posta p ON cp.idposta = p.idposta
             WHERE idpaciente = ?
             ORDER BY c.fecha DESC
             LIMIT ? OFFSET ?
