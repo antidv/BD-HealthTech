@@ -59,6 +59,13 @@ function DetallesCita() {
                         <h4 className="m-3">{diagnostico}</h4>
                         {medicamentos.map((medicamento, idx) => (
                           <div key={idx} style={{ marginBottom: "1em" }} className="card-body">
+                            <label className="card-text mb-3">Observacion</label>
+                            <input
+                              type="text"
+                              value={medicamento.observacion}
+                              disabled
+                              className="form-control"
+                            />
                             <label className="card-text mb-3">Medicamento:</label>
                             <input
                               type="text"
