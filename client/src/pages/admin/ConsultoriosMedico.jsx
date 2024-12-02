@@ -1,11 +1,13 @@
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getMedico } from "../../api/medicos";
+import { toggleMedicoConsultorioPosta } from "../../api/medicos";
 import Loading from "../Loading";
 import ErrorPage from "../ErrorPage";
 
 function ConsultoriosMedico() {
   const { idmedico } = useParams();
+  const queryClient = useQueryClient();
 
   // Peticion de datos de medico
   const {
@@ -16,6 +18,19 @@ function ConsultoriosMedico() {
     queryKey: ["medico", idmedico],
     queryFn: () => getMedico(idmedico),
   });
+
+  // Mutacion para habilitar - deshabilitar conmedposta
+  const mutation = useMutation({
+    mutationKey: ["toggleMedicoConsultorioPosta"],
+    mutationFn: (id) => toggleMedicoConsultorioPosta(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["medico", idmedico]);
+    },
+  });
+
+  const handleToggleConsultorio = (id) => {
+    mutation.mutate(id);
+  };
 
   if (isMedicoLoading) return <Loading nombre="Médico ..." />;
   if (isMedicoError)
@@ -102,8 +117,16 @@ function ConsultoriosMedico() {
                                     ? "btn-danger"
                                     : "btn-success"
                                 }`}
+                                onClick={() =>
+                                  handleToggleConsultorio(
+                                    consultorio.idmedconposta
+                                  )
+                                }
+                                disabled={mutation.isPending}
                               >
-                                {consultorio.estado
+                                {mutation.isPending
+                                  ? "Cambiando ..."
+                                  : consultorio.estado
                                   ? "Deshabilitar"
                                   : "Habilitar"}
                               </button>

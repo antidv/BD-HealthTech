@@ -31,3 +31,10 @@ export const updateMedico = async (idmedico, data) => {
   const response = await axios.put(`/medicos/${idmedico}`, data);
   return response.data;
 };
+
+export const toggleMedicoConsultorioPosta = async (idmedconposta) => {
+  const response = await axios.put(
+    `/medico-consultorio-posta/${idmedconposta}`
+  );
+  return response.data;
+};
