@@ -50,3 +50,13 @@ export const getProgramacionCitasPaciente = async ({
   });
   return response.data;
 };
+
+export const getDataCreateCitaPaciente = async (idprogramacion_cita) => {
+  const response = await axios.get(`/programacion-cita/${idprogramacion_cita}`);
+  return response.data;
+};
+
+export const createCitaPaciente = async (data) => {
+  const respone = await axios.post(`/citas`, data);
+  return respone.data;
+};

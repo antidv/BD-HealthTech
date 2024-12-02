@@ -1,9 +1,179 @@
-function solicitarCita() {
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { createCitaPaciente, getDataCreateCitaPaciente } from "../../api/citas";
+import Modal from "../../components/Modal";
+
+function SolicitarCita() {
+  const { idprogramacion_cita } = useParams();
+
+  // Estado del modal
+  const [modal, setModal] = useState({
+    show: false,
+    estado: true,
+    titulo: "",
+    message: "",
+  });
+
+  // Navegacion
+  const navigate = useNavigate();
+
+  const {
+    data: cita,
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey: ["programacion_cita", idprogramacion_cita],
+    queryFn: () => getDataCreateCitaPaciente(idprogramacion_cita),
+  });
+
+  const [motivo, setMotivo] = useState("");
+
+  // Crear cita
+  const mutation = useMutation({
+    mutationKey: ["crear-cita"],
+    mutationFn: createCitaPaciente,
+    onSuccess: (data) => {
+      setModal({
+        show: true,
+        estado: true,
+        titulo: "Registro exitoso",
+        message: `La cita se ha creado con éxito.`,
+      });
+      console.log("Cita creada con éxito:", data);
+    },
+    onError: (error) => {
+      setModal({
+        show: true,
+        estado: false,
+        titulo: "Ocurrió un error",
+        message: "Error: No se pudo crear la cita. Inténtalo de nuevo.",
+      });
+      console.error("Error al crear la cita:", error);
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Crear el objeto con los datos a enviar
+    const datosEnviar = {
+      idprogramacion_cita: cita.idprogramacion_cita,
+      idmedico: cita.idmedico,
+      motivo,
+      fecha: cita.fecha,
+      consultorio: cita.consultorio,
+    };
+    // Simular envío de datos
+    mutation.mutate(datosEnviar);
+
+    // Aquí puedes llamar a tu función de API para enviar los datos.
+  };
+
+  // Navegar al cerrar el modal
+  const handleModalClose = () => {
+    setModal({ ...modal, show: false });
+    if (modal.estado) {
+      navigate("/paciente/citas");
+    }
+  };
+
+  if (isLoading) return <p>Cargando la programación...</p>;
+  if (isError) return <p>Ocurrió un error...</p>;
+
   return (
-    <>
-      <div>Hola solicitar cita</div>
-    </>
+    <div>
+      {modal.show && (
+        <Modal
+          titulo={modal.titulo}
+          estado={modal.estado}
+          mensaje={modal.message}
+          setModal={setModal}
+          onClose={handleModalClose}
+        />
+      )}
+      <h1>Solicitar Cita</h1>
+      <form onSubmit={handleSubmit}>
+        {/* Mostrar los datos como inputs solo lectura */}
+        <div>
+          <label>
+            Fecha:
+            <input
+              type="text"
+              value={cita.fecha}
+              readOnly
+              className="form-control"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Posta:
+            <input
+              type="text"
+              value={cita.posta}
+              readOnly
+              className="form-control"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Consultorio:
+            <input
+              type="text"
+              value={cita.consultorio}
+              readOnly
+              className="form-control"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Médico:
+            <input
+              type="text"
+              value={cita.nombre}
+              readOnly
+              className="form-control"
+            />
+          </label>
+        </div>
+        <div>
+          <label>
+            Horario:
+            <input
+              type="text"
+              value={cita.hora}
+              readOnly
+              className="form-control"
+            />
+          </label>
+        </div>
+
+        {/* Campo editable para el motivo */}
+        <div>
+          <label>
+            Motivo de la cita:
+            <textarea
+              value={motivo}
+              onChange={(e) => setMotivo(e.target.value)}
+              required
+              className="form-control"
+              rows="3"
+            ></textarea>
+          </label>
+        </div>
+
+        <button
+          type="submit"
+          className="btn btn-primary mt-3"
+          disabled={mutation.isPending}
+        >
+          {mutation.isPending ? "Solicitando ..." : "Solicitar Cita"}
+        </button>
+      </form>
+    </div>
   );
 }
 
-export default solicitarCita;
+export default SolicitarCita;
