@@ -160,3 +160,35 @@ begin
 end$$
 
 delimiter ;
+
+DELIMITER $$
+
+CREATE TRIGGER set_idmedico_on_cita_insert
+BEFORE INSERT ON cita
+FOR EACH ROW
+BEGIN
+  DECLARE medico_id INT;
+
+  SELECT mcp.idmedico
+  INTO medico_id
+  FROM programacion_cita pc
+  JOIN medico_consultorio_posta mcp ON pc.idmedconposta = mcp.idmedconposta
+  WHERE pc.idprogramacion_cita = NEW.idprogramacion_cita;
+
+  SET NEW.idmedico = medico_id;
+END$$
+
+DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER update_cupos_disponibles
+AFTER INSERT ON cita
+FOR EACH ROW
+BEGIN
+  UPDATE programacion_cita
+  SET cupos_disponibles = cupos_disponibles - 1
+  WHERE idprogramacion_cita = NEW.idprogramacion_cita;
+END$$
+
+DELIMITER ;
