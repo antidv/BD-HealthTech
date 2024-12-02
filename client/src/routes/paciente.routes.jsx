@@ -1,6 +1,7 @@
 import { Navigate, Route } from "react-router-dom";
 import Paciente from "../pages/paciente/Paciente";
-// import CitasDisponibles from "../pages/paciente/CitasDisponibles";
+import CitasDisponibles from "../pages/paciente/CitasDisponibles";
+import SolicitarCita from "../pages/paciente/SolicitarCita";
 
 export default function RutasPaciente() {
   return (
@@ -11,7 +12,11 @@ export default function RutasPaciente() {
 
         {/* Citas */}
         <Route path="citas" element={<Paciente />} />
-        {/* <Route path="citas-disponibles" element={<CitasDisponibles />} /> */}
+        <Route path="citas-disponibles" element={<CitasDisponibles />} />
+        <Route
+          path="solicitar-cita/:idprogramacion_cita"
+          element={<SolicitarCita />}
+        />
       </Route>
     </>
   );

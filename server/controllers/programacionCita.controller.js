@@ -248,16 +248,46 @@ export const getProgramacionCita = async (req, res) => {
     const { id } = req.params;
 
     const query = `
-      SELECT * FROM programacion_cita WHERE idprogramacion_cita = ?;
+      SELECT pc.idprogramacion_cita,
+             DATE_FORMAT(pc.fecha, '%d-%m-%Y') AS fecha,
+             m.idmedico as idmedico,
+             CONCAT(m.nombre, ' ', m.apellidoP, ' ', m.apellidoM) AS medico,
+             c.nombre AS consultorio, 
+             p.nombre AS posta, 
+             h.hora_inicio, 
+             h.hora_fin,
+             h.idhorario as idhorario
+      FROM programacion_cita pc
+      INNER JOIN medico_consultorio_posta mcp ON pc.idmedconposta = mcp.idmedconposta
+      INNER JOIN medico m ON mcp.idmedico = m.idmedico
+      INNER JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
+      INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+      INNER JOIN posta p ON cp.idposta = p.idposta
+      INNER JOIN horario h ON pc.idhorario = h.idhorario
+      WHERE pc.idprogramacion_cita = ?;
     `;
+
     const rows = await connection.query(query, [id]);
 
     if (rows.length === 0) {
+      connection.release();
       return res.status(404).json({ error: "La programación de cita no existe" });
     }
 
-    res.status(200).json(rows[0]);
+    const row = rows[0];
+    const formattedRow = {
+      idprogramacion_cita: row.idprogramacion_cita,
+      fecha: row.fecha,
+      idmedico: row.idmedico,
+      nombre: row.medico,
+      consultorio: row.consultorio,
+      posta: row.posta,
+      idhorario: row.idhorario,
+      hora: `${formatTime(row.hora_inicio)} - ${formatTime(row.hora_fin)}`,
+    };
+
     connection.release();
+    res.status(200).json(formattedRow);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error al obtener la programación de cita");
