@@ -2,23 +2,17 @@ import { pool } from "../src/database.js";
 
 export const postAntecedentes = async (req, res) => {
     try {
-        const idusuario = req.userId;
+        const { idpaciente } = req.params;
         const connection = await pool.getConnection();
 
-        const paciente = await connection.query(
-            "SELECT idpaciente FROM paciente WHERE idusuario = ?",
-            [idusuario]
-        );
-
-        const idpaciente = paciente;
-        const [existingAntecedentes] = await connection.query(
+        const existingAntecedentes = await connection.query(
             "SELECT * FROM antecedentes WHERE idpaciente = ?",
             [idpaciente]
         );
 
         if (existingAntecedentes && existingAntecedentes.length > 0) {
             connection.release();
-            return res.status(400).json({ error: "Antecedentes ya existentes" });
+            return res.json([]);
         }
 
         const result = await connection.query(
