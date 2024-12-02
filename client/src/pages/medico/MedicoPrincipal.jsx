@@ -57,7 +57,7 @@ function MedicoPrincipal() {
               <div className="col-12">
                 <div className="table-responsive mt-5 me-5">
                   <h2 className="mb-4">Historial de citas</h2>
-                  <table class="table table-info table-bordered">
+                  <table className="table table-info table-bordered">
                     <thead className="table-light">
                       <tr>
                         <th scope="col">Fecha</th>
