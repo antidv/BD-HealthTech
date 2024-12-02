@@ -66,7 +66,7 @@ function MedicoPrincipal() {
                         <th scope="col">Consultorio</th>
                         <th scope="col">Paciente</th>
                         <th scope="col">Estado</th>
-                        <th scope="col">Detalles</th>
+                        <th scope="col">Accion</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -88,7 +88,9 @@ function MedicoPrincipal() {
                             <td>
                               <Link
                                 to={`/medico/diagnostico/${cita.idcita}`}
-                                className={`btn btn-primary`}
+                                className={`btn btn-primary ${
+                                  cita.estado === "Atendido" ? "disabled" : ""
+                                }`}
                               >
                                 Modificar
                               </Link>
