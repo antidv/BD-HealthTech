@@ -348,7 +348,7 @@ export const getProgramacionCitasMedico = async (req, res) => {
     const { idmedico } = medicoRows[0];
 
     // Parámetros para paginación y filtros
-    const { page = 1, limit = 10, nombrePosta, fecha = '' } = req.query;
+    const { page = 1, limit = 10, nombre = '', fecha = '' } = req.query;
 
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
@@ -358,9 +358,9 @@ export const getProgramacionCitasMedico = async (req, res) => {
     const conditions = [`m.idmedico = ?`];
     const params = [idmedico];
 
-    if (nombrePosta) {
+    if (nombre) {
       conditions.push(`p.nombre LIKE ?`);
-      params.push(`%${nombrePosta}%`);
+      params.push(`%${nombre}%`);
     }
 
     if (fecha) {
