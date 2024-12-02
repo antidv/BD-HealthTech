@@ -77,3 +77,10 @@ export const createDiagnosticoCita = async (idcita, data) => {
   const response = await axios.post(`/diagnostico/${idcita}`, data);
   return response.data;
 };
+
+export const getProgramacionCitaMedico = async ({ page, limit, nombre, fecha }) => {
+  const response = await axios.get("/programacion-cita-medico", {
+    params: { page, limit, nombre, fecha },
+  });
+  return response.data;
+}
