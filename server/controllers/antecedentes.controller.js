@@ -3,46 +3,57 @@ import { pool } from "../src/database.js";
 export const postAntecedentes = async (req, res) => {
     try {
         const { idpaciente } = req.params;
-        const connection = await pool.getConnection();
+        const { alergias, enfermedades } = req.body;
 
-        const existingAntecedentes = await connection.query(
-            "SELECT * FROM antecedentes WHERE idpaciente = ?",
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const existingAntecedenteRows = await connection.query(
+            "SELECT idantecedentes FROM antecedentes WHERE idpaciente = ?",
             [idpaciente]
         );
 
-        if (existingAntecedentes && existingAntecedentes.length > 0) {
-            connection.release();
+        let idantecedentes;
+        if (existingAntecedenteRows.length > 0) {
+            idantecedentes = existingAntecedenteRows[0].idantecedentes;
             return res.json([]);
-        }
-
-        const result = await connection.query(
-            "INSERT INTO antecedentes (idpaciente) VALUES (?)",
-            [idpaciente[0].idpaciente]
-        );
-
-        const idantecedentes = result.insertId;
-
-        const alergias = req.body.alergias || [];
-        for (const idalergia of alergias) {
-            await connection.query(
-                "INSERT INTO alergia_historia (idantecedentes, idalergia) VALUES (?, ?)",
-                [idantecedentes, idalergia]
+        } else {
+            const result = await connection.query(
+                "INSERT INTO antecedentes idpaciente VALUES ?",
+                [idpaciente]
             );
+            idantecedentes = result.insertId;
         }
 
-        const enfermedades = req.body.enfermedades || [];
-        for (const idenfermedad of enfermedades) {
-            await connection.query(
-                "INSERT INTO enfermedad_historia (idantecedentes, idenfermedad) VALUES (?, ?)",
-                [idantecedentes, idenfermedad]
-            );
+        if (alergias && alergias.length > 0) {
+            for (const idalergia of alergias) {
+                await connection.query(
+                    "INSERT INTO alergia_historia (idantecedentes, idalergia) VALUES (?, ?)",
+                    [idantecedentes, idalergia]
+                );
+            }
         }
 
+        if (enfermedades && enfermedades.length > 0) {
+            for (const idenfermedad of enfermedades) {
+                await connection.query(
+                    "INSERT INTO enfermedad_historia (idantecedentes, idenfermedad) VALUES (?, ?)",
+                    [idantecedentes, idenfermedad]
+                );
+            }
+        }
+
+        await connection.commit();
         connection.release();
-        res.status(201).json({ message: "Antecedentes creados exitosamente" });
+
+        res.status(201).json({ message: "Antecedentes actualizados exitosamente" });
     } catch (error) {
-        console.error('Error al crear antecedentes:', error);
-        res.status(500).json({ error: "Error al crear antecedentes" });
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error("Error al actualizar los antecedentes:", error);
+        res.status(500).send("Error al actualizar los antecedentes");
     }
 };
 

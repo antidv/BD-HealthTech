@@ -23,3 +23,36 @@ export const getMedicamentos = async (req, res) => {
         res.status(500).send("Error al obtener los medicamentos");
     }
 };
+
+export const postDiagnostico = async (req, res) => {
+    try {
+        const { idcita } = req.params;
+        const { idenfermedad, observacion, idmedicamento, dosis } = req.body;
+
+        const connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const diagnosticoResult = await connection.query(
+            "INSERT INTO diagnostico (idcita, idenfermedad, observacion) VALUES (?, ?, ?)",
+            [idcita, idenfermedad, observacion]
+        );
+        const iddiagnostico = diagnosticoResult.insertId;
+
+        await connection.query(
+            "INSERT INTO receta (iddiagnostico, idmedicamento, dosis) VALUES (?, ?, ?)",
+            [iddiagnostico, idmedicamento, dosis]
+        );
+
+        await connection.commit();
+        connection.release();
+
+        res.status(201).json({ message: "Diagnóstico y receta creados exitosamente" });
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+            connection.release();
+        }
+        console.error("Error al crear el diagnóstico y la receta:", error);
+        res.status(500).send("Error al crear el diagnóstico y la receta");
+    }
+};
