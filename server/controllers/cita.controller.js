@@ -192,7 +192,8 @@ export const getCitaMedico = async (req, res) => {
                 c.idcita, 
                 c.fecha, 
                 c.motivo, 
-                c.consultorio, 
+                c.consultorio,
+                p.idpaciente, 
                 p.nombre AS paciente_nombre, 
                 p.apellidoP AS paciente_apellido
             FROM cita c
@@ -243,6 +244,7 @@ export const getCitaMedico = async (req, res) => {
             fecha: formatDate(cita.fecha),
             motivo: cita.motivo,
             consultorio: cita.consultorio,
+            idpaciente: cita.idpaciente,
             paciente_nombre: cita.paciente_nombre,
             paciente_apellido: cita.paciente_apellido,
             estado: cita.estado,
