@@ -50,6 +50,53 @@ export const postMedico = async (req, res, next) => {
   }
 };
 
+export const perfilMedico = async (req, res) => {
+  try {
+    const idusuario = req.userId;
+    const connection = await pool.getConnection();
+
+    const medicoRows = await connection.query(
+      "SELECT idmedico FROM medico WHERE idusuario = ?",
+      [idusuario]
+    );
+
+    if (medicoRows.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: "El médico no existe" });
+    }
+
+    const idmedico = medicoRows[0].idmedico;
+
+    const query = `
+      SELECT  
+        m.nombre, 
+        m.apellidoP, 
+        m.apellidoM, 
+        m.dni, 
+        m.foto, 
+        m.disponible, 
+        e.nombre AS especialidad
+      FROM medico m
+      JOIN especialidad e ON m.idespecialidad = e.idespecialidad
+      WHERE m.idmedico = ?
+    `;
+    const rows = await connection.query(query, [idmedico]);
+
+    if (rows.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: "El médico no existe" });
+    }
+
+    const medico = rows[0];
+
+    connection.release();
+    res.status(200).json(medico);
+  } catch (error) {
+    console.error("Error al obtener el médico:", error);
+    res.status(500).send("Error al obtener el médico");
+  }
+}
+
 export const getMedicos = async (req, res) => {
   try {
     const connection = await pool.getConnection();
