@@ -354,12 +354,11 @@ export const postCita = async (req, res) => {
   };
   
 
-  export const updateCita = async (req, res) => {
+export const updateCita = async (req, res) => {
     try {
         const { id } = req.params;
         const fields = req.body;
 
-        // Verificar que solo se actualicen los campos 'estado' o 'triaje'
         const allowedFields = ['estado', 'triaje'];
         const keys = Object.keys(fields);
         const invalidFields = keys.filter(key => !allowedFields.includes(key));
@@ -372,14 +371,13 @@ export const postCita = async (req, res) => {
             return res.status(400).json({ error: "No se proporcionaron campos para actualizar" });
         }
 
-        // Construir consulta dinámica
         let query = 'UPDATE cita SET ';
         const params = [];
         for (const [key, value] of Object.entries(fields)) {
             query += `${key} = ?, `;
             params.push(value);
         }
-        query = query.slice(0, -2); // Eliminar la última coma y espacio
+        query = query.slice(0, -2);
         query += ' WHERE idcita = ?';
         params.push(id);
 
