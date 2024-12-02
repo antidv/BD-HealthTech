@@ -71,7 +71,7 @@ export const getAntecedentes = async (req, res) => {
 
         if (!antecedentes || antecedentes.length === 0) {
             connection.release();
-            return res.status(404).json([]);
+            return res.json([]);
         }
 
         for (const antecedente of antecedentes) {
@@ -81,7 +81,7 @@ export const getAntecedentes = async (req, res) => {
                  WHERE ah.idantecedentes = ?`,
                 [antecedente.idantecedentes]
             );
-            
+
             antecedente.alergias = Array.isArray(alergiasResult) ? alergiasResult.map(alergia => alergia.nombre) : [];
 
             const enfermedadesResult = await connection.query(
