@@ -30,3 +30,11 @@ export const deleteProgramacionCita = async (idprogramacion_cita) => {
   );
   return response.data;
 };
+
+// Citas paciente Logeado
+export const getCitasPacienteLogeado = async ({ page, limit }) => {
+  const response = await axios.get("/citas_paciente", {
+    params: { page, limit },
+  });
+  return response.data;
+};
