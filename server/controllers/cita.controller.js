@@ -74,7 +74,7 @@ export const getCitasMedico = async (req, res) => {
 
         const query = `
             SELECT c.idcita, c.fecha, c.hora_aprox, c.num_cupo, c.motivo, c.consultorio, p.nombre as posta_nombre,
-            m.nombre AS medico_nombre, m.apellidoP AS medico_apellido, c.estado
+            m.nombre AS medico_nombre, m.apellidoP AS medico_apellido, c.estado, pa.nombre AS paciente_nombre, pa.apellidoP AS paciente_apellido,
             FROM cita c
             INNER JOIN programacion_cita pc ON c.idprogramacion_cita = pc.idprogramacion_cita
             INNER JOIN medico_consultorio_posta mcp ON pc.idmedconposta = mcp.idmedconposta
@@ -82,6 +82,7 @@ export const getCitasMedico = async (req, res) => {
             INNER JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
             INNER JOIN consultorio co ON cp.idconsultorio = co.idconsultorio
             INNER JOIN posta p ON cp.idposta = p.idposta
+            INNER JOIN paciente pa ON c.idpaciente = pa.idpaciente
             WHERE idpaciente = ?
             ORDER BY c.fecha DESC
             LIMIT ? OFFSET ?
