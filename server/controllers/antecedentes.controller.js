@@ -71,7 +71,7 @@ export const getAntecedentes = async (req, res) => {
 
         if (!antecedentes || antecedentes.length === 0) {
             connection.release();
-            return res.status(404).json({ error: "No se encontraron antecedentes" });
+            return res.status(404).json([]);
         }
 
         for (const antecedente of antecedentes) {
@@ -81,8 +81,7 @@ export const getAntecedentes = async (req, res) => {
                  WHERE ah.idantecedentes = ?`,
                 [antecedente.idantecedentes]
             );
-
-            console.log("alergiasResult:", alergiasResult);
+            
             antecedente.alergias = Array.isArray(alergiasResult) ? alergiasResult.map(alergia => alergia.nombre) : [];
 
             const enfermedadesResult = await connection.query(
@@ -92,7 +91,6 @@ export const getAntecedentes = async (req, res) => {
                 [antecedente.idantecedentes]
             );
 
-            console.log("enfermedadesResult:", enfermedadesResult);
             antecedente.enfermedades = Array.isArray(enfermedadesResult) ? enfermedadesResult.map(enfermedad => enfermedad.nombre) : [];
         }
 
