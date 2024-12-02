@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getMedicosAdmin } from "../../api/medicos";
+import { cambiarEstadoMedico } from "../../api/medicos";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../hooks/usePagination";
 import CardMedico from "../../components/cards/CardMedico";
@@ -10,6 +11,7 @@ import Loading from "../Loading";
 function Medicos() {
   const { page, setPage } = usePagination();
   const [filter, setFilter] = useState("");
+  const queryClient = useQueryClient();
 
   const {
     data: medicos,
@@ -20,6 +22,19 @@ function Medicos() {
     queryFn: () => getMedicosAdmin({ page, limit: 9, search: filter }),
     keepPreviousData: true,
   });
+
+  // Mutacion para habilitar - deshabilitar conmedposta
+  const mutation = useMutation({
+    mutationKey: ["toggleEstadoMedico"],
+    mutationFn: (id) => cambiarEstadoMedico(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries(["medicos"]);
+    },
+  });
+
+  const handleToggleEstadoMedico = (id) => {
+    mutation.mutate(id);
+  };
 
   const handleSearch = (search) => {
     setFilter(search);
@@ -57,6 +72,9 @@ function Medicos() {
               nombre={`${medico.nombre} ${medico.apellidoP}`}
               especialidad={medico.especialidad}
               estado={medico.disponible}
+              idmedico={medico.idmedico}
+              handleOnClick={handleToggleEstadoMedico}
+              mutation={mutation}
             />
           ))}
           {/* Paginacion */}

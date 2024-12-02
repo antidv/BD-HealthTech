@@ -48,3 +48,8 @@ export const getCitaMedico = async (idcita) => {
   const { data } = await axios.get(`/citas_medico/${idcita}`);
   return data;
 };
+
+export const cambiarEstadoMedico = async (idmedico) => {
+  const response = await axios.put(`/medicos-disponible/${idmedico}`);
+  return response.data;
+};
