@@ -10,7 +10,7 @@ function NavBar() {
     Paciente: [
       { to: "/paciente/citas", label: "Mis citas" },
       { to: "/paciente/citas-disponibles", label: "Citas disponibles" },
-      { to: "/paciente/perfil", label: "Antecedentes médicos" },
+      { to: "/paciente/antecedentes", label: "Antecedentes médicos" },
     ],
     Medico: [
       { to: "/medico", label: "Pacientes" },
