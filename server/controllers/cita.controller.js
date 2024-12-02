@@ -146,7 +146,7 @@ export const getCitaPaciente = async (req, res) => {
 
         const diagnosticoQuery = `
             SELECT 
-                d.iddiagnostico, 
+                d.iddiagnostico, d.observacion,
                 e.nombre AS nombre_enfermedad, 
                 r.idreceta, 
                 med.nombre AS nombre_medicamento,
@@ -168,8 +168,9 @@ export const getCitaPaciente = async (req, res) => {
             }
             if (row.nombre_medicamento) {
                 diagnosticos[row.nombre_enfermedad].push({
-                    nombre_medicamento: row.nombre_medicamento,
-                    dosis: row.dosis
+                  nombre_medicamento: row.nombre_medicamento,
+                  observacion: row.observacion,
+                  dosis: row.dosis
                 });
             }
         });
