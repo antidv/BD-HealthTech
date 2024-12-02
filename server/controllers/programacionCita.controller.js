@@ -58,9 +58,14 @@ export const getCitasProgramadas = async (req, res) => {
     const limitNumber = Number(limit);
     const offset = (pageNumber - 1) * limitNumber;
 
-    const conditions = [`p.ciudad = ?`, `c.idconsultorio = ?`];
-    const params = [ciudad, idconsultorio];
+    const conditions = [`p.ciudad = ?`];
+    const params = [ciudad];
 
+    if (idconsultorio) {
+      conditions.push(`c.idconsultorio = ?`);
+      params.push(idconsultorio);
+    }
+    
     if (fecha) {
       conditions.push("DATE(pc.fecha) = ?");
       params.push(fecha);
