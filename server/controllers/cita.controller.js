@@ -258,68 +258,87 @@ export const getCitaMedico = async (req, res) => {
 
 export const postCita = async (req, res) => {
     try {
-        const {
-            idpaciente,
-            motivo,
-            fecha,
-            estado,
-            consultorio,
-            num_cupo,
-            hora_aprox,
-            triaje,
-            idmedico,
-            idprogramacion_cita
-        } = req.body;
-
-        const connection = await pool.getConnection();
-        try {
-            await connection.beginTransaction();
-
-            // Verificar que el paciente exista
-            const paciente = await connection.query('SELECT 1 FROM paciente WHERE idpaciente = ?', [idpaciente]);
-            if (paciente.length === 0) {
-                await connection.rollback();
-                connection.release();
-                return res.status(400).json({ error: "El paciente no existe" });
-            }
-
-            // Verificar que el médico exista
-            const medico = await connection.query('SELECT 1 FROM medico WHERE idmedico = ?', [idmedico]);
-            if (medico.length === 0) {
-                await connection.rollback();
-                connection.release();
-                return res.status(400).json({ error: "El médico no existe" });
-            }
-
-            // Verificar que la programación de cita exista
-            const programacionCita = await connection.query('SELECT 1 FROM programacion_cita WHERE idprogramacion_cita = ?', [idprogramacion_cita]);
-            if (programacionCita.length === 0) {
-                await connection.rollback();
-                connection.release();
-                return res.status(400).json({ error: "La programación de cita no existe" });
-            }
-
-            // Insertar la cita
-            const result = await connection.query(
-                `INSERT INTO cita (idpaciente, motivo, fecha, estado, consultorio, num_cupo, hora_aprox, triaje, idmedico, idprogramacion_cita)
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-                [idpaciente, motivo, fecha, estado, consultorio, num_cupo, hora_aprox, triaje, idmedico, idprogramacion_cita]
-            );
-
-            await connection.commit();
-            connection.release();
-            res.status(201).json({ idcita: result.insertId.toString() });
-        } catch (error) {
-            await connection.rollback();
-            connection.release();
-            console.error(error);
-            res.status(500).send('Error al crear la cita');
+      const { idmedico, idprogramacion_cita, motivo, fecha, consultorio } = req.body;
+  
+      if (!idmedico || !idprogramacion_cita || !motivo || !fecha || !consultorio) {
+        return res.status(400).json({ error: "Todos los campos son requeridos" });
+      }
+  
+      const idusuario = req.userId;
+      const connection = await pool.getConnection();
+  
+      try {
+        const pacienteRows = await connection.query(
+          `SELECT idpaciente FROM paciente WHERE idusuario = ?`,
+          [idusuario]
+        );
+  
+        if (pacienteRows.length === 0) {
+          return res.status(404).json({ error: "Paciente no encontrado" });
         }
+  
+        const { idpaciente } = pacienteRows[0];
+  
+        await connection.beginTransaction();
+  
+        const cupoQuery = `
+          SELECT cupos_disponibles
+          FROM programacion_cita
+          WHERE idprogramacion_cita = ? FOR UPDATE
+        `;
+
+        const [programacion] = await connection.query(cupoQuery, [idprogramacion_cita]);
+  
+        if (!programacion || programacion.cupos_disponibles <= 0) {
+          return res.status(400).json({ error: "No hay cupos disponibles para esta programación de cita" });
+        }
+  
+        const num_cupo = programacion.cupos_disponibles;
+  
+        const [day, month, year] = fecha.split("-");
+        const formattedDate = `${year}-${month}-${day}`;
+
+        const insertCitaQuery = `
+          INSERT INTO cita (
+            idpaciente, motivo, fecha, consultorio, num_cupo, triaje, idmedico, idprogramacion_cita
+          )
+          VALUES (?, ?, ?, ?, ?, '', ?, ?)
+        `;
+        const result = await connection.query(insertCitaQuery, [
+          idpaciente,
+          motivo,
+          formattedDate,
+          consultorio,
+          num_cupo,
+          idmedico,
+          idprogramacion_cita,
+        ]);
+  
+        await connection.commit();
+  
+        res.status(201).json({
+          idcita: result.insertId.toString(),
+          message: "Cita creada exitosamente",
+        });
+      } catch (error) {
+        await connection.rollback();
+  
+        if (error.code === "ER_DUP_ENTRY") {
+          return res.status(409).json({
+            error: "Ya existe una cita con los datos proporcionados",
+          });
+        }
+  
+        throw error;
+      } finally {
+        connection.release();
+      }
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al crear la cita');
+      console.error(error);
+      res.status(500).send("Error al crear la cita");
     }
-};
+  };
+  
 
 export const updateCita = async (req, res) => {
     try {
