@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMedicos, getMedico, perfilMedico, postMedico, updateMedicos } from '../controllers/medicos.controller.js';
+import { getMedicos, getMedico, perfilMedico, postMedico, updateMedicos, updateMedicoDisponible } from '../controllers/medicos.controller.js';
 import { verifyToken, isAdmin, isMedico } from '../libs/auth.middleware.js';
 
 const router = Router();
@@ -9,6 +9,7 @@ router.get('/perfil_medico', verifyToken, isMedico, perfilMedico);
 router.get('/medicos/:id', verifyToken, isAdmin, getMedico);
 router.post('/medicos', verifyToken, isAdmin, postMedico);
 router.put('/medicos/:id', verifyToken, isAdmin, updateMedicos);
+router.put('/medicos-disponible/:id', verifyToken, isAdmin, updateMedicoDisponible);
 router.delete('/medicos/:id', verifyToken, isAdmin);
 
 export default router;
