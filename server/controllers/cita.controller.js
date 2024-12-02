@@ -9,14 +9,45 @@ export const getCitasPaciente = async (req, res) => {
         const pacienteRows = await connection.query('SELECT idpaciente FROM paciente WHERE idusuario = ?', [idusuario]);
 
         const idpaciente = pacienteRows[0].idpaciente;
-        const citas = await connection.query('SELECT * FROM cita WHERE idpaciente = ?', [idpaciente]);
+
+        const { page = 1, limit = 10 } = req.query;
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const offset = (pageNumber - 1) * limitNumber;
+
+        const query = `
+            SELECT c.idcita, c.fecha, c.hora_aprox, c.num_cupo, c.motivo, c.consultorio, 
+            m.nombre AS medico_nombre, m.apellidoP AS medico_apellido, c.estado
+            FROM cita c
+            INNER JOIN medico m ON c.idmedico = m.idmedico
+            WHERE idpaciente = ?
+            LIMIT ? OFFSET ?
+        `;
+        const citas = await connection.query(query, [idpaciente, limitNumber, offset]);
+
+        const countQuery = `
+            SELECT COUNT(*) AS total
+            FROM cita
+            WHERE idpaciente = ?
+        `;
+        const [{ total }] = await connection.query(countQuery, [idpaciente]);
+        const totalNumber = Number(total);
+        const totalPages = Math.ceil(totalNumber / limitNumber);
+
         connection.release();
+        const formattedCitas = citas.map(cita => ({
+            ...cita,
+            fecha: formatDate(cita.fecha),
+            hora_aprox: formatTime(cita.hora_aprox)
+        }));
 
-        if (citas.length === 0) {
-            return res.status(404).json({ error: "El paciente no cuenta con citas." });
-        }
-
-        res.status(200).json(citas);
+        res.status(200).json({
+            data: formattedCitas,
+            total: totalNumber,
+            page: pageNumber,
+            limit: limitNumber,
+            totalPages: totalPages
+        });
     } catch (error) {
         console.error("Error al obtener las citas del paciente:", error);
         res.status(500).send("Error al obtener las citas del paciente");
@@ -31,14 +62,46 @@ export const getCitasMedico = async (req, res) => {
         const medicoRows = await connection.query('SELECT idmedico FROM medico WHERE idusuario = ?', [idusuario]);
 
         const idmedico = medicoRows[0].idmedico;
-        const citas = await connection.query('SELECT * FROM cita WHERE idmedico = ?', [idmedico]);
+
+        const { page = 1, limit = 10 } = req.query;
+        const pageNumber = Number(page);
+        const limitNumber = Number(limit);
+        const offset = (pageNumber - 1) * limitNumber;
+
+        const query = `
+            SELECT c.idcita, c.fecha, c.hora_aprox, c.num_cupo, c.motivo, c.consultorio, 
+            p.nombre AS paciente_nombre, p.apellidoP AS paciente_apellido, c.estado
+            FROM cita c
+            INNER JOIN paciente p ON c.idpaciente = p.idpaciente
+            WHERE idmedico = ?
+            LIMIT ? OFFSET ?
+        `;
+
+        const citas = await connection.query(query, [idmedico, limitNumber, offset]);
+
+        const countQuery = `
+            SELECT COUNT(*) AS total
+            FROM cita
+            WHERE idmedico = ?
+        `;
+        const [{ total }] = await connection.query(countQuery, [idmedico]);
+        const totalNumber = Number(total);
+        const totalPages = Math.ceil(totalNumber / limitNumber);
+
         connection.release();
+        const formattedCitas = citas.map(cita => ({
+            ...cita,
+            fecha: formatDate(cita.fecha),
+            hora_aprox: formatTime(cita.hora_aprox)
+        }));
 
-        if (citas.length === 0) {
-            return res.status(404).json({ error: "El médico no cuenta con citas." });
-        }
-
-        res.status(200).json(citas);
+        res.status(200).json({
+            data: formattedCitas,
+            total: totalNumber,
+            page: pageNumber,
+            limit: limitNumber,
+            totalPages: totalPages
+        });
     } catch (error) {
         console.error("Error al obtener las citas del médico:", error);
         res.status(500).send("Error al obtener las citas del médico");
@@ -162,4 +225,20 @@ export const updateCita = async (req, res) => {
         console.error(error);
         res.status(500).send('Error al actualizar la cita');
     }
+};
+
+const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+};
+
+const formatTime = (time) => {
+    const [hours, minutes] = time.split(':');
+    const date = new Date();
+    date.setHours(hours, minutes);
+    const options = { hour: 'numeric', minute: 'numeric', hour12: true };
+    return date.toLocaleTimeString('en-US', options);
 };
