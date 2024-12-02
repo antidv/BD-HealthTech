@@ -9,3 +9,8 @@ export const getAntecedentesPaciente = async () => {
   const { data } = await axios.get("/antecedentes");
   return data;
 };
+
+export const getCitaPaciente = async (idcita) => {
+  const { data } = await axios.get(`/citas_paciente/${idcita}`);
+  return data;
+};

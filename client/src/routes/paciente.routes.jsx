@@ -3,6 +3,7 @@ import Paciente from "../pages/paciente/Paciente";
 import CitasDisponibles from "../pages/paciente/CitasDisponibles";
 import SolicitarCita from "../pages/paciente/SolicitarCita";
 import Antecedentes from "../pages/paciente/Antecedentes";
+import DetallesCita from "../pages/paciente/DetallesCita";
 
 export default function RutasPaciente() {
   return (
@@ -13,7 +14,7 @@ export default function RutasPaciente() {
 
         {/* Citas */}
         <Route path="citas" element={<Paciente />} />
-        <Route path="citas/:idcita" element={<h2>Cita xd</h2>} />
+        <Route path="citas/:idcita" element={<DetallesCita />} />
         <Route path="citas-disponibles" element={<CitasDisponibles />} />
         <Route
           path="solicitar-cita/:idprogramacion_cita"
