@@ -97,7 +97,7 @@ function ConsultoriosMedico() {
                       <p>El medico no tiene asignado un consultorio</p>
                     ) : (
                       posta.consultorios.map((consultorio, index) => (
-                        <div className="col-4">
+                        <div key={index} className="col-4">
                           <div key={index} className="card">
                             <div className="card-body">
                               <p className="card-text">

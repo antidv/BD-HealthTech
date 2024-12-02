@@ -69,6 +69,7 @@ export const perfilMedico = async (req, res) => {
 
     const query = `
       SELECT  
+        m.idmedico,
         m.nombre, 
         m.apellidoP, 
         m.apellidoM, 
@@ -229,6 +230,112 @@ export const getMedico = async (req, res) => {
       foto: medico.foto,
       disponible: medico.disponible,
       postas: postas
+    };
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error al obtener el médico:", error);
+    res.status(500).send("Error al obtener el médico");
+  }
+};
+
+export const getMedicoConsultorio = async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const idusuario = req.userId;
+
+    // Obtener idmedico del usuario autenticado
+    const medicoRows = await connection.query(
+      "SELECT idmedico FROM medico WHERE idusuario = ?",
+      [idusuario]
+    );
+
+    if (medicoRows.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: "El médico no existe" });
+    }
+
+    const idmedico = medicoRows[0].idmedico;
+
+    // Obtener datos completos del médico
+    const medicoQuery = `
+      SELECT 
+        m.idmedico, 
+        m.nombre, 
+        m.apellidoP, 
+        m.dni, 
+        e.nombre AS especialidad, 
+        m.foto, 
+        m.disponible
+      FROM medico m
+      JOIN especialidad e ON m.idespecialidad = e.idespecialidad
+      WHERE m.idmedico = ?
+    `;
+
+    const medicoDetails = await connection.query(medicoQuery, [idmedico]);
+
+    if (medicoDetails.length === 0) {
+      connection.release();
+      return res.status(404).json({ error: "El médico no existe" });
+    }
+
+    const medico = medicoDetails[0]; // Datos completos del médico
+
+    // Obtener los consultorios y postas asociadas al médico
+    const consultorioPostaQuery = `
+      SELECT 
+        p.nombre AS nombre_posta, 
+        c.nombre AS nombre_consultorio, 
+        mcp.disponible AS estado_consultorio,
+        mcp.idmedconposta as id_mcp
+      FROM medico_consultorio_posta mcp
+      JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
+      JOIN posta p ON cp.idposta = p.idposta
+      JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+      WHERE mcp.idmedico = ?
+    `;
+    const consultorioPostaRows = await connection.query(consultorioPostaQuery, [idmedico]);
+
+    connection.release();
+
+    if (!Array.isArray(consultorioPostaRows)) {
+      return res.status(500).json({ error: "Error al obtener los consultorios y postas asociados" });
+    }
+
+    // Agrupar postas y consultorios
+    const postas = consultorioPostaRows.reduce((result, row) => {
+      const posta = result.find((p) => p.nombre_posta === row.nombre_posta);
+      if (!posta) {
+        result.push({
+          nombre_posta: row.nombre_posta,
+          consultorios: [
+            {
+              nombre_consultorio: row.nombre_consultorio,
+              idmedconposta: row.id_mcp,
+              estado: row.estado_consultorio,
+            },
+          ],
+        });
+      } else {
+        posta.consultorios.push({
+          nombre_consultorio: row.nombre_consultorio,
+          idmedconposta: row.id_mcp,
+          estado: row.estado_consultorio,
+        });
+      }
+      return result;
+    }, []);
+
+    // Construir respuesta con datos del médico y postas
+    const result = {
+      idmedico: medico.idmedico,
+      nombre: medico.nombre,
+      apellidoP: medico.apellidoP,
+      dni: medico.dni,
+      especialidad: medico.especialidad,
+      foto: medico.foto,
+      disponible: medico.disponible,
+      postas: postas,
     };
 
     res.status(200).json(result);

@@ -53,3 +53,8 @@ export const cambiarEstadoMedico = async (idmedico) => {
   const response = await axios.put(`/medicos-disponible/${idmedico}`);
   return response.data;
 };
+
+export const getConsultoriosMedicoLog = async () => {
+  const { data } = await axios.get("/medico-consultorio");
+  return data;
+}
