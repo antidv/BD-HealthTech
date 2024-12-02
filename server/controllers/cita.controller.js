@@ -354,12 +354,21 @@ export const postCita = async (req, res) => {
   };
   
 
-export const updateCita = async (req, res) => {
+  export const updateCita = async (req, res) => {
     try {
         const { id } = req.params;
         const fields = req.body;
 
-        if (Object.keys(fields).length === 0) {
+        // Verificar que solo se actualicen los campos 'estado' o 'triaje'
+        const allowedFields = ['estado', 'triaje'];
+        const keys = Object.keys(fields);
+        const invalidFields = keys.filter(key => !allowedFields.includes(key));
+
+        if (invalidFields.length > 0) {
+            return res.status(400).json({ error: `Los campos no permitidos para actualizar: ${invalidFields.join(', ')}` });
+        }
+
+        if (keys.length === 0) {
             return res.status(400).json({ error: "No se proporcionaron campos para actualizar" });
         }
 
@@ -376,18 +385,16 @@ export const updateCita = async (req, res) => {
 
         const connection = await pool.getConnection();
         const result = await connection.query(query, params);
+        connection.release();
 
         if (result.affectedRows === 0) {
-            connection.release();
-            return res.status(404).json({ error: "La cita no existe" });
+            return res.status(404).json({ error: "Cita no encontrada" });
         }
 
-        const citaActualizada = await connection.query('SELECT * FROM cita WHERE idcita = ?', [id]);
-        connection.release();
-        res.json(JSON.parse(JSON.stringify(citaActualizada[0], replacer)));
+        res.status(200).json({ message: "Cita actualizada exitosamente" });
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al actualizar la cita');
+        console.error("Error al actualizar la cita:", error);
+        res.status(500).send("Error al actualizar la cita");
     }
 };
 
