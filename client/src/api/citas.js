@@ -38,3 +38,15 @@ export const getCitasPacienteLogeado = async ({ page, limit }) => {
   });
   return response.data;
 };
+
+export const getProgramacionCitasPaciente = async ({
+  page,
+  limit,
+  idconsultorio,
+  fecha,
+}) => {
+  const response = await axios.get("/programacioncita-ciudad", {
+    params: { page, limit, idconsultorio, fecha },
+  });
+  return response.data;
+};
