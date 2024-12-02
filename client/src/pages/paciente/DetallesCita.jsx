@@ -21,51 +21,68 @@ function DetallesCita() {
 
   return (
     <>
-      <div>
-        <h1>Detalles de la Cita</h1>
-        <form>
-          <div>
-            <label>Fecha:</label>
-            <input type="text" value={cita.fecha} disabled />
-          </div>
-          <div>
-            <label>Motivo:</label>
-            <input type="text" value={cita.motivo} disabled />
-          </div>
-          <div>
-            <label>Consultorio:</label>
-            <input type="text" value={cita.consultorio} disabled />
-          </div>
-          <div>
-            <label>Médico:</label>
-            <input
-              type="text"
-              value={`${cita.medico_nombre} ${cita.medico_apellido}`}
-              disabled
-            />
-          </div>
-          <h2>Diagnósticos:</h2>
-          {Object.entries(cita.diagnosticos).map(
-            ([diagnostico, medicamentos], index) => (
-              <div key={index}>
-                <h3>{diagnostico}</h3>
-                {medicamentos.map((medicamento, idx) => (
-                  <div key={idx} style={{ marginBottom: "1em" }}>
-                    <label>Medicamento:</label>
-                    <input
-                      type="text"
-                      value={medicamento.nombre_medicamento}
-                      disabled
-                    />
-                    <label>Dosis:</label>
-                    <input type="text" value={medicamento.dosis} disabled />
-                  </div>
-                ))}
+      <div className="container-fluid containerColor">
+        <div className="row align-items-center justify-content-center">
+          <div className="col-12">
+            <h2 className="m-3">Detalles de la cita</h2>
+            <form>
+              <div className="row m-3">
+                <div className="col-3 mb-3">
+                  <label className="form-label">Fecha:</label>
+                  <input type="text" value={cita.fecha} disabled className="form-control"/>
+                </div>
+                <div className="col-3 mb-3">
+                  <label className="form-label">Motivo:</label>
+                  <input type="text" value={cita.motivo} disabled className="form-control"/>
+                </div>
+                <div className="col-3 mb-3">
+                  <label className="form-label">Consultorio:</label>
+                  <input type="text" value={cita.consultorio} disabled className="form-control"/>
+                </div>
+                <div className="col-3 mb-3">
+                  <label className="form-label">Médico:</label>
+                  <input
+                    type="text"
+                    value={`${cita.medico_nombre} ${cita.medico_apellido}`}
+                    disabled className="form-control"
+                  />
+                </div>
               </div>
-            )
-          )}
-        </form>
+              
+              <h3 className="m-3">Diagnósticos</h3>
+              <div className="row m-3">
+                {Object.entries(cita.diagnosticos).map(
+                  ([diagnostico, medicamentos], index) => (
+                    <div key={index} className="col-4 mb-3">
+                      <div className="card">
+                        <h4 className="m-3">{diagnostico}</h4>
+                        {medicamentos.map((medicamento, idx) => (
+                          <div key={idx} style={{ marginBottom: "1em" }} className="card-body">
+                            <label className="card-text mb-3">Medicamento:</label>
+                            <input
+                              type="text"
+                              value={medicamento.nombre_medicamento}
+                              disabled
+                              className="form-control"
+                            />
+                            <label className="card-text mt-3">Dosis:</label>
+                            <input type="text" value={medicamento.dosis} disabled className="form-control"/>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                )}
+              </div>
+              <div className="row">
+                
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
+      
+      
     </>
   );
 }
