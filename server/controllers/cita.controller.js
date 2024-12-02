@@ -276,6 +276,20 @@ export const postCita = async (req, res) => {
         }
   
         const { idpaciente } = pacienteRows[0];
+
+        const existingCitaQuery = `
+            SELECT COUNT(*) AS count
+            FROM cita
+            WHERE idpaciente = ? AND idprogramacion_cita = ? AND estado = 'En espera'
+        `;
+
+        const [existingCita] = await connection.query(existingCitaQuery, [idpaciente, idprogramacion_cita]);
+
+        if (existingCita.count > 0) {
+        return res.status(409).json({
+            error: "El paciente ya tiene una cita en espera para esta programación.",
+        });
+        }
   
         await connection.beginTransaction();
   
