@@ -91,7 +91,10 @@ function MedicoPrincipal() {
                               <Link
                                 to={`/medico/diagnostico/${cita.idcita}`}
                                 className={`btn btn-primary ${
-                                  cita.estado === "Atendido" ? "disabled" : ""
+                                  cita.estado === "Atendido" ||
+                                  cita.estado === "Ausente"
+                                    ? "disabled"
+                                    : ""
                                 }`}
                               >
                                 Modificar
