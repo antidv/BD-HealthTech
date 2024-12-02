@@ -14,7 +14,7 @@ function NavBar() {
     ],
     Medico: [
       { to: "/medico/citas", label: "Mis citas" },
-      { to: "/medico/404", label: "Unknonw" },
+      { to: "/medico/postas", label: "Postas" },
     ],
     Administrador: [
       { to: "/admin/postas", label: "Postas" },
