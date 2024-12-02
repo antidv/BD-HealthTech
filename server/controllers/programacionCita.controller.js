@@ -58,7 +58,7 @@ export const getCitasProgramadas = async (req, res) => {
       return res.status(400).send("El idconsultorio es requerido.");
     }
 
-    const { page = 1, limit = 10, nombre = '', fecha = '' } = req.query;
+    const { page = 1, limit = 10, fecha = '' } = req.query;
 
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
@@ -67,10 +67,6 @@ export const getCitasProgramadas = async (req, res) => {
     const conditions = [`p.ciudad = ?`, `c.idconsultorio = ?`];
     const params = [ciudad, idconsultorio];
 
-    if (nombre) {
-      conditions.push('c.nombre LIKE ?');
-      params.push(`%${nombre}%`);
-    }
     if (fecha) {
       conditions.push("DATE(pc.fecha) = ?");
       params.push(fecha);
