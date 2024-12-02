@@ -5,7 +5,7 @@ import { verifyToken, isAdmin, isMedico } from '../libs/auth.middleware.js';
 const router = Router();
 
 router.get('/medicos', verifyToken, isAdmin, getMedicos);
-router.get('/medicos_perfil', verifyToken, isMedico, perfilMedico);
+router.get('/perfil_medico', verifyToken, isMedico, perfilMedico);
 router.get('/medicos/:id', verifyToken, isAdmin, getMedico);
 router.post('/medicos', verifyToken, isAdmin, postMedico);
 router.put('/medicos/:id', verifyToken, isAdmin, updateMedicos);
