@@ -67,3 +67,13 @@ export const getCitasMedico = async ({ page, limit }) => {
   });
   return response.data;
 };
+
+export const updateCitaMedico = async (idcita, data) => {
+  const response = await axios.put(`/citas/${idcita}`, data);
+  return response.data;
+};
+
+export const createDiagnosticoCita = async (idcita, data) => {
+  const response = await axios.post(`/diagnostico/${idcita}`, data);
+  return response.data;
+};

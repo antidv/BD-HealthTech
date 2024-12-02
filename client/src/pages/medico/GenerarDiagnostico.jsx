@@ -1,18 +1,45 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useForm, useWatch } from "react-hook-form";
 import { getCitaMedico } from "../../api/medicos";
 import {
   getEnfermedades,
   getMedicamentos,
   getAntecedentesFaltantesPaciente,
 } from "../../api/antecedentes";
+import { updateCitaMedico, createDiagnosticoCita } from "../../api/citas";
 import { getPerfilPacienteId } from "../../api/paciente";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import Loading from "../Loading";
 import ErrorPage from "../ErrorPage";
 import CardPaciente from "../../components/cards/CardPaciente";
 
 function GenerarDiagnostico() {
   const { idcita } = useParams();
+
+  // React Hook Form
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+    watch,
+    setValue,
+  } = useForm({
+    defaultValues: {
+      triaje: "-",
+      estado: "",
+      idenfermedad: "",
+      observacion: "",
+      idmedicamento: "",
+      dosis: "",
+    },
+  });
+
+  const estado = watch("estado");
+
+  // Navegacion
+  const navigate = useNavigate();
+
   // Peticion de la cita
   const {
     data: cita,
@@ -65,6 +92,63 @@ function GenerarDiagnostico() {
     queryFn: getMedicamentos,
   });
 
+  // Mutaciones
+  const mutationCita = useMutation({
+    mutationKey: ["actualizar-cita"],
+    mutationFn: ({ idcita, data }) => updateCitaMedico(idcita, data),
+  });
+  const mutationDiagnostico = useMutation({
+    mutationFn: ({ idcita, data }) => createDiagnosticoCita(idcita, data),
+  });
+
+  // Manejo del envio del formulario
+  const onSubmit = (data) => {
+    const { triaje, estado, idenfermedad, observacion, idmedicamento, dosis } =
+      data;
+
+    console.log("Datos recibidos: ", data);
+
+    // Preparar datos de cita
+    const citaData = { triaje, estado };
+
+    // Enviar datos a la cita
+    mutationCita.mutate(
+      { idcita, data: citaData },
+      {
+        onSuccess: (response) => {
+          alert("Cita actualizada con exito");
+          navigate(`/medico/citas`);
+          console.log("Cita actualizada: ", response);
+        },
+        onError: (error) => {
+          console.error("Error al actualizar la cita: ", error);
+        },
+      }
+    );
+
+    // Enviar datos del diagnóstico solo si el estado es "Atendido"
+    if (estado === "Atendido") {
+      const diagnosticoData = {
+        idenfermedad,
+        observacion,
+        idmedicamento,
+        dosis,
+      };
+
+      mutationDiagnostico.mutate(
+        { idcita, data: diagnosticoData },
+        {
+          onSuccess: (response) => {
+            console.log("Diagnóstico creado: ", response);
+          },
+          onError: (error) => {
+            console.error("Error al crear el diagnóstico: ", error);
+          },
+        }
+      );
+    }
+  };
+
   if (isCLoad || isPacLoad || isAntLoad || isEnfLoad || isMedLoad)
     return <Loading nombre="datos de cita ..." />;
   if (isCError || isPacError || isAntError || isEnfError || isMedError)
@@ -113,94 +197,155 @@ function GenerarDiagnostico() {
                     </li>
                   </ul>
                 </div>
-                <label htmlFor="triaje" className="form-label">
-                  Triaje:
-                </label>
-                <input id="triaje" type="text" className="form-control" />
-                <label htmlFor="triaje" className="form-label">
-                  Estado de la Cita
-                </label>
-                <select className="form-select">
-                  <option value={"Atendido"}>Atendido</option>
-                  <option value={"Ausente"}>Ausente</option>
-                </select>
                 <h2>Generar diagnóstico</h2>
+                <form onSubmit={handleSubmit(onSubmit)}>
+                  {/* Triaje y estado de la cita */}
+                  {/* Triaje */}
+                  <label htmlFor="triaje" className="form-label">
+                    Triaje:
+                  </label>
+                  <input
+                    id="triaje"
+                    type="text"
+                    className={`form-control ${
+                      errors.triaje ? "is-invalid" : ""
+                    }`}
+                    {...register("triaje", {
+                      required: "El triaje es obligatorio",
+                    })}
+                  />
+                  {errors.triaje && (
+                    <p className="invalid-feedback">{errors.triaje.message}</p>
+                  )}
+
+                  {/* Estado */}
+                  <label htmlFor="estado" className="form-label">
+                    Estado de la Cita:
+                  </label>
+                  <select
+                    id="estado"
+                    className={`form-select ${
+                      errors.estado ? "is-invalid" : ""
+                    }`}
+                    {...register("estado", {
+                      required: "El estado es obligatorio",
+                    })}
+                  >
+                    <option value="">Seleccione el estado</option>
+                    <option value="Atendido">Atendido</option>
+                    <option value="Ausente">Ausente</option>
+                  </select>
+                  {errors.estado && (
+                    <p className="invalid-feedback">{errors.estado.message}</p>
+                  )}
+                  {/* Diagnóstico */}
+                  {estado !== "Ausente" && (
+                    <>
+                      <label htmlFor="idenfermedad" className="form-label mt-2">
+                        Diagnóstico:
+                      </label>
+                      <select
+                        id="idenfermedad"
+                        className={`form-select ${
+                          errors.idenfermedad ? "is-invalid" : ""
+                        }`}
+                        {...register("idenfermedad", {
+                          required: "Seleccione una enfermedad",
+                        })}
+                      >
+                        <option value="">Seleccione una enfermedad</option>
+                        {enfermedades?.map((enf) => (
+                          <option
+                            key={enf.idenfermedad}
+                            value={enf.idenfermedad}
+                          >
+                            {enf.nombre}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.idenfermedad && (
+                        <div className="invalid-feedback">
+                          {errors.idenfermedad.message}
+                        </div>
+                      )}
+
+                      <label htmlFor="observacion" className="form-label mt-2">
+                        Observaciones:
+                      </label>
+                      <textarea
+                        id="observacion"
+                        className={`form-control ${
+                          errors.observacion ? "is-invalid" : ""
+                        }`}
+                        {...register("observacion", {
+                          required: "La observación es obligatoria",
+                        })}
+                      ></textarea>
+                      {errors.observacion && (
+                        <div className="invalid-feedback">
+                          {errors.observacion.message}
+                        </div>
+                      )}
+
+                      <label
+                        htmlFor="idmedicamento"
+                        className="form-label mt-2"
+                      >
+                        Medicamento:
+                      </label>
+                      <select
+                        id="idmedicamento"
+                        className={`form-select ${
+                          errors.idmedicamento ? "is-invalid" : ""
+                        }`}
+                        {...register("idmedicamento", {
+                          required: "Seleccione un medicamento",
+                        })}
+                      >
+                        <option value="">Seleccione un medicamento</option>
+                        {medicamentos?.map((med) => (
+                          <option
+                            key={med.idmedicamento}
+                            value={med.idmedicamento}
+                          >
+                            {med.nombre}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.idmedicamento && (
+                        <div className="invalid-feedback">
+                          {errors.idmedicamento.message}
+                        </div>
+                      )}
+
+                      <label htmlFor="dosis" className="form-label mt-2">
+                        Dosis:
+                      </label>
+                      <input
+                        id="dosis"
+                        type="text"
+                        className={`form-control ${
+                          errors.dosis ? "is-invalid" : ""
+                        }`}
+                        {...register("dosis", {
+                          required: "La dosis es obligatoria",
+                        })}
+                      />
+                      {errors.dosis && (
+                        <div className="invalid-feedback">
+                          {errors.dosis.message}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  <button type="submit" className="btn btn-primary">
+                    Generar
+                  </button>
+                </form>
                 {/* <button className="btn btn-primary">Agregar</button> */}
-                <div className="row">
-                  <div className="col-10 mt-4">
-                    <div className="card">
-                      <div className="card-body">
-                        <form>
-                          <div className="row">
-                            <div className="col-12">
-                              <label
-                                htmlFor="Enfermedad"
-                                className="form-label mt-2"
-                              >
-                                Diagnostico
-                              </label>
-                              <select className="form-select">
-                                <option value="">
-                                  Seleccione una enfermendad
-                                </option>
-                                {enfermedades?.map((enf) => (
-                                  <option
-                                    key={enf.idenfermedad}
-                                    value={enf.idenfermedad}
-                                  >
-                                    {enf.nombre}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <label htmlFor="obs">Observaciones:</label>
-                            <textarea
-                              id="obs"
-                              className="form-control"
-                            ></textarea>
-                            <div className="col-12">
-                              <label
-                                htmlFor="medicamento"
-                                className="form-label mt-2"
-                              >
-                                Medicamento
-                              </label>
-                              <select className="form-select">
-                                <option value="">
-                                  Seleccione un medicamento
-                                </option>
-                                {medicamentos?.map((med) => (
-                                  <option
-                                    key={med.idmedicamento}
-                                    value={med.idmedicamento}
-                                  >
-                                    {med.nombre}
-                                  </option>
-                                ))}
-                              </select>
-                            </div>
-                            <div className="col-12">
-                              <label
-                                htmlFor="dosis"
-                                className="form-label mt-2"
-                              >
-                                Dosis
-                              </label>
-                              <input
-                                id="dosis"
-                                type="text"
-                                className="form-control"
-                              />
-                            </div>
-                          </div>
-                        </form>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
-            <div className="row mt-2 me-5">
+            {/* <div className="row mt-2 me-5">
               <div className="col-12 mt-3 me-5">
                 <h3>Antecedentes médicos</h3>
               </div>
@@ -244,15 +389,12 @@ function GenerarDiagnostico() {
                   ))}
                 </div>
               </div>
-            </div>
+            </div> */}
             <div className="row mt-2 me-5">
               <div className="col-12 d-flex justify-content-end">
                 <Link to={"/medico/citas"} className="btn btn-secondary me-3">
                   Volver
                 </Link>
-                <button type="button" className="btn btn-primary">
-                  Generar
-                </button>
               </div>
             </div>
           </div>
