@@ -14,3 +14,8 @@ export const getCitaPaciente = async (idcita) => {
   const { data } = await axios.get(`/citas_paciente/${idcita}`);
   return data;
 };
+
+export const getPerfilPacienteId = async (idpaciente) => {
+  const { data } = await axios.get(`/ver_paciente/${idpaciente}`);
+  return data;
+};

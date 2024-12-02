@@ -43,3 +43,8 @@ export const getPerfilMedico = async () => {
   const { data } = await axios.get("/perfil_medico");
   return data;
 };
+
+export const getCitaMedico = async (idcita) => {
+  const { data } = await axios.get(`/citas_medico/${idcita}`);
+  return data;
+};
