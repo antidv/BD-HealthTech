@@ -51,14 +51,8 @@ export const getCitasProgramadas = async (req, res) => {
 
     const pacienteRows = await connection.query('SELECT ciudad FROM paciente WHERE idusuario = ?', [idusuario]);
     const { ciudad }= pacienteRows[0];
-    const { idconsultorio } = req.body;
 
-    if (!idconsultorio) {
-      connection.release();
-      return res.status(400).send("El idconsultorio es requerido.");
-    }
-
-    const { page = 1, limit = 10, fecha = '' } = req.query;
+    const { page = 1, limit = 10, idconsultorio, fecha = '' } = req.query;
 
     const pageNumber = Number(page);
     const limitNumber = Number(limit);
