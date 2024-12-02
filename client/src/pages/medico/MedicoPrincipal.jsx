@@ -63,6 +63,7 @@ function MedicoPrincipal() {
                         <th scope="col">Fecha</th>
                         <th scope="col">Hora</th>
                         <th scope="col">Motivo</th>
+                        <th scope="col">Posta</th>
                         <th scope="col">Consultorio</th>
                         <th scope="col">Paciente</th>
                         <th scope="col">Estado</th>
@@ -78,6 +79,7 @@ function MedicoPrincipal() {
                             <td scope="row">{cita.fecha}</td>
                             <td>{cita.hora_aprox}</td>
                             <td>{cita.motivo}</td>
+                            <td>{cita.posta_nombre}</td>
                             <td>{cita.consultorio}</td>
                             <td>
                               {cita.paciente_nombre +

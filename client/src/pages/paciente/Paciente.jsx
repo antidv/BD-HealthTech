@@ -65,6 +65,7 @@ function Paciente() {
                     <th scope="col">Hora</th>
                     <th scope="col">Cupo</th>
                     <th scope="col">Motivo</th>
+                    <th scope="col">Posta</th>
                     <th scope="col">Consultorio</th>
                     <th scope="col">Médico</th>
                     <th scope="col">Estado</th>
@@ -81,6 +82,7 @@ function Paciente() {
                         <td>{cita.hora_aprox}</td>
                         <td>{cita.num_cupo}</td>
                         <td>{cita.motivo}</td>
+                        <td>{cita.posta_nombre}</td>
                         <td>{cita.consultorio}</td>
                         <td>
                           {cita.medico_nombre + " " + cita.medico_apellido}
