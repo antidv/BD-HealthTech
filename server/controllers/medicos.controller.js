@@ -135,7 +135,7 @@ export const getMedico = async (req, res) => {
       SELECT 
         p.nombre AS nombre_posta, 
         c.nombre AS nombre_consultorio, 
-        cp.disponible AS estado_consultorio
+        mcp.disponible AS estado_consultorio
       FROM medico_consultorio_posta mcp
       JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
       JOIN posta p ON cp.idposta = p.idposta
