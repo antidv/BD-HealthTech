@@ -239,7 +239,8 @@ function EditarMedico() {
                   </select>
                   {errors.especialidad && <p>{errors.especialidad.message}</p>}
                 </div>
-                <div className="col-6 mb-3">
+
+                {/* <div className="col-6 mb-3">
                   <label htmlFor="correo" className="form-label">
                     Correo
                   </label>
@@ -256,11 +257,11 @@ function EditarMedico() {
                     })}
                   />
                   {errors.correo && <p>{errors.correo.message}</p>}
-                </div>
+                </div> */}
               </div>
               
               <div className="row me-5">
-                <div className="col-6 mb-3">
+                {/* <div className="col-6 mb-3">
                   <label htmlFor="contrasenia" className="form-label">
                     Contraseña
                   </label>
@@ -294,7 +295,7 @@ function EditarMedico() {
                     })}
                   />
                   {errors.confirmarContra && <p>{errors.confirmarContra.message}</p>}
-                </div>
+                </div> */}
               </div>
               
               <div className="row me-5">
