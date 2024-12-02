@@ -112,16 +112,31 @@ export const perfilPaciente = async (req, res) => {
         const idusuario = req.userId;
         const connection = await pool.getConnection();
 
-        const rows = await connection.query('SELECT * FROM paciente WHERE idusuario = ?', idusuario);
+        const rows = await connection.query('SELECT * FROM paciente WHERE idusuario = ?', [idusuario]);
         if (rows.length <= 0) {
+            connection.release();
             return res.status(404).json({ error: "El paciente no existe" });
         }
-        res.status(200).json(rows[0]);
+
+        const paciente = rows[0];
+        if (paciente.fecha_nacimiento) {
+            paciente.fecha_nacimiento = formatDate(paciente.fecha_nacimiento);
+        }
+
         connection.release();
+        res.status(200).json(paciente);
     } catch (error) {
         console.error(error);
         res.status(500).send('Error al obtener el paciente');
     }
+};
+
+const formatDate = (date) => {
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
 };
 
 export const updatePaciente = async (req, res) => {
