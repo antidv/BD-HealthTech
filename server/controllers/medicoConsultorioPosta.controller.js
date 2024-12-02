@@ -125,23 +125,33 @@ export const updateMedicoConsultorioPosta = async (req, res) => {
   try {
     const connection = await pool.getConnection();
     const { id } = req.params;
-    const { disponible } = req.body;
 
-    const result = await connection.query(
-      "UPDATE medico_consultorio_posta SET disponible = ? WHERE idmedconposta = ?",
-      [disponible, id]
+    const [currentRow] = await connection.query(
+      "SELECT disponible FROM medico_consultorio_posta WHERE idmedconposta = ?",
+      [id]
     );
 
-    if (result.affectedRows === 0) {
+    if (!currentRow) {
       return res.status(404).json({ error: "El registro no existe" });
     }
 
-    const updatedRows = await connection.query(
+    const newDisponible = currentRow.disponible === 1 ? 0 : 1;
+
+    const result = await connection.query(
+      "UPDATE medico_consultorio_posta SET disponible = ? WHERE idmedconposta = ?",
+      [newDisponible, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(500).json({ error: "No se pudo actualizar el registro" });
+    }
+
+    const [updatedRow] = await connection.query(
       "SELECT * FROM medico_consultorio_posta WHERE idmedconposta = ?",
       [id]
     );
 
-    res.json(updatedRows[0]);
+    res.json(updatedRow);
     connection.release();
   } catch (error) {
     console.error(error);
