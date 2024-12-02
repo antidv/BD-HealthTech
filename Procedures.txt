@@ -192,3 +192,23 @@ BEGIN
 END$$
 
 DELIMITER ;
+
+DELIMITER $$
+
+CREATE TRIGGER set_consultorio_on_cita_insert
+BEFORE INSERT ON cita
+FOR EACH ROW
+BEGIN
+  DECLARE nombre_consultorio VARCHAR(50);
+
+  SELECT c.nombre
+  INTO nombre_consultorio
+  FROM medico m
+  JOIN especialidad e ON m.idespecialidad = e.idespecialidad
+  JOIN consultorio c ON e.idconsultorio = c.idconsultorio
+  WHERE m.idmedico = NEW.idmedico;
+
+  SET NEW.consultorio = nombre_consultorio;
+END$$
+
+DELIMITER ;
