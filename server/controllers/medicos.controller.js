@@ -310,3 +310,43 @@ export const updateMedicos = async (req, res) => {
     res.status(500).send("Error al actualizar el médico");
   }
 };
+
+export const updateMedicoDisponible = async (req, res) => {
+  try {
+    const connection = await pool.getConnection();
+    const { id } = req.params;
+
+    const [currentRow] = await connection.query(
+      "SELECT disponible FROM medico WHERE idmedico = ?",
+      [id]
+    );
+
+    if (!currentRow) {
+      connection.release();
+      return res.status(404).json({ error: "El médico no existe" });
+    }
+
+    const newDisponible = currentRow.disponible === 1 ? 0 : 1;
+
+    const result = await connection.query(
+      "UPDATE medico SET disponible = ? WHERE idmedico = ?",
+      [newDisponible, id]
+    );
+
+    if (result.affectedRows === 0) {
+      connection.release();
+      return res.status(500).json({ error: "No se pudo actualizar el registro del médico" });
+    }
+
+    const [updatedRow] = await connection.query(
+      "SELECT * FROM medico WHERE idmedico = ?",
+      [id]
+    );
+
+    res.json(updatedRow);
+    connection.release();
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al actualizar el registro del médico");
+  }
+};
