@@ -47,7 +47,7 @@ function SolicitarCita() {
         show: true,
         estado: false,
         titulo: "Ocurrió un error",
-        message: "Error: No se pudo crear la cita. Inténtalo de nuevo.",
+        message: `Error: No se pudo crear la cita. ${error.response.data.error}`,
       });
       console.error("Error al crear la cita:", error);
     },
@@ -100,45 +100,37 @@ function SolicitarCita() {
                 {/* Mostrar los datos como inputs solo lectura */}
                 <div className="row m-5">
                   <div className="col-4 mb-3">
-                    <label className="form-label">
-                      Fecha:
-                    </label>
+                    <label className="form-label">Fecha:</label>
                     <input
-                        type="text"
-                        value={cita.fecha}
-                        readOnly
-                        className="form-control"
-                      />
+                      type="text"
+                      value={cita.fecha}
+                      readOnly
+                      className="form-control"
+                    />
                   </div>
                   <div className="col-4 mb-3">
-                    <label className="form-label">
-                      Posta:
-                    </label>
+                    <label className="form-label">Posta:</label>
                     <input
-                        type="text"
-                        value={cita.posta}
-                        readOnly
-                        className="form-control"
-                      />
+                      type="text"
+                      value={cita.posta}
+                      readOnly
+                      className="form-control"
+                    />
                   </div>
                   <div className="col-4 mb-3">
-                    <label className="form-label">
-                      Consultorio:
-                    </label>
+                    <label className="form-label">Consultorio:</label>
                     <input
-                        type="text"
-                        value={cita.consultorio}
-                        readOnly
-                        className="form-control"
-                      />
+                      type="text"
+                      value={cita.consultorio}
+                      readOnly
+                      className="form-control"
+                    />
                   </div>
                 </div>
-                
+
                 <div className="row ms-5 me-5">
                   <div className="col-4 mb-3">
-                    <label className="form-label">
-                      Médico:
-                    </label>
+                    <label className="form-label">Médico:</label>
                     <input
                       type="text"
                       value={cita.nombre}
@@ -147,9 +139,7 @@ function SolicitarCita() {
                     />
                   </div>
                   <div className="col-4 mb-3">
-                    <label className="form-label">
-                      Horario:
-                    </label>
+                    <label className="form-label">Horario:</label>
                     <input
                       type="text"
                       value={cita.hora}
@@ -160,9 +150,7 @@ function SolicitarCita() {
 
                   {/* Campo editable para el motivo */}
                   <div className="col-4 mb-3">
-                    <label className="form-label">
-                      Motivo de la cita:
-                    </label>
+                    <label className="form-label">Motivo de la cita:</label>
                     <textarea
                       value={motivo}
                       onChange={(e) => setMotivo(e.target.value)}
@@ -172,16 +160,18 @@ function SolicitarCita() {
                     ></textarea>
                   </div>
                 </div>
-                
+
                 <div className="row ms-5 me-5">
                   <div className="col-12 d-flex justify-content-end">
                     <button
-                    type="submit"
-                    className="btn btn-primary mt-3"
-                    disabled={mutation.isPending}
-                  >
-                    {mutation.isPending ? "Solicitando ..." : "Solicitar Cita"}
-                  </button>
+                      type="submit"
+                      className="btn btn-primary mt-3"
+                      disabled={mutation.isPending}
+                    >
+                      {mutation.isPending
+                        ? "Solicitando ..."
+                        : "Solicitar Cita"}
+                    </button>
                   </div>
                 </div>
               </form>
@@ -190,9 +180,6 @@ function SolicitarCita() {
         </div>
       </div>
     </>
-    
-    
-    
   );
 }
 
