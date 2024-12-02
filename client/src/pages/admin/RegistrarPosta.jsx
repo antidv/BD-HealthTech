@@ -111,7 +111,7 @@ function RegistrarPosta() {
                     required: "El nombre es obligatorio",
                   })}
                 />
-                {errors.nombre && <p>{errors.nombre.message}</p>}
+                {errors.nombre && <p className="invalid-feedback">{errors.nombre.message}</p>}
               </div>
 
               <div className="col-6 mb-3">
@@ -126,7 +126,7 @@ function RegistrarPosta() {
                     required: "La ciudad es obligatoria",
                   })}
                 />
-                {errors.ciudad && <p>{errors.ciudad.message}</p>}
+                {errors.ciudad && <p className="invalid-feedback">{errors.ciudad.message}</p>}
               </div>
             </div>
 
@@ -143,7 +143,7 @@ function RegistrarPosta() {
                     required: "La dirección es obligatoria",
                   })}
                 />
-                {errors.direccion && <p>{errors.direccion.message}</p>}
+                {errors.direccion && <p className="invalid-feedback">{errors.direccion.message}</p>}
               </div>
 
               <div className="col-6 mb-3">
@@ -161,7 +161,7 @@ function RegistrarPosta() {
                     },
                   })}
                 />
-                {errors.telefono && <p>{errors.telefono.message}</p>}
+                {errors.telefono && <p className="invalid-feedback">{errors.telefono.message}</p>}
               </div>
             </div>
 

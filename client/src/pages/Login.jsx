@@ -96,7 +96,7 @@ function Login() {
                   })}
                 />
                 {errors.correo && (
-                  <p className="text-danger">{errors.correo.message}</p>
+                  <p className="invalid-feedback">{errors.correo.message}</p>
                 )}
               </div>
 
@@ -113,7 +113,7 @@ function Login() {
                   })}
                 />
                 {errors.contrasenia && (
-                  <p className="text-danger">{errors.contrasenia.message}</p>
+                  <p className="invalid-feedback">{errors.contrasenia.message}</p>
                 )}
               </div>
               <div className="d-flex justify-content-center">

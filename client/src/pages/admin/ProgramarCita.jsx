@@ -142,7 +142,7 @@ function ProgramarCita() {
                         ))}
                       </select>
                       {errors.idmedconposta && (
-                        <p className="text-danger">
+                        <p className="invalid-feedback">
                           {errors.idmedconposta.message}
                         </p>
                       )}
@@ -166,7 +166,7 @@ function ProgramarCita() {
                         ))}
                       </select>
                       {errors.idhorario && (
-                        <p className="text-danger">
+                        <p className="invalid-feedback">
                           {errors.idhorario.message}
                         </p>
                       )}
@@ -195,7 +195,7 @@ function ProgramarCita() {
                         })}
                       />
                       {errors.fecha && (
-                        <p className="text-danger">{errors.fecha.message}</p>
+                        <p className="invalid-feedback">{errors.fecha.message}</p>
                       )}
                     </div>
 
@@ -218,7 +218,7 @@ function ProgramarCita() {
                         })}
                       />
                       {errors.cupos_totales && (
-                        <p className="text-danger">
+                        <p className="invalid-feedback">
                           {errors.cupos_totales.message}
                         </p>
                       )}

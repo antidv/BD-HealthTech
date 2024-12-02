@@ -167,7 +167,7 @@ function EditarMedico() {
                       required: "El nombre es obligatorio",
                     })}
                   />
-                  {errors.nombre && <p>{errors.nombre.message}</p>}
+                  {errors.nombre && <p className="invalid-feedback">{errors.nombre.message}</p>}
                 </div>
                 <div className="col-6 mb-3">
                   <label htmlFor="apellidoP" className="form-label">
@@ -181,7 +181,7 @@ function EditarMedico() {
                       required: "El apellido paterno es obligatorio",
                     })}
                   />
-                  {errors.apellidoP && <p>{errors.apellidoP.message}</p>}
+                  {errors.apellidoP && <p className="invalid-feedback">{errors.apellidoP.message}</p>}
                 </div>
               </div>
               <div className="row me-5">
@@ -197,7 +197,7 @@ function EditarMedico() {
                       required: "El apellido materno es obligatorio",
                     })}
                   />
-                  {errors.apellidoM && <p>{errors.apellidoM.message}</p>}
+                  {errors.apellidoM && <p className="invalid-feedback">{errors.apellidoM.message}</p>}
                 </div>
                 <div className="col-6 mb-3">
                   <label htmlFor="dni" className="form-label">
@@ -215,7 +215,7 @@ function EditarMedico() {
                       },
                     })}
                   />
-                  {errors.dni && <p>{errors.dni.message}</p>}
+                  {errors.dni && <p className="invalid-feedback">{errors.dni.message}</p>}
                 </div>
               </div>
               
@@ -237,7 +237,7 @@ function EditarMedico() {
                       </option>
                     ))}
                   </select>
-                  {errors.especialidad && <p>{errors.especialidad.message}</p>}
+                  {errors.especialidad && <p className="invalid-feedback">{errors.especialidad.message}</p>}
                 </div>
 
                 {/* <div className="col-6 mb-3">

@@ -107,7 +107,7 @@ function RegistrarMedico() {
                     required: "El nombre es obligatorio",
                   })}
                 />
-                {errors.nombre && <p>{errors.nombre.message}</p>}
+                {errors.nombre && <p className="invalid-feedback">{errors.nombre.message}</p>}
               </div>
               <div className="col-3 mb-3">
                 <label htmlFor="apellidoP" className="form-label">
@@ -121,7 +121,7 @@ function RegistrarMedico() {
                     required: "El apellido paterno es obligatorio",
                   })}
                 />
-                {errors.apellidoP && <p>{errors.apellidoP.message}</p>}
+                {errors.apellidoP && <p className="invalid-feedback">{errors.apellidoP.message}</p>}
               </div>
               <div className="col-3 mb-3">
                 <label htmlFor="apellidoM" className="form-label">
@@ -135,7 +135,7 @@ function RegistrarMedico() {
                     required: "El apellido materno es obligatorio",
                   })}
                 />
-                {errors.apellidoM && <p>{errors.apellidoM.message}</p>}
+                {errors.apellidoM && <p className="invalid-feedback">{errors.apellidoM.message}</p>}
               </div>
               <div className="col-3 mb-3">
                 <label htmlFor="dni" className="form-label">
@@ -153,7 +153,7 @@ function RegistrarMedico() {
                     },
                   })}
                 />
-                {errors.dni && <p>{errors.dni.message}</p>}
+                {errors.dni && <p className="invalid-feedback">{errors.dni.message}</p>}
               </div>
             </div>
             <div className="row m-3">
@@ -175,7 +175,7 @@ function RegistrarMedico() {
                     </option>
                   ))}
                 </select>
-                {errors.especialidad && <p>{errors.especialidad.message}</p>}
+                {errors.especialidad && <p className="invalid-feedback">{errors.especialidad.message}</p>}
               </div>
               <div className="col-3 mb-3">
                 <label htmlFor="correo" className="form-label">
@@ -193,7 +193,7 @@ function RegistrarMedico() {
                     },
                   })}
                 />
-                {errors.correo && <p>{errors.correo.message}</p>}
+                {errors.correo && <p className="invalid-feedback">{errors.correo.message}</p>}
               </div>
               <div className="col-3 mb-3">
                 <label htmlFor="contrasenia" className="form-label">
@@ -211,7 +211,7 @@ function RegistrarMedico() {
                     },
                   })}
                 />
-                {errors.contrasenia && <p>{errors.contrasenia.message}</p>}
+                {errors.contrasenia && <p className="invalid-feedback">{errors.contrasenia.message}</p>}
               </div>
               <div className="col-3 mb-3">
                 <label htmlFor="confirmarContra" className="form-label">
@@ -229,7 +229,7 @@ function RegistrarMedico() {
                   })}
                 />
                 {errors.confirmarContra && (
-                  <p>{errors.confirmarContra.message}</p>
+                  <p className="invalid-feedback">{errors.confirmarContra.message}</p>
                 )}
               </div>
             </div>
