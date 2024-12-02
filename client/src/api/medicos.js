@@ -38,3 +38,8 @@ export const toggleMedicoConsultorioPosta = async (idmedconposta) => {
   );
   return response.data;
 };
+
+export const getPerfilMedico = async () => {
+  const { data } = await axios.get("/perfil_medico");
+  return data;
+};
