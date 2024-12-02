@@ -19,6 +19,7 @@ export const getCitasPaciente = async (req, res) => {
             FROM cita c
             INNER JOIN medico m ON c.idmedico = m.idmedico
             WHERE idpaciente = ?
+            ORDER BY c.fecha DESC
             LIMIT ? OFFSET ?
         `;
         const citas = await connection.query(query, [idpaciente, limitNumber, offset]);
@@ -72,6 +73,7 @@ export const getCitasMedico = async (req, res) => {
             FROM cita c
             INNER JOIN paciente p ON c.idpaciente = p.idpaciente
             WHERE idmedico = ?
+            ORDER BY c.fecha DESC
             LIMIT ? OFFSET ?
         `;
 
