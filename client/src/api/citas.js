@@ -60,3 +60,10 @@ export const createCitaPaciente = async (data) => {
   const respone = await axios.post(`/citas`, data);
   return respone.data;
 };
+
+export const getCitasMedico = async ({ page, limit }) => {
+  const response = await axios.get("/citas_medico", {
+    params: { page, limit },
+  });
+  return response.data;
+};

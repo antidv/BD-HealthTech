@@ -13,8 +13,8 @@ function NavBar() {
       { to: "/paciente/antecedentes", label: "Antecedentes médicos" },
     ],
     Medico: [
-      { to: "/medico", label: "Pacientes" },
-      { to: "/medico/citas", label: "Citas" },
+      { to: "/medico/citas", label: "Mis citas" },
+      { to: "/medico/404", label: "Unknonw" },
     ],
     Administrador: [
       { to: "/admin/postas", label: "Postas" },
