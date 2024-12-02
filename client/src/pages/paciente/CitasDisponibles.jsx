@@ -15,9 +15,6 @@ function CitasDisponibles() {
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1); // Suma un día
   const formattedTomorrow = tomorrow.toISOString().split("T")[0]; // Formatea la fecha como YYYY-MM-DD
-  console.log("Fecha de hoy: ", today); // Sun Dec 01 2024 00:00:00 GMT-0500
-  console.log("Fecha de mañana: ", tomorrow); // Mon Dec 02 2024 00:00:00 GMT-0500
-  console.log("Fecha mañana formateada: ", formattedTomorrow); // 2024-12-02
 
   // Filtros visibles en el formulario
   const [searchFilters, setSearchFilters] = useState({

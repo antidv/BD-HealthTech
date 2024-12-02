@@ -58,7 +58,7 @@ function Paciente() {
           <div className="col-8">
             <div className="table-responsive mt-5 me-5">
               <h2 className="mb-4">Mis citas</h2>
-              <table class="table table-info table-bordered">
+              <table className="table table-info table-bordered">
                 <thead className="table-light">
                   <tr>
                     <th scope="col">Fecha</th>
@@ -82,7 +82,9 @@ function Paciente() {
                         <td>{cita.num_cupo}</td>
                         <td>{cita.motivo}</td>
                         <td>{cita.consultorio}</td>
-                        <td>{cita.medico}</td>
+                        <td>
+                          {cita.medico_nombre + " " + cita.medico_apellido}
+                        </td>
                         <td>{cita.estado}</td>
                         <td>
                           <Link
