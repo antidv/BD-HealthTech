@@ -293,6 +293,9 @@ export const postCita = async (req, res) => {
   
         const num_cupo = programacion.cupos_disponibles;
   
+        const [day, month, year] = fecha.split("-");
+        const formattedDate = `${year}-${month}-${day}`;
+
         const insertCitaQuery = `
           INSERT INTO cita (
             idpaciente, motivo, fecha, consultorio, num_cupo, triaje, idmedico, idprogramacion_cita
@@ -302,7 +305,7 @@ export const postCita = async (req, res) => {
         const result = await connection.query(insertCitaQuery, [
           idpaciente,
           motivo,
-          fecha,
+          formattedDate,
           consultorio,
           num_cupo,
           idmedico,
