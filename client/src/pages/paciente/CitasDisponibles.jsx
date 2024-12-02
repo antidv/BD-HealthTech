@@ -75,99 +75,110 @@ function CitasDisponibles() {
     setPage(newPage);
   };
 
-  if (isLoading || isCLoad) return <div>Cargando programacion de citas...</div>;
+  if (isLoading || isCLoad) return <div>Cargando programación de citas...</div>;
   if (isError || isCError) return <div>Ha ocurrido un error</div>;
 
   return (
-    <div>
-      <h1>Citas disponibles</h1>
-      <p>
-        Solo se muestran la programacion de citas de las postas de su ciudad
-      </p>
-      {/* Filtros */}
-      <div className="d-flex m-3">
-        {/* Select para consultorios */}
-        <select
-          className="form-control w-25"
-          name="idconsultorio"
-          value={searchFilters.idconsultorio}
-          onChange={handleInputChange}
-        >
-          <option value="">Seleccione un consultorio</option>
-          {consultorios?.map((consultorio) => (
-            <option
-              key={consultorio.idconsultorio}
-              value={consultorio.idconsultorio}
-            >
-              {consultorio.nombre}
-            </option>
-          ))}
-        </select>
-        {/* Input de fecha */}
-        <input
-          type="date"
-          name="fecha"
-          className="form-control ms-3"
-          value={searchFilters.fecha}
-          onChange={handleInputChange}
-          min={formattedTomorrow}
-        />
-        <button className="btn btn-primary ms-3" onClick={handleSearch}>
-          Buscar
-        </button>
-      </div>
-      {/* Tabla de citas */}
-      <table border="1" style={{ width: "100%", marginTop: "20px" }}>
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Médico</th>
-            <th>Consultorio</th>
-            <th>Posta</th>
-            <th>Horario</th>
-            <th>Cupos Totales</th>
-            <th>Cupos Disponibles</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.data.length > 0 ? (
-            data.data.map((cita) => (
-              <tr key={cita.idprogramacion_cita}>
-                <td>{cita.fecha}</td>
-                <td>{cita.nombre + " " + cita.apellido}</td>
-                <td>{cita.consultorio}</td>
-                <td>{cita.posta}</td>
-                <td>{cita.hora}</td>
-                <td>{cita.cupos_totales}</td>
-                <td>{cita.cupos_disponibles}</td>
-                <td>
-                  <Link
-                    to={`/paciente/solicitar-cita/${cita.idprogramacion_cita}`}
-                    className={`btn btn-primary ${
-                      cita.cupos_disponibles === 0 ? "disabled" : ""
-                    }`}
+    <>
+      <div className="container-fluid containerColor">
+        <div className="row align-items-center justify-content-center">
+          <div className="col-12">
+            <h1 className="m-3">Citas disponibles</h1>
+            <p className="m-3">
+              Solo se muestran la programación de citas de las postas de su ciudad.
+            </p>
+            {/* Filtros */}
+            <div className="d-flex m-3">
+              {/* Select para consultorios */}
+              <select
+                className="form-control w-25"
+                name="idconsultorio"
+                value={searchFilters.idconsultorio}
+                onChange={handleInputChange}
+              >
+                <option value="">Seleccione un consultorio</option>
+                {consultorios?.map((consultorio) => (
+                  <option
+                    key={consultorio.idconsultorio}
+                    value={consultorio.idconsultorio}
                   >
-                    Solicitar
-                  </Link>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="7">No se encontraron citas programadas.</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-
-      {/* Paginación */}
-      <Pagination
-        currentPage={page}
-        totalPages={data.totalPages}
-        onPageChange={handlePageChange}
-      />
-    </div>
+                    {consultorio.nombre}
+                  </option>
+                ))}
+              </select>
+              {/* Input de fecha */}
+              <input
+                type="date"
+                name="fecha"
+                className="form-control ms-3 w-25"
+                value={searchFilters.fecha}
+                onChange={handleInputChange}
+                min={formattedTomorrow}
+              />
+              <button className="btn btn-primary ms-3" onClick={handleSearch}>
+                Buscar
+              </button>
+            </div>
+            <div className="table-responsive m-3">
+              {/* Tabla de citas */}
+              <table border="1" style={{ width: "100%", marginTop: "20px" }} className="table table-info table-bordered">
+                <thead>
+                  <tr>
+                    <th>Fecha</th>
+                    <th>Médico</th>
+                    <th>Consultorio</th>
+                    <th>Posta</th>
+                    <th>Horario</th>
+                    <th>Cupos Totales</th>
+                    <th>Cupos Disponibles</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.data.length > 0 ? (
+                    data.data.map((cita) => (
+                      <tr key={cita.idprogramacion_cita}>
+                        <td>{cita.fecha}</td>
+                        <td>{cita.nombre + " " + cita.apellido}</td>
+                        <td>{cita.consultorio}</td>
+                        <td>{cita.posta}</td>
+                        <td>{cita.hora}</td>
+                        <td>{cita.cupos_totales}</td>
+                        <td>{cita.cupos_disponibles}</td>
+                        <td>
+                          <Link
+                            to={`/paciente/solicitar-cita/${cita.idprogramacion_cita}`}
+                            className={`btn btn-primary ${
+                              cita.cupos_disponibles === 0 ? "disabled" : ""
+                            }`}
+                          >
+                            Solicitar
+                          </Link>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7">No se encontraron citas programadas.</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+            {/* Paginación */}
+            <Pagination
+              currentPage={page}
+              totalPages={data.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </div>
+        </div>
+      </div>
+    </>
+    
+    
+    
+    
   );
 }
 

@@ -101,6 +101,64 @@ export const getAntecedentes = async (req, res) => {
         res.status(500).json({ error: "Error al obtener antecedentes" });
     }
 };
+
+export const getAntecedenteAleEnf = async (req, res) => {
+    try {
+        const { idpaciente } = req.params;
+        const connection = await pool.getConnection();
+
+        const antecedentes = await connection.query(
+            "SELECT idantecedentes FROM antecedentes WHERE idpaciente = ?",
+            [idpaciente]
+        );
+
+        if (antecedentes.length === 0) {
+            connection.release();
+            return res.status(404).json({ error: "No se encontraron antecedentes para el paciente" });
+        }
+
+        const alergiasRelacionadas = await connection.query(
+            `SELECT DISTINCT a.idalergia
+             FROM alergia a
+             JOIN alergia_historia ah ON a.idalergia = ah.idalergia
+             WHERE ah.idantecedentes IN (?)`,
+            [antecedentes.map((a) => a.idantecedentes)]
+        );
+
+        const alergiasRelacionadasIds = alergiasRelacionadas.map((ar) => ar.idalergia);
+
+        const alergiasFaltantes = await connection.query(
+            `SELECT * FROM alergia WHERE idalergia NOT IN (?)`,
+            [alergiasRelacionadasIds.length > 0 ? alergiasRelacionadasIds : [0]]
+        );
+
+        const enfermedadesRelacionadas = await connection.query(
+            `SELECT DISTINCT e.idenfermedad
+             FROM enfermedad e
+             JOIN enfermedad_historia eh ON e.idenfermedad = eh.idenfermedad
+             WHERE eh.idantecedentes IN (?)`,
+            [antecedentes.map((a) => a.idantecedentes)]
+        );
+
+        const enfermedadesRelacionadasIds = enfermedadesRelacionadas.map((er) => er.idenfermedad);
+
+        const enfermedadesFaltantes = await connection.query(
+            `SELECT * FROM enfermedad WHERE idenfermedad NOT IN (?)`,
+            [enfermedadesRelacionadasIds.length > 0 ? enfermedadesRelacionadasIds : [0]]
+        );
+
+        connection.release();
+
+        res.status(200).json({
+            alergias_faltantes: alergiasFaltantes,
+            enfermedades_faltantes: enfermedadesFaltantes,
+        });
+    } catch (error) {
+        console.error("Error al obtener antecedentes:", error);
+        res.status(500).json({ error: "Error al obtener antecedentes" });
+    }
+};
+
 export const updateAntecedentes = async (req, res) => {
     try {
         const idusuario = req.userId;
