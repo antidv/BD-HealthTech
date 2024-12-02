@@ -11,9 +11,6 @@ export const postAntecedentes = async (req, res) => {
         );
 
         const idpaciente = paciente;
-
-        console.log("idpaciente: ",idpaciente);
-
         const [existingAntecedentes] = await connection.query(
             "SELECT * FROM antecedentes WHERE idpaciente = ?",
             [idpaciente]
@@ -165,7 +162,6 @@ export const updateAntecedentes = async (req, res) => {
             }
         }
         
-
         await connection.commit();
         connection.release();
         res.status(200).json({ message: "Antecedentes actualizados exitosamente" });
