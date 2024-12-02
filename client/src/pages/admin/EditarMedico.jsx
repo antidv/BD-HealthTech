@@ -353,9 +353,6 @@ function EditarMedico() {
           </div>
         </div>
       </div>
-      
-      
-      
     </>
   );
 }

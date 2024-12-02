@@ -44,6 +44,105 @@ export const postProgramacionCita = async (req, res) => {
   }
 };
 
+export const getCitasProgramadas = async (req, res) => {
+  try {
+    const idusuario = req.userId;
+    const connection = await pool.getConnection();
+
+    const pacienteRows = await connection.query('SELECT ciudad FROM paciente WHERE idusuario = ?', [idusuario]);
+    const { ciudad }= pacienteRows[0];
+    const { idconsultorio } = req.body;
+
+    if (!idconsultorio) {
+      connection.release();
+      return res.status(400).send("El idconsultorio es requerido.");
+    }
+
+    const { page = 1, limit = 10, fecha = '' } = req.query;
+
+    const pageNumber = Number(page);
+    const limitNumber = Number(limit);
+    const offset = (pageNumber - 1) * limitNumber;
+
+    const conditions = [`p.ciudad = ?`, `c.idconsultorio = ?`];
+    const params = [ciudad, idconsultorio];
+
+    if (fecha) {
+      conditions.push("DATE(pc.fecha) = ?");
+      params.push(fecha);
+    }
+
+    const whereClause = `WHERE ${conditions.join(' AND ')}`;
+
+    const query = `
+      SELECT pc.idprogramacion_cita,
+             DATE_FORMAT(pc.fecha, '%d-%m-%Y') AS fecha,
+             m.nombre AS medico,
+             m.apellidoP AS apellido,
+             c.nombre AS consultorio, 
+             p.nombre AS posta, 
+             h.hora_inicio, 
+             h.hora_fin,
+             pc.cupos_totales,
+             pc.cupos_disponibles
+      FROM programacion_cita pc
+      INNER JOIN medico_consultorio_posta mcp ON pc.idmedconposta = mcp.idmedconposta
+      INNER JOIN medico m ON mcp.idmedico = m.idmedico
+      INNER JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
+      INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+      INNER JOIN posta p ON cp.idposta = p.idposta
+      INNER JOIN horario h ON pc.idhorario = h.idhorario
+      ${whereClause}
+      ORDER BY pc.fecha DESC
+      LIMIT ? OFFSET ?;
+    `;
+
+    params.push(limitNumber, offset);
+    const rows = await connection.query(query, params);
+
+    const countQuery = `
+      SELECT COUNT(*) AS total
+      FROM programacion_cita pc
+      INNER JOIN medico_consultorio_posta mcp ON pc.idmedconposta = mcp.idmedconposta
+      INNER JOIN medico m ON mcp.idmedico = m.idmedico
+      INNER JOIN consultorio_posta cp ON mcp.idconsultorio_posta = cp.idconsultorio_posta
+      INNER JOIN consultorio c ON cp.idconsultorio = c.idconsultorio
+      INNER JOIN posta p ON cp.idposta = p.idposta
+      ${whereClause}
+    `;
+
+    const [{ total }] = await connection.query(countQuery, params.slice(0, -2));
+    const totalNumber = Number(total);
+    const totalPages = Math.ceil(totalNumber / limitNumber);
+
+    connection.release();
+
+    const formattedRows = rows.map(row => ({
+      idprogramacion_cita: row.idprogramacion_cita,
+      fecha: row.fecha,
+      nombre: row.medico,
+      apellido: row.apellido,
+      consultorio: row.consultorio,
+      posta: row.posta,
+      hora: `${formatTime(row.hora_inicio)} - ${formatTime(row.hora_fin)}`,
+      cupos_totales: row.cupos_totales,
+      cupos_disponibles: row.cupos_disponibles,
+    }));
+
+    res.status(200).json({
+      data: formattedRows,
+      total: totalNumber,
+      page: pageNumber,
+      limit: limitNumber,
+      totalPages: totalPages,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error al obtener las programaciones de citas");
+  }
+};
+
 export const getProgramacionesCita = async (req, res) => {
     try {
       const connection = await pool.getConnection();

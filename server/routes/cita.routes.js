@@ -3,7 +3,8 @@ import { Router } from 'express';
 import {
   getCitasPaciente,
   getCitasMedico,
-  getCita,
+  getCitaPaciente,
+  getCitaMedico,
   postCita,
   updateCita,
 } from '../controllers/cita.controller.js';
@@ -13,7 +14,8 @@ const router = Router();
 
 router.get('/citas_paciente', verifyToken, isPaciente, getCitasPaciente);
 router.get('/citas_medico', verifyToken, isMedico, getCitasMedico);
-router.get('/citas/:id', verifyToken, isMedico, getCita);
+router.get('/citas_paciente/:id', verifyToken, isPaciente, getCitaPaciente);
+router.get('/citas_medico/:id', verifyToken, isMedico, getCitaMedico);
 router.post('/citas', verifyToken, isPaciente, postCita);
 router.put('/citas/:id', verifyToken, isMedico, updateCita);
 

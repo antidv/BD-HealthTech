@@ -1,7 +1,5 @@
 import { pool } from "../src/database.js";
 
-const replacer = (key, value) => (typeof value === 'bigint' ? value.toString() : value);
-
 export const getCitasPaciente = async (req, res) => {
     try {
         const idusuario = req.userId;
@@ -108,20 +106,151 @@ export const getCitasMedico = async (req, res) => {
     }
 };
 
-export const getCita = async (req, res) => {
+export const getCitaPaciente = async (req, res) => {
     try {
         const { id } = req.params;
         const connection = await pool.getConnection();
-        const citas = await connection.query('SELECT * FROM cita WHERE idcita = ?', [id]);
-        connection.release();
-        if (citas.length === 0) {
-            res.status(404).json({ error: "La cita no existe" });
-        } else {
-            res.status(200).json(JSON.parse(JSON.stringify(citas[0], replacer)));
+
+        const citaQuery = `
+            SELECT 
+                c.idcita, 
+                c.fecha, 
+                c.motivo, 
+                c.consultorio, 
+                m.nombre AS medico_nombre, 
+                m.apellidoP AS medico_apellido
+            FROM cita c
+            INNER JOIN medico m ON c.idmedico = m.idmedico
+            WHERE c.idcita = ?
+        `;
+        const citaRows = await connection.query(citaQuery, [id]);
+
+        if (citaRows.length === 0) {
+            connection.release();
+            return res.status(404).json({ error: "La cita no existe" });
         }
+
+        const cita = citaRows[0];
+
+        const diagnosticoQuery = `
+            SELECT 
+                d.iddiagnostico, 
+                e.nombre AS nombre_enfermedad, 
+                r.idreceta, 
+                med.nombre AS nombre_medicamento,
+                r.dosis
+            FROM diagnostico d
+            INNER JOIN enfermedad e ON d.idenfermedad = e.idenfermedad
+            LEFT JOIN receta r ON d.iddiagnostico = r.iddiagnostico
+            LEFT JOIN medicamento med ON r.idmedicamento = med.idmedicamento
+            WHERE d.idcita = ?
+        `;
+        const diagnosticoRows = await connection.query(diagnosticoQuery, [id]);
+
+        connection.release();
+
+        const diagnosticos = {};
+        diagnosticoRows.forEach(row => {
+            if (!diagnosticos[row.nombre_enfermedad]) {
+                diagnosticos[row.nombre_enfermedad] = [];
+            }
+            if (row.nombre_medicamento) {
+                diagnosticos[row.nombre_enfermedad].push({
+                    nombre_medicamento: row.nombre_medicamento,
+                    dosis: row.dosis
+                });
+            }
+        });
+
+        const result = {
+            idcita: cita.idcita,
+            fecha: formatDate(cita.fecha),
+            motivo: cita.motivo,
+            consultorio: cita.consultorio,
+            medico_nombre: cita.medico_nombre,
+            medico_apellido: cita.medico_apellido,
+            estado: cita.estado,
+            diagnosticos: diagnosticos
+        };
+
+        res.status(200).json(result);
     } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al obtener la cita');
+        console.error("Error al obtener la cita del paciente:", error);
+        res.status(500).send("Error al obtener la cita del paciente");
+    }
+};
+
+export const getCitaMedico = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const connection = await pool.getConnection();
+
+        const citaQuery = `
+            SELECT 
+                c.idcita, 
+                c.fecha, 
+                c.motivo, 
+                c.consultorio, 
+                p.nombre AS paciente_nombre, 
+                p.apellidoP AS paciente_apellido
+            FROM cita c
+            INNER JOIN paciente p ON c.idpaciente = p.idpaciente
+            WHERE c.idcita = ?
+        `;
+        const citaRows = await connection.query(citaQuery, [id]);
+
+        if (citaRows.length === 0) {
+            connection.release();
+            return res.status(404).json({ error: "La cita no existe" });
+        }
+
+        const cita = citaRows[0];
+
+        const diagnosticoQuery = `
+            SELECT 
+                d.iddiagnostico, 
+                e.nombre AS nombre_enfermedad, 
+                r.idreceta, 
+                med.nombre AS nombre_medicamento,
+                r.dosis
+            FROM diagnostico d
+            INNER JOIN enfermedad e ON d.idenfermedad = e.idenfermedad
+            LEFT JOIN receta r ON d.iddiagnostico = r.iddiagnostico
+            LEFT JOIN medicamento med ON r.idmedicamento = med.idmedicamento
+            WHERE d.idcita = ?
+        `;
+        const diagnosticoRows = await connection.query(diagnosticoQuery, [id]);
+
+        connection.release();
+
+        const diagnosticos = {};
+        diagnosticoRows.forEach(row => {
+            if (!diagnosticos[row.nombre_enfermedad]) {
+                diagnosticos[row.nombre_enfermedad] = [];
+            }
+            if (row.nombre_medicamento) {
+                diagnosticos[row.nombre_enfermedad].push({
+                    nombre_medicamento: row.nombre_medicamento,
+                    dosis: row.dosis
+                });
+            }
+        });
+
+        const result = {
+            idcita: cita.idcita,
+            fecha: formatDate(cita.fecha),
+            motivo: cita.motivo,
+            consultorio: cita.consultorio,
+            paciente_nombre: cita.paciente_nombre,
+            paciente_apellido: cita.paciente_apellido,
+            estado: cita.estado,
+            diagnosticos: diagnosticos
+        };
+
+        res.status(200).json(result);
+    } catch (error) {
+        console.error("Error al obtener la cita del paciente:", error);
+        res.status(500).send("Error al obtener la cita del paciente");
     }
 };
 
