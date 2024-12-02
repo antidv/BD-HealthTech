@@ -35,52 +35,59 @@ export const getDiagnostico = async (req, res) => {
     }
 };
 
-// Crear un nuevo diagnóstico
-export const postDiagnostico = async (req, res) => {
+export const postDiagnosticoConRecetas = async (req, res) => {
+    let connection;
     try {
-        const { idcita, idenfermedad, observacion } = req.body;
+        const { idcita } = req.params;
+        const { id_enfermedad, observacion, receta } = req.body;
 
-        const connection = await pool.getConnection();
-        try {
-            await connection.beginTransaction();
+        if (!id_enfermedad || !observacion || !Array.isArray(receta) || receta.length === 0) {
+            return res.status(400).json({ message: "Datos incompletos o inválidos" });
+        }
 
-            // Verificar que la cita exista
-            const cita = await connection.query('SELECT 1 FROM cita WHERE idcita = ?', [idcita]);
-            if (cita.length === 0) {
-                await connection.rollback();
-                connection.release();
-                return res.status(400).json({ error: "La cita no existe" });
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        const diagnosticoQuery = `
+            INSERT INTO diagnostico (idcita, idenfermedad, observacion)
+            VALUES (?, ?, ?)
+        `;
+        const diagnosticoResult = await connection.query(diagnosticoQuery, [idcita, id_enfermedad, observacion]);
+
+        const iddiagnostico = Number(diagnosticoResult.insertId);
+
+        if (!iddiagnostico) {
+            throw new Error("No se pudo obtener el ID del diagnóstico insertado");
+        }
+
+        const recetaQuery = `
+            INSERT INTO receta (iddiagnostico, idmedicamento, dosis)
+            VALUES (?, ?, ?)
+        `;
+        for (const item of receta) {
+            const { idmedicamento, dosis } = item;
+
+            if (!idmedicamento || !dosis) {
+                throw new Error("Datos de receta incompletos");
             }
 
-            // Verificar que la enfermedad exista
-            const enfermedad = await connection.query('SELECT 1 FROM enfermedad WHERE idenfermedad = ?', [idenfermedad]);
-            if (enfermedad.length === 0) {
-                await connection.rollback();
-                connection.release();
-                return res.status(400).json({ error: "La enfermedad no existe" });
-            }
+            await connection.query(recetaQuery, [iddiagnostico, idmedicamento, dosis]);
+        }
 
-            // Insertar el diagnóstico
-            const result = await connection.query(
-                `INSERT INTO diagnostico (idcita, idenfermedad, observacion)
-                 VALUES (?, ?, ?)`,
-                [idcita, idenfermedad, observacion]
-            );
+        await connection.commit();
+        connection.release();
 
-            await connection.commit();
-            connection.release();
-            res.status(201).json({ iddiagnostico: result.insertId.toString() }); // Convertir BigInt a string
-        } catch (error) {
+        res.status(201).json({ message: "Diagnóstico y recetas creados exitosamente" });
+    } catch (error) {
+        if (connection) {
             await connection.rollback();
             connection.release();
-            console.error(error);
-            res.status(500).send('Error al crear el diagnóstico');
         }
-    } catch (error) {
-        console.error(error);
-        res.status(500).send('Error al crear el diagnóstico');
+        console.error("Error al crear el diagnóstico y las recetas:", error);
+        res.status(500).json({ message: "Error al crear el diagnóstico y las recetas", error: error.message });
     }
 };
+
 
 // Actualizar un diagnóstico existente
 export const updateDiagnostico = async (req, res) => {
