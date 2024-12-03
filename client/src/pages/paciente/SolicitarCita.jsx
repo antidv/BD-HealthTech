@@ -97,83 +97,85 @@ function SolicitarCita() {
               )}
               <h1 className="m-3">Solicitar cita</h1>
               <form onSubmit={handleSubmit}>
-                {/* Mostrar los datos como inputs solo lectura */}
-                <div className="row m-5">
-                  <div className="col-4 mb-3">
-                    <label className="form-label">Fecha:</label>
-                    <input
-                      type="text"
-                      value={cita.fecha}
-                      readOnly
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="col-4 mb-3">
-                    <label className="form-label">Posta:</label>
-                    <input
-                      type="text"
-                      value={cita.posta}
-                      readOnly
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="col-4 mb-3">
-                    <label className="form-label">Consultorio:</label>
-                    <input
-                      type="text"
-                      value={cita.consultorio}
-                      readOnly
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-
-                <div className="row ms-5 me-5">
-                  <div className="col-4 mb-3">
-                    <label className="form-label">Médico:</label>
-                    <input
-                      type="text"
-                      value={cita.nombre}
-                      readOnly
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="col-4 mb-3">
-                    <label className="form-label">Horario:</label>
-                    <input
-                      type="text"
-                      value={cita.hora}
-                      readOnly
-                      className="form-control"
-                    />
+                <fieldset disabled={mutation.isPending}>
+                  {/* Mostrar los datos como inputs solo lectura */}
+                  <div className="row m-5">
+                    <div className="col-4 mb-3">
+                      <label className="form-label">Fecha:</label>
+                      <input
+                        type="text"
+                        value={cita.fecha}
+                        readOnly
+                        className="form-control"
+                      />
+                    </div>
+                    <div className="col-4 mb-3">
+                      <label className="form-label">Posta:</label>
+                      <input
+                        type="text"
+                        value={cita.posta}
+                        readOnly
+                        className="form-control"
+                      />
+                    </div>
+                    <div className="col-4 mb-3">
+                      <label className="form-label">Consultorio:</label>
+                      <input
+                        type="text"
+                        value={cita.consultorio}
+                        readOnly
+                        className="form-control"
+                      />
+                    </div>
                   </div>
 
-                  {/* Campo editable para el motivo */}
-                  <div className="col-4 mb-3">
-                    <label className="form-label">Motivo de la cita:</label>
-                    <textarea
-                      value={motivo}
-                      onChange={(e) => setMotivo(e.target.value)}
-                      required
-                      className="form-control"
-                      rows="3"
-                    ></textarea>
-                  </div>
-                </div>
+                  <div className="row ms-5 me-5">
+                    <div className="col-4 mb-3">
+                      <label className="form-label">Médico:</label>
+                      <input
+                        type="text"
+                        value={cita.nombre}
+                        readOnly
+                        className="form-control"
+                      />
+                    </div>
+                    <div className="col-4 mb-3">
+                      <label className="form-label">Horario:</label>
+                      <input
+                        type="text"
+                        value={cita.hora}
+                        readOnly
+                        className="form-control"
+                      />
+                    </div>
 
-                <div className="row ms-5 me-5">
-                  <div className="col-12 d-flex justify-content-end">
-                    <button
-                      type="submit"
-                      className="btn btn-primary mt-3"
-                      disabled={mutation.isPending}
-                    >
-                      {mutation.isPending
-                        ? "Solicitando ..."
-                        : "Solicitar Cita"}
-                    </button>
+                    {/* Campo editable para el motivo */}
+                    <div className="col-4 mb-3">
+                      <label className="form-label">Motivo de la cita:</label>
+                      <textarea
+                        value={motivo}
+                        onChange={(e) => setMotivo(e.target.value)}
+                        required
+                        className="form-control"
+                        rows="3"
+                      ></textarea>
+                    </div>
                   </div>
-                </div>
+
+                  <div className="row ms-5 me-5">
+                    <div className="col-12 d-flex justify-content-end">
+                      <button
+                        type="submit"
+                        className="btn btn-primary mt-3"
+                        disabled={mutation.isPending}
+                      >
+                        {mutation.isPending
+                          ? "Solicitando ..."
+                          : "Solicitar Cita"}
+                      </button>
+                    </div>
+                  </div>
+                </fieldset>
               </form>
             </div>
           </div>

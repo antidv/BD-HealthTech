@@ -199,148 +199,172 @@ function GenerarDiagnostico() {
                 </div>
                 <h2>Generar diagnóstico</h2>
                 <form onSubmit={handleSubmit(onSubmit)}>
-                  {/* Triaje y estado de la cita */}
-                  {/* Triaje */}
-                  <label htmlFor="triaje" className="form-label">
-                    Triaje:
-                  </label>
-                  <input
-                    id="triaje"
-                    type="text"
-                    className={`form-control ${
-                      errors.triaje ? "is-invalid" : ""
-                    }`}
-                    {...register("triaje", {
-                      required: "El triaje es obligatorio",
-                    })}
-                  />
-                  {errors.triaje && (
-                    <p className="invalid-feedback">{errors.triaje.message}</p>
-                  )}
-
-                  {/* Estado */}
-                  <label htmlFor="estado" className="form-label">
-                    Estado de la Cita:
-                  </label>
-                  <select
-                    id="estado"
-                    className={`form-select ${
-                      errors.estado ? "is-invalid" : ""
-                    }`}
-                    {...register("estado", {
-                      required: "El estado es obligatorio",
-                    })}
+                  <fieldset
+                    disabled={
+                      mutationCita.isPending || mutationDiagnostico.isPending
+                    }
                   >
-                    <option value="">Seleccione el estado</option>
-                    <option value="Atendido">Atendido</option>
-                    <option value="Ausente">Ausente</option>
-                  </select>
-                  {errors.estado && (
-                    <p className="invalid-feedback">{errors.estado.message}</p>
-                  )}
-                  {/* Diagnóstico */}
-                  {estado !== "Ausente" && (
-                    <>
-                      <label htmlFor="idenfermedad" className="form-label mt-2">
-                        Diagnóstico:
-                      </label>
-                      <select
-                        id="idenfermedad"
-                        className={`form-select ${
-                          errors.idenfermedad ? "is-invalid" : ""
-                        }`}
-                        {...register("idenfermedad", {
-                          required: "Seleccione una enfermedad",
-                        })}
-                      >
-                        <option value="">Seleccione una enfermedad</option>
-                        {enfermedades?.map((enf) => (
-                          <option
-                            key={enf.idenfermedad}
-                            value={enf.idenfermedad}
-                          >
-                            {enf.nombre}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.idenfermedad && (
-                        <div className="invalid-feedback">
-                          {errors.idenfermedad.message}
-                        </div>
-                      )}
+                    {/* Triaje y estado de la cita */}
+                    {/* Triaje */}
+                    <label htmlFor="triaje" className="form-label">
+                      Triaje:
+                    </label>
+                    <input
+                      id="triaje"
+                      type="text"
+                      className={`form-control ${
+                        errors.triaje ? "is-invalid" : ""
+                      }`}
+                      {...register("triaje", {
+                        required: "El triaje es obligatorio",
+                      })}
+                    />
+                    {errors.triaje && (
+                      <p className="invalid-feedback">
+                        {errors.triaje.message}
+                      </p>
+                    )}
 
-                      <label htmlFor="observacion" className="form-label mt-2">
-                        Observaciones:
-                      </label>
-                      <textarea
-                        id="observacion"
-                        className={`form-control ${
-                          errors.observacion ? "is-invalid" : ""
-                        }`}
-                        {...register("observacion", {
-                          required: "La observación es obligatoria",
-                        })}
-                      ></textarea>
-                      {errors.observacion && (
-                        <div className="invalid-feedback">
-                          {errors.observacion.message}
-                        </div>
-                      )}
+                    {/* Estado */}
+                    <label htmlFor="estado" className="form-label">
+                      Estado de la Cita:
+                    </label>
+                    <select
+                      id="estado"
+                      className={`form-select ${
+                        errors.estado ? "is-invalid" : ""
+                      }`}
+                      {...register("estado", {
+                        required: "El estado es obligatorio",
+                      })}
+                    >
+                      <option value="">Seleccione el estado</option>
+                      <option value="Atendido">Atendido</option>
+                      <option value="Ausente">Ausente</option>
+                    </select>
+                    {errors.estado && (
+                      <p className="invalid-feedback">
+                        {errors.estado.message}
+                      </p>
+                    )}
+                    {/* Diagnóstico */}
+                    {estado !== "Ausente" && (
+                      <>
+                        <label
+                          htmlFor="idenfermedad"
+                          className="form-label mt-2"
+                        >
+                          Diagnóstico:
+                        </label>
+                        <select
+                          id="idenfermedad"
+                          className={`form-select ${
+                            errors.idenfermedad ? "is-invalid" : ""
+                          }`}
+                          {...register("idenfermedad", {
+                            required: "Seleccione una enfermedad",
+                          })}
+                        >
+                          <option value="">Seleccione una enfermedad</option>
+                          {enfermedades?.map((enf) => (
+                            <option
+                              key={enf.idenfermedad}
+                              value={enf.idenfermedad}
+                            >
+                              {enf.nombre}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.idenfermedad && (
+                          <div className="invalid-feedback">
+                            {errors.idenfermedad.message}
+                          </div>
+                        )}
 
-                      <label
-                        htmlFor="idmedicamento"
-                        className="form-label mt-2"
-                      >
-                        Medicamento:
-                      </label>
-                      <select
-                        id="idmedicamento"
-                        className={`form-select ${
-                          errors.idmedicamento ? "is-invalid" : ""
-                        }`}
-                        {...register("idmedicamento", {
-                          required: "Seleccione un medicamento",
-                        })}
-                      >
-                        <option value="">Seleccione un medicamento</option>
-                        {medicamentos?.map((med) => (
-                          <option
-                            key={med.idmedicamento}
-                            value={med.idmedicamento}
-                          >
-                            {med.nombre}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.idmedicamento && (
-                        <div className="invalid-feedback">
-                          {errors.idmedicamento.message}
-                        </div>
-                      )}
+                        <label
+                          htmlFor="observacion"
+                          className="form-label mt-2"
+                        >
+                          Observaciones:
+                        </label>
+                        <textarea
+                          id="observacion"
+                          className={`form-control ${
+                            errors.observacion ? "is-invalid" : ""
+                          }`}
+                          {...register("observacion", {
+                            required: "La observación es obligatoria",
+                          })}
+                        ></textarea>
+                        {errors.observacion && (
+                          <div className="invalid-feedback">
+                            {errors.observacion.message}
+                          </div>
+                        )}
 
-                      <label htmlFor="dosis" className="form-label mt-2">
-                        Dosis:
-                      </label>
-                      <input
-                        id="dosis"
-                        type="text"
-                        className={`form-control ${
-                          errors.dosis ? "is-invalid" : ""
-                        }`}
-                        {...register("dosis", {
-                          required: "La dosis es obligatoria",
-                        })}
-                      />
-                      {errors.dosis && (
-                        <div className="invalid-feedback">
-                          {errors.dosis.message}
-                        </div>
-                      )}
-                    </>
-                  )}
-                  <button type="submit" className="btn btn-primary">
-                    Generar
-                  </button>
+                        <label
+                          htmlFor="idmedicamento"
+                          className="form-label mt-2"
+                        >
+                          Medicamento:
+                        </label>
+                        <select
+                          id="idmedicamento"
+                          className={`form-select ${
+                            errors.idmedicamento ? "is-invalid" : ""
+                          }`}
+                          {...register("idmedicamento", {
+                            required: "Seleccione un medicamento",
+                          })}
+                        >
+                          <option value="">Seleccione un medicamento</option>
+                          {medicamentos?.map((med) => (
+                            <option
+                              key={med.idmedicamento}
+                              value={med.idmedicamento}
+                            >
+                              {med.nombre}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.idmedicamento && (
+                          <div className="invalid-feedback">
+                            {errors.idmedicamento.message}
+                          </div>
+                        )}
+
+                        <label htmlFor="dosis" className="form-label mt-2">
+                          Dosis:
+                        </label>
+                        <input
+                          id="dosis"
+                          type="text"
+                          className={`form-control ${
+                            errors.dosis ? "is-invalid" : ""
+                          }`}
+                          {...register("dosis", {
+                            required: "La dosis es obligatoria",
+                          })}
+                        />
+                        {errors.dosis && (
+                          <div className="invalid-feedback">
+                            {errors.dosis.message}
+                          </div>
+                        )}
+                      </>
+                    )}
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={
+                        mutationCita.isPending || mutationDiagnostico.isPending
+                      }
+                    >
+                      {mutationCita.isPending || mutationDiagnostico.isPending
+                        ? "Generando ..."
+                        : "Generar"}
+                    </button>
+                  </fieldset>
                 </form>
                 {/* <button className="btn btn-primary">Agregar</button> */}
               </div>
