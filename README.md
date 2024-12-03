@@ -36,7 +36,7 @@ Asegúrate de tener instalados estos elementos:
    En la carpeta principal del código fuente, ejecuta en la terminal el siguiente comando:
 
    ```bash
-   npm run start
+   npm run dev
    ```
 
    Con ello, se ejecutará el servidor local para el backend. Recuerda tener configurado el archivo _.env_
@@ -62,3 +62,17 @@ Asegúrate de tener instalados estos elementos:
    Con ello, se ejecutará el servidor local para el frontend.
 
 1. Dirígete al al servidor local ingresando el siguiente link en tu navegador: http://localhost:5173/
+
+# Cuentas
+
+1. Admin:
+- Correo: admin@correo.com
+- Contraseña: admin123
+
+1. Medico:
+- Correo: medico1@correo.com
+- Contraseña: medico123
+
+1. Paciente:
+- Correo: paciente1@correo.com
+- Contraseña: paciente123

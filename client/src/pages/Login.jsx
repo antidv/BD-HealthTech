@@ -79,52 +79,61 @@ function Login() {
             )}
             <h1>Iniciar Sesión</h1>
             <form onSubmit={onSubmit}>
-              <div className="d-flex flex-column justify-content-center">
-                <input
-                  type="email"
-                  placeholder="Correo"
-                  className="form-control mt-3 mb-3 w-50 mx-auto"
-                  {...register("correo", {
-                    required: {
-                      value: true,
-                      message: "Correo es requerido",
-                    },
-                    pattern: {
-                      value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                      message: "Correo no válido",
-                    },
-                  })}
-                />
-                {errors.correo && (
-                  <p className="invalid-feedback">{errors.correo.message}</p>
-                )}
-              </div>
+              <fieldset disabled={loadingLogin}>
+                <div className="d-flex flex-column justify-content-center">
+                  <input
+                    type="email"
+                    placeholder="Correo"
+                    className={`form-control mt-3 w-50 mx-auto ${
+                      errors.correo ? "is-invalid" : ""
+                    }`}
+                    {...register("correo", {
+                      required: {
+                        value: true,
+                        message: "Correo es requerido",
+                      },
+                      pattern: {
+                        value:
+                          /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                        message: "Correo no válido",
+                      },
+                    })}
+                  />
+                  {errors.correo && (
+                    <p className="invalid-feedback">{errors.correo.message}</p>
+                  )}
+                </div>
 
-              <div className="d-flex flex-column justify-content-center">
-                <input
-                  type="password"
-                  placeholder="Contraseña"
-                  className="form-control mt-3 mb-3 w-50 mx-auto"
-                  {...register("contrasenia", {
-                    required: {
-                      value: true,
-                      message: "Contaseña es requerida",
-                    },
-                  })}
-                />
-                {errors.contrasenia && (
-                  <p className="invalid-feedback">{errors.contrasenia.message}</p>
-                )}
-              </div>
-              <div className="d-flex justify-content-center">
-                <button
-                  type="submit"
-                  disabled={loadingLogin}
-                  className="btn btn-warning mt-3 mb-3"
-                >
-                  {loadingLogin ? "Cargando ..." : "Iniciar"}
-                </button>
-              </div>
+                <div className="d-flex flex-column justify-content-center">
+                  <input
+                    type="password"
+                    placeholder="Contraseña"
+                    className={`form-control mt-3 w-50 mx-auto ${
+                      errors.contrasenia ? "is-invalid" : ""
+                    }`}
+                    {...register("contrasenia", {
+                      required: {
+                        value: true,
+                        message: "Contaseña es requerida",
+                      },
+                    })}
+                  />
+                  {errors.contrasenia && (
+                    <p className="invalid-feedback">
+                      {errors.contrasenia.message}
+                    </p>
+                  )}
+                </div>
+                <div className="d-flex justify-content-center">
+                  <button
+                    type="submit"
+                    disabled={loadingLogin}
+                    className="btn btn-warning mt-3 mb-3"
+                  >
+                    {loadingLogin ? "Cargando ..." : "Iniciar"}
+                  </button>
+                </div>
+              </fieldset>
             </form>
           </div>
         </div>

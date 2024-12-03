@@ -32,7 +32,7 @@ function ConsultoriosMedico() {
     mutation.mutate(id);
   };
 
-  if (isMedicoLoading) return <Loading nombre="Médico ..." />;
+  if (isMedicoLoading) return <Loading nombre="médico y consultorios..." />;
   if (isMedicoError)
     return <ErrorPage code={500} message="Ocurrión un error ..." />;
 

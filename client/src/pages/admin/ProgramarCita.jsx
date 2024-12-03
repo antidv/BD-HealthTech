@@ -122,127 +122,140 @@ function ProgramarCita() {
                   />
                 )}
                 <form onSubmit={onSubmit}>
-                  <div className="row m-3">
-                    <div className="col-6 mb-3">
-                      <h4>Doctores</h4>
-                      <select
-                        className="form-select"
-                        {...register("idmedconposta", {
-                          required: "El doctor es requerido",
-                        })}
-                      >
-                        <option value="">Seleccione un doctor</option>
-                        {data?.doctores?.map((doctor) => (
-                          <option
-                            key={doctor.iddoctor}
-                            value={doctor.idconsultorio_medico_posta}
-                          >
-                            {doctor.nombre}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.idmedconposta && (
-                        <p className="invalid-feedback">
-                          {errors.idmedconposta.message}
-                        </p>
-                      )}
+                  <fieldset disabled={mutation.isPending}>
+                    <div className="row m-3">
+                      <div className="col-6 mb-3">
+                        <h4>Doctores</h4>
+                        <select
+                          className={`form-select ${
+                            errors.idmedconposta ? "is-invalid" : ""
+                          }`}
+                          {...register("idmedconposta", {
+                            required: "El doctor es requerido",
+                          })}
+                        >
+                          <option value="">Seleccione un doctor</option>
+                          {data?.doctores?.map((doctor) => (
+                            <option
+                              key={doctor.iddoctor}
+                              value={doctor.idconsultorio_medico_posta}
+                            >
+                              {doctor.nombre}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.idmedconposta && (
+                          <p className="invalid-feedback">
+                            {errors.idmedconposta.message}
+                          </p>
+                        )}
+                      </div>
+                      <div className="col-6 mb-3">
+                        <h4>Horarios</h4>
+                        <select
+                          className={`form-select ${
+                            errors.idhorario ? "is-invalid" : ""
+                          }`}
+                          {...register("idhorario", {
+                            required: "El horario es requerido",
+                          })}
+                        >
+                          <option value="">Seleccione un horario</option>
+                          {horarios?.map((horario) => (
+                            <option
+                              key={horario.idhorario}
+                              value={horario.idhorario}
+                            >
+                              {horario.hora}
+                            </option>
+                          ))}
+                        </select>
+                        {errors.idhorario && (
+                          <p className="invalid-feedback">
+                            {errors.idhorario.message}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <div className="col-6 mb-3">
-                      <h4>Horarios</h4>
-                      <select
-                        className="form-select"
-                        {...register("idhorario", {
-                          required: "El horario es requerido",
-                        })}
-                      >
-                        <option value="">Seleccione un horario</option>
-                        {horarios?.map((horario) => (
-                          <option
-                            key={horario.idhorario}
-                            value={horario.idhorario}
-                          >
-                            {horario.hora}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.idhorario && (
-                        <p className="invalid-feedback">
-                          {errors.idhorario.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="row m-3">
-                    <div className="col-6 mb-3">
-                      <h4>Calendario</h4>
-                      <input
-                        type="date"
-                        className="form-control"
-                        {...register("fecha", {
-                          required: "La fecha es requerida",
-                          validate: {
-                            futureDate: (value) => {
-                              const today = new Date()
-                                .toISOString()
-                                .split("T")[0]; // Obtiene la fecha de hoy en formato 'YYYY-MM-DD'
-                              if (value <= today) {
-                                return "La fecha debe ser posterior al día de hoy";
-                              }
-                              return true;
+                    <div className="row m-3">
+                      <div className="col-6 mb-3">
+                        <h4>Calendario</h4>
+                        <input
+                          type="date"
+                          className={`form-control ${
+                            errors.fecha ? "is-invalid" : ""
+                          }`}
+                          {...register("fecha", {
+                            required: "La fecha es requerida",
+                            validate: {
+                              futureDate: (value) => {
+                                const today = new Date()
+                                  .toISOString()
+                                  .split("T")[0]; // Obtiene la fecha de hoy en formato 'YYYY-MM-DD'
+                                if (value <= today) {
+                                  return "La fecha debe ser posterior al día de hoy";
+                                }
+                                return true;
+                              },
                             },
-                          },
-                        })}
-                      />
-                      {errors.fecha && (
-                        <p className="invalid-feedback">{errors.fecha.message}</p>
-                      )}
+                          })}
+                        />
+                        {errors.fecha && (
+                          <p className="invalid-feedback">
+                            {errors.fecha.message}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="col-6 mb-3">
+                        <h4>Cupos disponibles</h4>
+                        <input
+                          type="number"
+                          className={`form-control ${
+                            errors.cupos_totales ? "is-invalid" : ""
+                          }`}
+                          {...register("cupos_totales", {
+                            required: "Ingrese los cupos de la cita",
+                            min: {
+                              value: 1,
+                              message:
+                                "El número de cupos debe ser mayor que 0",
+                            },
+                            max: {
+                              value: 20,
+                              message:
+                                "El número de cupos no puede ser mayor a 20",
+                            },
+                          })}
+                        />
+                        {errors.cupos_totales && (
+                          <p className="invalid-feedback">
+                            {errors.cupos_totales.message}
+                          </p>
+                        )}
+                      </div>
                     </div>
 
-                    <div className="col-6 mb-3">
-                      <h4>Cupos disponibles</h4>
-                      <input
-                        type="number"
-                        className="form-control"
-                        {...register("cupos_totales", {
-                          required: "Ingrese los cupos de la cita",
-                          min: {
-                            value: 1,
-                            message: "El número de cupos debe ser mayor que 0",
-                          },
-                          max: {
-                            value: 20,
-                            message:
-                              "El número de cupos no puede ser mayor a 20",
-                          },
-                        })}
-                      />
-                      {errors.cupos_totales && (
-                        <p className="invalid-feedback">
-                          {errors.cupos_totales.message}
-                        </p>
-                      )}
-                    </div>
-                  </div>
+                    <div className="row m-3">
+                      <div className="col-12 d-flex justify-content-end">
+                        <Link
+                          to={`/admin/postas/${data?.posta?.idposta}`}
+                          className="btn btn-secondary me-3"
+                        >
+                          Volver
+                        </Link>
 
-                  <div className="row m-3">
-                    <div className="col-12 d-flex justify-content-end">
-                      <Link
-                        to={`/admin/postas/${data?.posta?.idposta}`}
-                        className="btn btn-secondary me-3"
-                      >
-                        Volver
-                      </Link>
-
-                      <button
-                        type="submit"
-                        className="btn btn-primary"
-                        disabled={mutation.isPending}
-                      >
-                        {mutation.isPending ? "Programando ..." : "Programar"}
-                      </button>
+                        <button
+                          type="submit"
+                          className="btn btn-primary"
+                          disabled={mutation.isPending}
+                        >
+                          {mutation.isPending ? "Programando ..." : "Programar"}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  </fieldset>
                 </form>
               </div>
             )}

@@ -9,26 +9,36 @@
 }
 
 /* Imagen Cards */
-.imageCard{
+.imageCard {
   width: 200px;
 }
 
-.cardConsultorioPosta{
+.cardConsultorioPosta {
   width: 500px;
 }
 
-.cardConsultorioMedico, .cardPaciente, .cardMedico{
+.cardConsultorioMedico,
+.cardPaciente,
+.cardMedico {
   width: 350px;
 }
 
-.cardGreen{
-  background-color: rgba(125, 232, 129,0.5);
+.cardGreen {
+  background-color: rgba(125, 232, 129, 0.5);
 }
 
-.cardRed{
-  background-color: rgba(232, 125, 125,0.5);
+.cardRed {
+  background-color: rgba(232, 125, 125, 0.5);
 }
 
-.imageConsultorio{
+.imageConsultorio {
   width: 150px;
+}
+
+.modal-success {
+  border: 2px solid green;
+}
+
+.modal-error {
+  border: 2px solid red;
 }

@@ -167,12 +167,17 @@ function EditarPosta() {
                   <input
                     id="nombre"
                     type="text"
-                    className="form-control"
+                    disabled={mutation.isPending}
+                    className={`form-control ${
+                      errors.nombre ? "is-invalid" : ""
+                    }`}
                     {...register("nombre", {
                       required: "El nombre es obligatorio",
                     })}
                   />
-                  {errors.nombre && <p className="invalid-feedback">{errors.nombre.message}</p>}
+                  {errors.nombre && (
+                    <p className="invalid-feedback">{errors.nombre.message}</p>
+                  )}
                 </div>
 
                 <div className="col-6 mb-3">
@@ -182,12 +187,17 @@ function EditarPosta() {
                   <input
                     id="ciudad"
                     type="text"
-                    className="form-control"
+                    disabled={mutation.isPending}
+                    className={`form-control ${
+                      errors.ciudad ? "is-invalid" : ""
+                    }`}
                     {...register("ciudad", {
                       required: "La ciudad es obligatoria",
                     })}
                   />
-                  {errors.ciudad && <p className="invalid-feedback">{errors.ciudad.message}</p>}
+                  {errors.ciudad && (
+                    <p className="invalid-feedback">{errors.ciudad.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -199,12 +209,19 @@ function EditarPosta() {
                   <input
                     id="direccion"
                     type="text"
-                    className="form-control"
+                    disabled={mutation.isPending}
+                    className={`form-control ${
+                      errors.direccion ? "is-invalid" : ""
+                    }`}
                     {...register("direccion", {
                       required: "La dirección es obligatoria",
                     })}
                   />
-                  {errors.direccion && <p className="invalid-feedback">{errors.direccion.message}</p>}
+                  {errors.direccion && (
+                    <p className="invalid-feedback">
+                      {errors.direccion.message}
+                    </p>
+                  )}
                 </div>
 
                 <div className="col-6 mb-3">
@@ -214,7 +231,10 @@ function EditarPosta() {
                   <input
                     id="telefono"
                     type="text"
-                    className="form-control"
+                    disabled={mutation.isPending}
+                    className={`form-control ${
+                      errors.telefono ? "is-invalid" : ""
+                    }`}
                     {...register("telefono", {
                       pattern: {
                         value: /^\d{7}$/,
@@ -222,16 +242,21 @@ function EditarPosta() {
                       },
                     })}
                   />
-                  {errors.telefono && <p className="invalid-feedback">{errors.telefono.message}</p>}
+                  {errors.telefono && (
+                    <p className="invalid-feedback">
+                      {errors.telefono.message}
+                    </p>
+                  )}
                 </div>
                 <div className="col-6 d-flex">
-                  <label htmlFor="estado" className="form-label">
+                  <label htmlFor="estado" className="form-check-label">
                     Estado
                   </label>
                   <input
+                    disabled={mutation.isPending}
                     type="checkbox"
                     id="estado"
-                    className="form-check ms-2"
+                    className="form-check-input ms-2"
                     {...register("estado")}
                   />
                 </div>
@@ -249,6 +274,7 @@ function EditarPosta() {
                       <div className="form-check">
                         <input
                           type="checkbox"
+                          disabled={mutation.isPending}
                           id={`consultorios.${index}.disponible`}
                           className="form-check-input"
                           defaultChecked={consultorio.disponible}
@@ -261,6 +287,7 @@ function EditarPosta() {
                           {consultorio.consultorio_nombre}
                         </label>
                         <input
+                          disabled={mutation.isPending}
                           type="hidden"
                           value={consultorio.idconsultorio}
                           {...register(`consultorios.${index}.idconsultorio`)}
@@ -285,6 +312,7 @@ function EditarPosta() {
                     >
                       <div className="form-check">
                         <input
+                          disabled={mutation.isPending}
                           type="checkbox"
                           value={consultorio_faltante.idconsultorio}
                           className="form-check-input"

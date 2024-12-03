@@ -123,7 +123,9 @@ function EditarMedico() {
           <div className="col-4 justify-content-center">
             {/* Dato de medico */}
             <div className="card m-5 cardConsultorioMedico">
-              <h2 className="m-3 text-center">{data.medico.nombre + " " + data.medico.apellidoP}</h2>
+              <h2 className="m-3 text-center">
+                {data.medico.nombre + " " + data.medico.apellidoP}
+              </h2>
               <div className="d-flex justify-content-center">
                 <img src={data.medico.foto} alt="medico" width={200} />
               </div>
@@ -160,28 +162,40 @@ function EditarMedico() {
                     Nombres
                   </label>
                   <input
+                    disabled={mutation.isPending}
                     id="nombre"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      errors.nombre ? "is-invalid" : ""
+                    }`}
                     {...register("nombre", {
                       required: "El nombre es obligatorio",
                     })}
                   />
-                  {errors.nombre && <p className="invalid-feedback">{errors.nombre.message}</p>}
+                  {errors.nombre && (
+                    <p className="invalid-feedback">{errors.nombre.message}</p>
+                  )}
                 </div>
                 <div className="col-6 mb-3">
                   <label htmlFor="apellidoP" className="form-label">
                     Apellido paterno
                   </label>
                   <input
+                    disabled={mutation.isPending}
                     id="apellidoP"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      errors.apellidoP ? "is-invalid" : ""
+                    }`}
                     {...register("apellidoP", {
                       required: "El apellido paterno es obligatorio",
                     })}
                   />
-                  {errors.apellidoP && <p className="invalid-feedback">{errors.apellidoP.message}</p>}
+                  {errors.apellidoP && (
+                    <p className="invalid-feedback">
+                      {errors.apellidoP.message}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="row me-5">
@@ -190,23 +204,31 @@ function EditarMedico() {
                     Apellido materno
                   </label>
                   <input
+                    disabled={mutation.isPending}
                     id="apellidoM"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${
+                      errors.apellidoM ? "is-invalid" : ""
+                    }`}
                     {...register("apellidoM", {
                       required: "El apellido materno es obligatorio",
                     })}
                   />
-                  {errors.apellidoM && <p className="invalid-feedback">{errors.apellidoM.message}</p>}
+                  {errors.apellidoM && (
+                    <p className="invalid-feedback">
+                      {errors.apellidoM.message}
+                    </p>
+                  )}
                 </div>
                 <div className="col-6 mb-3">
                   <label htmlFor="dni" className="form-label">
                     DNI
                   </label>
                   <input
+                    disabled={mutation.isPending}
                     id="dni"
                     type="text"
-                    className="form-control"
+                    className={`form-control ${errors.dni ? "is-invalid" : ""}`}
                     {...register("dni", {
                       required: "El dni es obligatorio",
                       pattern: {
@@ -215,29 +237,41 @@ function EditarMedico() {
                       },
                     })}
                   />
-                  {errors.dni && <p className="invalid-feedback">{errors.dni.message}</p>}
+                  {errors.dni && (
+                    <p className="invalid-feedback">{errors.dni.message}</p>
+                  )}
                 </div>
               </div>
-              
+
               <div className="row me-5">
                 <div className="col-6 mb-3">
                   <label htmlFor="especialidad" className="form-label">
                     Especialidad
                   </label>
                   <select
-                    className="form-select"
+                    disabled={mutation.isPending}
+                    className={`form-select ${
+                      errors.especialidad ? "is-invalid" : ""
+                    }`}
                     {...register("especialidad", {
                       required: "La especialidad es requerida",
                     })}
                   >
                     <option value="">Seleccione una especialidad</option>
                     {especialidades?.map((esp) => (
-                      <option key={esp.idespecialidad} value={esp.idespecialidad}>
+                      <option
+                        key={esp.idespecialidad}
+                        value={esp.idespecialidad}
+                      >
                         {esp.nombre}
                       </option>
                     ))}
                   </select>
-                  {errors.especialidad && <p className="invalid-feedback">{errors.especialidad.message}</p>}
+                  {errors.especialidad && (
+                    <p className="invalid-feedback">
+                      {errors.especialidad.message}
+                    </p>
+                  )}
                 </div>
 
                 {/* <div className="col-6 mb-3">
@@ -259,7 +293,7 @@ function EditarMedico() {
                   {errors.correo && <p>{errors.correo.message}</p>}
                 </div> */}
               </div>
-              
+
               <div className="row me-5">
                 {/* <div className="col-6 mb-3">
                   <label htmlFor="contrasenia" className="form-label">
@@ -297,14 +331,22 @@ function EditarMedico() {
                   {errors.confirmarContra && <p>{errors.confirmarContra.message}</p>}
                 </div> */}
               </div>
-              
+
               <div className="row me-5">
-                <div className="col-6 mb-3 d-flex">
-                  <label htmlFor="estado" className="form-label">Disponible</label>
-                  <input type="checkbox" id="estado" {...register("disponible")} className="ms-2 form-check" />
+                <div className="col-6 mb-3 d-flex form-check">
+                  <label htmlFor="estado" className="form-check-label">
+                    Disponible
+                  </label>
+                  <input
+                    disabled={mutation.isPending}
+                    type="checkbox"
+                    id="estado"
+                    {...register("disponible")}
+                    className="ms-2 form-check-input"
+                  />
                 </div>
               </div>
-              
+
               {/* Datos de consultorios faltantes */}
               <div className="row me-5 mt-2">
                 <div className="col-12">
@@ -314,8 +356,12 @@ function EditarMedico() {
                   <p>No se encontraron consultorios disponibles</p>
                 ) : (
                   data.consultoriosFaltantes?.map((consultorio_faltante) => (
-                    <div key={consultorio_faltante.idconsultorio_posta} className="col-6 mb-3 d-flex">
+                    <div
+                      key={consultorio_faltante.idconsultorio_posta}
+                      className="col-6 mb-3 d-flex form-check"
+                    >
                       <input
+                        disabled={mutation.isPending}
                         type="checkbox"
                         value={consultorio_faltante.idconsultorio_posta}
                         className="form-check-input"
@@ -332,7 +378,7 @@ function EditarMedico() {
                   ))
                 )}
               </div>
-              
+
               <div className="row me-5">
                 <div className="col-12 d-flex justify-content-end">
                   <Link

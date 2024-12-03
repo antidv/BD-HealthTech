@@ -56,7 +56,14 @@ function NavBar() {
                 {link.label}
               </Link>
             ))}
-            <Link to="/" onClick={() => logout()} className="nav-link">
+          </div>
+          {/* Contenedor para el logout alineado a la derecha */}
+          <div className="ms-auto">
+            <Link
+              to="/"
+              onClick={() => logout()}
+              className="nav-link text-danger"
+            >
               Logout
             </Link>
           </div>
