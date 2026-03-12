@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon ./index.js"
+    "start": "node ./index.js",
+    "dev": "nodemon ./index.js",
+    "db:setup": "node ./db/dbSetup.js"
   },
   "keywords": [],
   "author": "",
