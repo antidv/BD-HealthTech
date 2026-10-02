@@ -1,13 +1,14 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import { useState } from "react";
 import { createCitaPaciente, getDataCreateCitaPaciente } from "../../api/citas";
 import Modal from "../../components/Modal";
+import Loading from "../Loading";
+import ErrorPage from "../ErrorPage";
 
 function SolicitarCita() {
   const { idprogramacion_cita } = useParams();
 
-  // Estado del modal
   const [modal, setModal] = useState({
     show: false,
     estado: true,
@@ -15,7 +16,6 @@ function SolicitarCita() {
     message: "",
   });
 
-  // Navegacion
   const navigate = useNavigate();
 
   const {
@@ -29,33 +29,29 @@ function SolicitarCita() {
 
   const [motivo, setMotivo] = useState("");
 
-  // Crear cita
   const mutation = useMutation({
     mutationKey: ["crear-cita"],
     mutationFn: createCitaPaciente,
-    onSuccess: (data) => {
+    onSuccess: () => {
       setModal({
         show: true,
         estado: true,
-        titulo: "Registro exitoso",
-        message: `La cita se ha creado con éxito.`,
+        titulo: "Reserva exitosa",
+        message: "Tu cita médica ha sido solicitada con éxito.",
       });
-      console.log("Cita creada con éxito:", data);
     },
     onError: (error) => {
       setModal({
         show: true,
         estado: false,
-        titulo: "Ocurrió un error",
-        message: `Error: No se pudo crear la cita. ${error.response.data.error}`,
+        titulo: "Error al solicitar",
+        message: error.response?.data?.error || "No se pudo registrar la cita.",
       });
-      console.error("Error al crear la cita:", error);
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Crear el objeto con los datos a enviar
     const datosEnviar = {
       idprogramacion_cita: cita.idprogramacion_cita,
       idmedico: cita.idmedico,
@@ -63,13 +59,9 @@ function SolicitarCita() {
       fecha: cita.fecha,
       consultorio: cita.consultorio,
     };
-    // Simular envío de datos
     mutation.mutate(datosEnviar);
-
-    // Aquí puedes llamar a tu función de API para enviar los datos.
   };
 
-  // Navegar al cerrar el modal
   const handleModalClose = () => {
     setModal({ ...modal, show: false });
     if (modal.estado) {
@@ -77,111 +69,116 @@ function SolicitarCita() {
     }
   };
 
-  if (isLoading) return <p>Cargando la programación...</p>;
-  if (isError) return <p>Ocurrió un error...</p>;
+  if (isLoading) return <Loading nombre="programación de cita..." />;
+  if (isError) return <ErrorPage code={500} message="No se pudo cargar la cita seleccionada" />;
 
   return (
-    <>
-      <div className="container-fluid containerColor">
-        <div className="row align-items-center justify-content-center">
-          <div className="col-12">
-            <div>
-              {modal.show && (
-                <Modal
-                  titulo={modal.titulo}
-                  estado={modal.estado}
-                  mensaje={modal.message}
-                  setModal={setModal}
-                  onClose={handleModalClose}
-                />
-              )}
-              <h1 className="m-3">Solicitar cita</h1>
-              <form onSubmit={handleSubmit}>
-                <fieldset disabled={mutation.isPending}>
-                  {/* Mostrar los datos como inputs solo lectura */}
-                  <div className="row m-5">
-                    <div className="col-4 mb-3">
-                      <label className="form-label">Fecha:</label>
-                      <input
-                        type="text"
-                        value={cita.fecha}
-                        readOnly
-                        className="form-control"
-                      />
-                    </div>
-                    <div className="col-4 mb-3">
-                      <label className="form-label">Posta:</label>
-                      <input
-                        type="text"
-                        value={cita.posta}
-                        readOnly
-                        className="form-control"
-                      />
-                    </div>
-                    <div className="col-4 mb-3">
-                      <label className="form-label">Consultorio:</label>
-                      <input
-                        type="text"
-                        value={cita.consultorio}
-                        readOnly
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
+    <div className="containerColor py-4">
+      {modal.show && (
+        <Modal
+          titulo={modal.titulo}
+          estado={modal.estado}
+          mensaje={modal.message}
+          setModal={setModal}
+          onClose={handleModalClose}
+        />
+      )}
 
-                  <div className="row ms-5 me-5">
-                    <div className="col-4 mb-3">
-                      <label className="form-label">Médico:</label>
-                      <input
-                        type="text"
-                        value={cita.nombre}
-                        readOnly
-                        className="form-control"
-                      />
-                    </div>
-                    <div className="col-4 mb-3">
-                      <label className="form-label">Horario:</label>
-                      <input
-                        type="text"
-                        value={cita.hora}
-                        readOnly
-                        className="form-control"
-                      />
-                    </div>
-
-                    {/* Campo editable para el motivo */}
-                    <div className="col-4 mb-3">
-                      <label className="form-label">Motivo de la cita:</label>
-                      <textarea
-                        value={motivo}
-                        onChange={(e) => setMotivo(e.target.value)}
-                        required
-                        className="form-control"
-                        rows="3"
-                      ></textarea>
-                    </div>
-                  </div>
-
-                  <div className="row ms-5 me-5">
-                    <div className="col-12 d-flex justify-content-end">
-                      <button
-                        type="submit"
-                        className="btn btn-primary mt-3"
-                        disabled={mutation.isPending}
-                      >
-                        {mutation.isPending
-                          ? "Solicitando ..."
-                          : "Solicitar Cita"}
-                      </button>
-                    </div>
-                  </div>
-                </fieldset>
-              </form>
-            </div>
+      <div className="container" style={{ maxWidth: "860px" }}>
+        <div className="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h1 className="fw-bold mb-1">Confirmar Cita Médica</h1>
+            <p className="text-muted small mb-0">Revisa los datos de atención y describe tu motivo</p>
           </div>
+          <Link to="/paciente/citas-disponibles" className="btn btn-secondary shadow-sm">
+            <i className="bi bi-arrow-left me-1"></i> Volver
+          </Link>
+        </div>
+
+        <div className="card border-0 shadow-sm p-4 p-md-5">
+          <form onSubmit={handleSubmit}>
+            <fieldset disabled={mutation.isPending}>
+              {/* Información fija de la programación */}
+              <div className="row g-3 mb-4 p-3 bg-light rounded-3">
+                <div className="col-12 col-md-4">
+                  <span className="text-muted small d-block">Fecha</span>
+                  <span className="fw-semibold text-dark">
+                    <i className="bi bi-calendar-check me-1 text-primary"></i>
+                    {cita.fecha}
+                  </span>
+                </div>
+                <div className="col-12 col-md-4">
+                  <span className="text-muted small d-block">Horario</span>
+                  <span className="fw-semibold text-dark">
+                    <i className="bi bi-clock me-1 text-primary"></i>
+                    {cita.hora}
+                  </span>
+                </div>
+                <div className="col-12 col-md-4">
+                  <span className="text-muted small d-block">Centro de salud</span>
+                  <span className="fw-semibold text-dark">
+                    <i className="bi bi-buildings me-1 text-primary"></i>
+                    {cita.posta}
+                  </span>
+                </div>
+                <div className="col-12 col-md-6">
+                  <span className="text-muted small d-block">Consultorio</span>
+                  <span className="badge bg-white text-dark border px-3 py-2 mt-1">
+                    {cita.consultorio}
+                  </span>
+                </div>
+                <div className="col-12 col-md-6">
+                  <span className="text-muted small d-block">Médico asignado</span>
+                  <span className="fw-semibold text-dark">
+                    <i className="bi bi-person-badge me-1 text-primary"></i>
+                    {cita.nombre}
+                  </span>
+                </div>
+              </div>
+
+              {/* Motivo editable */}
+              <div className="mb-4">
+                <label className="form-label fw-bold" htmlFor="motivo">
+                  Motivo de la consulta
+                </label>
+                <textarea
+                  id="motivo"
+                  value={motivo}
+                  onChange={(e) => setMotivo(e.target.value)}
+                  required
+                  rows="3"
+                  className="form-control"
+                  placeholder="Describe brevemente tus síntomas o el motivo de tu atención..."
+                ></textarea>
+              </div>
+
+              <div className="d-flex justify-content-end gap-2">
+                <Link to="/paciente/citas-disponibles" className="btn btn-secondary px-4">
+                  Cancelar
+                </Link>
+                <button
+                  type="submit"
+                  className="btn btn-warning px-4 fw-bold shadow-sm"
+                  disabled={mutation.isPending}
+                >
+                  {mutation.isPending ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2"></span>
+                      Reservando...
+                    </>
+                  ) : (
+                    <>
+                      <i className="bi bi-check2-circle me-1"></i>
+                      Confirmar Cita
+                    </>
+                  )}
+                </button>
+              </div>
+            </fieldset>
+          </form>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

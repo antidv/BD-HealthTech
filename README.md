@@ -33,13 +33,28 @@ Asegúrate de tener instalados estos elementos:
    cd ..
    ```
 
-   En la carpeta principal del código fuente, ejecuta en la terminal el siguiente comando:
+1. Configura el archivo `.env` en la raíz con tus credenciales de PostgreSQL local:
+   ```env
+   PORT=3000
+   DB_HOST=localhost
+   DB_USER=postgres
+   DB_PASSWORD=tu_contraseña
+   DB_NAME=posta
+   DB_PORT=5432
+   TOKEN_SECRET=mytoken
+   ```
+
+1. Inicializa y despliega el esquema y datos en PostgreSQL ejecutando:
+
+   ```bash
+   npm run db:setup
+   ```
+
+1. Ejecuta el servidor backend:
 
    ```bash
    npm run dev
    ```
-
-   Con ello, se ejecutará el servidor local para el backend. Recuerda tener configurado el archivo _.env_
 
    Si quieres ejecutar el servidor y que este se actualice automaticamente con cada cambio realizado, ejecuta el siguiente comando en lugar del anterior:
 

@@ -1,5 +1,3 @@
-USE posta;
-
 -- ==========================================================
 -- 1. CATÁLOGOS BASE (Consultorios, Postas, Horarios, etc.)
 -- ==========================================================
@@ -84,8 +82,7 @@ INSERT INTO usuario (idusuario, rol, correo, contrasenia) VALUES
 INSERT INTO admin (idadmin, idusuario) VALUES
 (1, 1);
 
-
--- El Paciente 1 (idpaciente 1) es el que usaremos para ver más data
+-- Pacientes
 INSERT INTO paciente (idpaciente, idusuario, nombre, apellidoP, apellidoM, genero, dni, fecha_nacimiento, celular, direccion, ciudad) VALUES
 (1, 3, 'Carlos', 'Quispe', 'Pérez', 'Masculino', '11111111', '1990-05-15', '999111222', 'Av. Central 123', 'Ate'),
 (2, 6, 'María', 'López', 'Rojas', 'Femenino', '22222222', '1985-08-20', '988222333', 'Jr. Los Pinos 456', 'Ate'),
@@ -94,7 +91,7 @@ INSERT INTO paciente (idpaciente, idusuario, nombre, apellidoP, apellidoM, gener
 (5, 9, 'Luis', 'Torres', 'Mendoza', 'Masculino', '55555555', '1978-07-07', '955555666', 'Jr. Amazonas 654', 'San Luis'),
 (6, 10, 'Ana', 'Vargas', 'Sánchez', 'Femenino', '66666666', '2010-09-12', '944666777', 'Pasaje Luna 987', 'Ate');
 
--- El Médico 1 (idmedico 1) será el principal
+-- Médicos
 INSERT INTO medico (idmedico, idusuario, nombre, apellidoP, apellidoM, dni, idespecialidad, disponible) VALUES
 (1, 2, 'Roberto', 'Sánchez', 'Paz', '88888888', 1, 1),
 (2, 4, 'Laura', 'García', 'Ríos', '99999999', 2, 1),
@@ -110,7 +107,6 @@ INSERT INTO consultorio_posta (idconsultorio_posta, idconsultorio, idposta, disp
 (4, 4, 1, 1), (5, 5, 1, 1), (6, 6, 1, 1);
 
 -- Asignamos médicos a los consultorios de la Posta 1
--- Médico 1 (Roberto, Medicina General) tiene mucha actividad aquí
 INSERT INTO medico_consultorio_posta (idmedconposta, idmedico, idconsultorio_posta, disponible) VALUES
 (1, 1, 1, 1), 
 (2, 2, 2, 1),
@@ -121,14 +117,14 @@ INSERT INTO medico_consultorio_posta (idmedconposta, idmedico, idconsultorio_pos
 -- ==========================================================
 
 INSERT INTO antecedentes (idantecedentes, idpaciente, fecha_creacion) VALUES
-(1, 1, '2024-01-15'), (2, 2, '2025-05-20'), (3, 3, '2025-08-10'),
-(4, 4, '2025-10-05'), (5, 5, '2026-01-12'), (6, 6, '2026-02-01');
+(1, 1, '2024-01-15 00:00:00'), (2, 2, '2025-05-20 00:00:00'), (3, 3, '2025-08-10 00:00:00'),
+(4, 4, '2025-10-05 00:00:00'), (5, 5, '2026-01-12 00:00:00'), (6, 6, '2026-02-01 00:00:00');
 
-INSERT INTO alergia_historia (idantecedentes, idalergia) VALUES
-(1, 1), (1, 3), (2, 2), (3, 5), (4, 4), (5, 6);
+INSERT INTO alergia_historia (idalergia_historia, idantecedentes, idalergia) VALUES
+(1, 1, 1), (2, 1, 3), (3, 2, 2), (4, 3, 5), (5, 4, 4), (6, 5, 6);
 
-INSERT INTO enfermedad_historia (idantecedentes, idenfermedad) VALUES
-(1, 3), (1, 4), (2, 6), (4, 5), (5, 1), (6, 2);
+INSERT INTO enfermedad_historia (idenfermedad_historia, idenfermedad, idantecedentes) VALUES
+(1, 3, 1), (2, 4, 1), (3, 6, 2), (4, 5, 4), (5, 1, 5), (6, 2, 6);
 
 -- ==========================================================
 -- 6. PROGRAMACIÓN Y CITAS (Actividad para Médico 1 y Paciente 1)
@@ -136,21 +132,21 @@ INSERT INTO enfermedad_historia (idantecedentes, idenfermedad) VALUES
 
 -- Programaciones de citas para el Médico 1 (idmedconposta = 1)
 INSERT INTO programacion_cita (idprogramacion_cita, idmedconposta, idhorario, fecha, cupos_totales, cupos_disponibles) VALUES
-(1, 1, 1, CURDATE(), 10, 8),              -- Hoy, turno 1 (2 ocupados)
-(2, 1, 2, CURDATE(), 10, 10),             -- Hoy, turno 2
-(3, 1, 1, DATE_ADD(CURDATE(), INTERVAL 1 DAY), 10, 9), -- Mañana, turno 1 (1 ocupado)
-(4, 1, 3, DATE_ADD(CURDATE(), INTERVAL 2 DAY), 10, 10),
-(5, 2, 1, CURDATE(), 5, 5),               -- Programación para otro médico (Pediatra)
-(6, 3, 4, CURDATE(), 8, 8);               -- Programación para otro médico (Odontólogo)
+(1, 1, 1, CURRENT_DATE, 10, 8),
+(2, 1, 2, CURRENT_DATE, 10, 10),
+(3, 1, 1, (CURRENT_DATE + INTERVAL '1 DAY')::DATE, 10, 9),
+(4, 1, 3, (CURRENT_DATE + INTERVAL '2 DAY')::DATE, 10, 10),
+(5, 2, 1, CURRENT_DATE, 5, 5),
+(6, 3, 4, CURRENT_DATE, 8, 8);
 
--- Citas (El Paciente 1 interactúa mucho con el Médico 1)
+-- Citas
 INSERT INTO cita (idcita, idpaciente, idmedico, idprogramacion_cita, motivo, fecha, estado, consultorio, num_cupo, hora_aprox, triaje) VALUES
-(1, 1, 1, 1, 'Dolor de cabeza severo', CURDATE(), 'Atendido', 'Medicina General', 1, '08:00:00', 'Presión 140/90, Temp 37.5'),
-(2, 2, 1, 1, 'Malestar general', CURDATE(), 'En espera', 'Medicina General', 2, '08:12:00', 'Pendiente'),
-(3, 1, 1, 3, 'Control de presión', DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'En espera', 'Medicina General', 1, '08:00:00', 'Pendiente'),
-(4, 3, 2, 5, 'Fiebre infantil', CURDATE(), 'En espera', 'Pediatría', 1, '08:00:00', 'Temp 39.0'),
-(5, 4, 3, 6, 'Dolor de muela', CURDATE(), 'En espera', 'Odontología', 1, '14:00:00', 'Pendiente'),
-(6, 5, 1, 2, 'Chequeo general', CURDATE(), 'Ausente', 'Medicina General', 1, '10:00:00', 'No se presentó');
+(1, 1, 1, 1, 'Dolor de cabeza severo', CURRENT_DATE, 'Atendido', 'Medicina General', 1, '08:00:00', 'Presión 140/90, Temp 37.5'),
+(2, 2, 1, 1, 'Malestar general', CURRENT_DATE, 'En espera', 'Medicina General', 2, '08:12:00', 'Pendiente'),
+(3, 1, 1, 3, 'Control de presión', (CURRENT_DATE + INTERVAL '1 DAY')::DATE, 'En espera', 'Medicina General', 1, '08:00:00', 'Pendiente'),
+(4, 3, 2, 5, 'Fiebre infantil', CURRENT_DATE, 'En espera', 'Pediatría', 1, '08:00:00', 'Temp 39.0'),
+(5, 4, 3, 6, 'Dolor de muela', CURRENT_DATE, 'En espera', 'Odontología', 1, '14:00:00', 'Pendiente'),
+(6, 5, 1, 2, 'Chequeo general', CURRENT_DATE, 'Ausente', 'Medicina General', 1, '10:00:00', 'No se presentó');
 
 -- ==========================================================
 -- 7. DIAGNÓSTICOS Y RECETAS (Para las citas atendidas)
@@ -166,3 +162,27 @@ INSERT INTO receta (idreceta, iddiagnostico, idmedicamento, dosis) VALUES
 (1, 1, 4, 'Tomar 1 pastilla cada 12 horas por 7 días'),
 (2, 2, 1, 'Tomar 1 pastilla en caso de dolor agudo'),
 (3, 2, 5, 'Aplicar 1 inyección si el dolor no cede en 24h');
+
+-- ==========================================================
+-- 8. SINCRONIZACIÓN DE SECUENCIAS (Para IDs autoincrementales)
+-- ==========================================================
+SELECT setval(pg_get_serial_sequence('usuario', 'idusuario'), coalesce(max(idusuario), 1)) FROM usuario;
+SELECT setval(pg_get_serial_sequence('admin', 'idadmin'), coalesce(max(idadmin), 1)) FROM admin;
+SELECT setval(pg_get_serial_sequence('consultorio', 'idconsultorio'), coalesce(max(idconsultorio), 1)) FROM consultorio;
+SELECT setval(pg_get_serial_sequence('posta', 'idposta'), coalesce(max(idposta), 1)) FROM posta;
+SELECT setval(pg_get_serial_sequence('horario', 'idhorario'), coalesce(max(idhorario), 1)) FROM horario;
+SELECT setval(pg_get_serial_sequence('enfermedad', 'idenfermedad'), coalesce(max(idenfermedad), 1)) FROM enfermedad;
+SELECT setval(pg_get_serial_sequence('medicamento', 'idmedicamento'), coalesce(max(idmedicamento), 1)) FROM medicamento;
+SELECT setval(pg_get_serial_sequence('alergia', 'idalergia'), coalesce(max(idalergia), 1)) FROM alergia;
+SELECT setval(pg_get_serial_sequence('especialidad', 'idespecialidad'), coalesce(max(idespecialidad), 1)) FROM especialidad;
+SELECT setval(pg_get_serial_sequence('paciente', 'idpaciente'), coalesce(max(idpaciente), 1)) FROM paciente;
+SELECT setval(pg_get_serial_sequence('medico', 'idmedico'), coalesce(max(idmedico), 1)) FROM medico;
+SELECT setval(pg_get_serial_sequence('consultorio_posta', 'idconsultorio_posta'), coalesce(max(idconsultorio_posta), 1)) FROM consultorio_posta;
+SELECT setval(pg_get_serial_sequence('antecedentes', 'idantecedentes'), coalesce(max(idantecedentes), 1)) FROM antecedentes;
+SELECT setval(pg_get_serial_sequence('medico_consultorio_posta', 'idmedconposta'), coalesce(max(idmedconposta), 1)) FROM medico_consultorio_posta;
+SELECT setval(pg_get_serial_sequence('programacion_cita', 'idprogramacion_cita'), coalesce(max(idprogramacion_cita), 1)) FROM programacion_cita;
+SELECT setval(pg_get_serial_sequence('cita', 'idcita'), coalesce(max(idcita), 1)) FROM cita;
+SELECT setval(pg_get_serial_sequence('diagnostico', 'iddiagnostico'), coalesce(max(iddiagnostico), 1)) FROM diagnostico;
+SELECT setval(pg_get_serial_sequence('receta', 'idreceta'), coalesce(max(idreceta), 1)) FROM receta;
+SELECT setval(pg_get_serial_sequence('alergia_historia', 'idalergia_historia'), coalesce(max(idalergia_historia), 1)) FROM alergia_historia;
+SELECT setval(pg_get_serial_sequence('enfermedad_historia', 'idenfermedad_historia'), coalesce(max(idenfermedad_historia), 1)) FROM enfermedad_historia;

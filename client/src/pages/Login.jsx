@@ -62,79 +62,118 @@ function Login() {
 
   return (
     <>
-      <div className="container-fluid containerColor">
-        <div className="row align-items-center justify-content-center vh-100">
-          <div className="col-6 text-center">
-            <img src={Logo} alt="Logo" className="logo" />
-          </div>
+      <div className="containerColor d-flex align-items-center justify-content-center min-vh-100 p-3">
+        {modal.show && (
+          <Modal
+            titulo={modal.titulo}
+            estado={modal.estado}
+            mensaje={modal.message}
+            setModal={setModal}
+          />
+        )}
 
-          <div className="col-6 align-items-center justify-content-center text-center">
-            {modal.show && (
-              <Modal
-                titulo={modal.titulo}
-                estado={modal.estado}
-                mensaje={modal.message}
-                setModal={setModal}
-              />
-            )}
-            <h1>Iniciar Sesión</h1>
-            <form onSubmit={onSubmit}>
-              <fieldset disabled={loadingLogin}>
-                <div className="d-flex flex-column justify-content-center">
-                  <input
-                    type="email"
-                    placeholder="Correo"
-                    className={`form-control mt-3 w-50 mx-auto ${
-                      errors.correo ? "is-invalid" : ""
-                    }`}
-                    {...register("correo", {
-                      required: {
-                        value: true,
-                        message: "Correo es requerido",
-                      },
-                      pattern: {
-                        value:
-                          /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                        message: "Correo no válido",
-                      },
-                    })}
-                  />
-                  {errors.correo && (
-                    <p className="invalid-feedback">{errors.correo.message}</p>
-                  )}
-                </div>
+        <div className="container" style={{ maxWidth: "980px" }}>
+          <div className="row g-0 align-items-center login-card overflow-hidden">
+            {/* Columna Izquierda: Logo y Presentación */}
+            <div className="col-12 col-md-6 text-center p-4 p-lg-5 d-flex flex-column align-items-center justify-content-center border-end-md">
+              <img src={Logo} alt="HealthTech Logo" className="logo img-fluid mb-3" />
+              <p className="text-muted small mt-2 mb-0">
+                Plataforma de atención médica y gestión de citas
+              </p>
+            </div>
 
-                <div className="d-flex flex-column justify-content-center">
-                  <input
-                    type="password"
-                    placeholder="Contraseña"
-                    className={`form-control mt-3 w-50 mx-auto ${
-                      errors.contrasenia ? "is-invalid" : ""
-                    }`}
-                    {...register("contrasenia", {
-                      required: {
-                        value: true,
-                        message: "Contaseña es requerida",
-                      },
-                    })}
-                  />
-                  {errors.contrasenia && (
-                    <p className="invalid-feedback">
-                      {errors.contrasenia.message}
-                    </p>
-                  )}
-                </div>
-                <div className="d-flex justify-content-center">
+            {/* Columna Derecha: Formulario */}
+            <div className="col-12 col-md-6 p-4 p-lg-5">
+              <div className="mb-4 text-center text-md-start">
+                <h2 className="fw-bold mb-1">Iniciar Sesión</h2>
+                <p className="text-muted small">Ingresa tus credenciales para acceder</p>
+              </div>
+
+              <form onSubmit={onSubmit}>
+                <fieldset disabled={loadingLogin}>
+                  <div className="mb-3">
+                    <label className="form-label" htmlFor="correo">
+                      Correo electrónico
+                    </label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0 text-muted">
+                        <i className="bi bi-envelope"></i>
+                      </span>
+                      <input
+                        id="correo"
+                        type="email"
+                        placeholder="ejemplo@correo.com"
+                        className={`form-control border-start-0 ${
+                          errors.correo ? "is-invalid" : ""
+                        }`}
+                        {...register("correo", {
+                          required: {
+                            value: true,
+                            message: "El correo es requerido",
+                          },
+                          pattern: {
+                            value:
+                              /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
+                            message: "Correo no válido",
+                          },
+                        })}
+                      />
+                    </div>
+                    {errors.correo && (
+                      <p className="invalid-feedback d-block small mt-1">{errors.correo.message}</p>
+                    )}
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="form-label" htmlFor="contrasenia">
+                      Contraseña
+                    </label>
+                    <div className="input-group">
+                      <span className="input-group-text bg-light border-end-0 text-muted">
+                        <i className="bi bi-lock"></i>
+                      </span>
+                      <input
+                        id="contrasenia"
+                        type="password"
+                        placeholder="••••••••"
+                        className={`form-control border-start-0 ${
+                          errors.contrasenia ? "is-invalid" : ""
+                        }`}
+                        {...register("contrasenia", {
+                          required: {
+                            value: true,
+                            message: "La contraseña es requerida",
+                          },
+                        })}
+                      />
+                    </div>
+                    {errors.contrasenia && (
+                      <p className="invalid-feedback d-block small mt-1">
+                        {errors.contrasenia.message}
+                      </p>
+                    )}
+                  </div>
+
                   <button
                     type="submit"
                     disabled={loadingLogin}
-                    className="btn btn-warning mt-3 mb-3"
+                    className="btn btn-warning w-100 py-2 fs-6 fw-bold shadow-sm"
                   >
-                    {loadingLogin ? "Cargando ..." : "Iniciar"}
+                    {loadingLogin ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2" role="status"></span>
+                        Iniciando sesión...
+                      </>
+                    ) : (
+                      <>
+                        <i className="bi bi-box-arrow-in-right me-1"></i>
+                        Ingresar
+                      </>
+                    )}
                   </button>
-                </div>
-              </fieldset>
-            </form>
+                </fieldset>
+              </form>
+            </div>
           </div>
         </div>
       </div>

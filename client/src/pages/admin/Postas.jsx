@@ -7,7 +7,6 @@ import CardPosta from "../../components/cards/CardPosta";
 import SearchBar from "../../components/SearchBar";
 import Loading from "../Loading";
 import ErrorPage from "../ErrorPage";
-//import PostaFoto from "../../assets/posta.jpg";
 
 function Postas() {
   const { page, setPage } = usePagination();
@@ -32,24 +31,29 @@ function Postas() {
   if (isError) return <ErrorPage code={500} message="Ocurrió un error ..." />;
 
   return (
-    <>
-      <div className="container-fluid containerColor">
-        <div className="row align-items-center justify-content-center">
-          <div className="col-12">
-            <h1 className="m-3">Postas</h1>
-            {/* Barra de busqueda */}
-            <SearchBar
-              onSearch={handleSearch}
-              nombre="posta"
-              url="/admin/registrar/posta"
-            />
+    <div className="containerColor py-4">
+      <div className="container" style={{ maxWidth: "1200px" }}>
+        <div className="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h1 className="fw-bold mb-1">Postas Médicas</h1>
+            <p className="text-muted small mb-0">Gestión de centros de salud y postas asociadas</p>
           </div>
         </div>
 
-        <div className="row m-3">
-          {/* Renderizado de cards */}
+        {/* Barra de busqueda */}
+        <SearchBar
+          onSearch={handleSearch}
+          nombre="posta"
+          url="/admin/registrar/posta"
+        />
+
+        {/* Renderizado de cards */}
+        <div className="row g-4">
           {postas.data.length === 0 ? (
-            <p>No hay datos para mostrar</p>
+            <div className="col-12 text-center py-5">
+              <i className="bi bi-buildings text-muted fs-1 mb-2 d-block"></i>
+              <p className="text-muted">No se encontraron postas médicas.</p>
+            </div>
           ) : (
             postas.data.map((posta) => (
               <CardPosta
@@ -63,15 +67,16 @@ function Postas() {
               />
             ))
           )}
-          {/* Paginacion */}
-          <Pagination
-            currentPage={page}
-            totalPages={postas.totalPages}
-            onPageChange={setPage}
-          />
         </div>
+
+        {/* Paginacion */}
+        <Pagination
+          currentPage={page}
+          totalPages={postas.totalPages}
+          onPageChange={setPage}
+        />
       </div>
-    </>
+    </div>
   );
 }
 

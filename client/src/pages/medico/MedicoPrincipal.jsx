@@ -32,16 +32,16 @@ function MedicoPrincipal() {
   });
 
   if (isMedLoad || isCitaLoad)
-    return <Loading nombre="perfil medico y citas ..." />;
+    return <Loading nombre="perfil médico y citas..." />;
   if (isMedError || isCitaError)
-    return <ErrorPage code={500} message={"Ocurrió un error"} />;
+    return <ErrorPage code={500} message={"Ocurrió un error al cargar la información"} />;
 
   return (
-    <>
-      <div className="container-fluid containerColor">
-        <div className="row justify-content-center">
-          <div className="col-4 justify-content-center">
-            {/* Dato de medico */}
+    <div className="containerColor py-4">
+      <div className="container" style={{ maxWidth: "1280px" }}>
+        <div className="row g-4 align-items-start">
+          {/* Datos del médico */}
+          <div className="col-12 col-lg-4">
             <CardMedicoVistaM
               nombre={
                 medico.nombre + " " + medico.apellidoP + " " + medico.apellidoM
@@ -52,72 +52,104 @@ function MedicoPrincipal() {
               disponible={medico.disponible}
             />
           </div>
-          <div className="col-8">
-            <div className="row mt-2 me-5">
-              <div className="col-12">
-                <div className="table-responsive mt-5 me-5">
-                  <h2 className="mb-4">Historial de citas</h2>
-                  <table className="table table-info table-bordered">
-                    <thead className="table-light">
+
+          {/* Tabla de citas asignadas */}
+          <div className="col-12 col-lg-8">
+            <div className="d-flex align-items-center justify-content-between mb-3">
+              <div>
+                <h2 className="fw-bold mb-0">Historial de Citas</h2>
+                <p className="text-muted small mb-0">Citas asignadas y atención a pacientes</p>
+              </div>
+            </div>
+
+            <div className="card border-0 shadow-sm overflow-hidden mb-4">
+              <div className="table-responsive">
+                <table className="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Paciente</th>
+                      <th>Consultorio</th>
+                      <th>Posta</th>
+                      <th>Estado</th>
+                      <th className="text-end pe-3">Acción</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {!citas?.data || citas?.data?.length === 0 ? (
                       <tr>
-                        <th scope="col">Fecha</th>
-                        <th scope="col">Hora</th>
-                        <th scope="col">Motivo</th>
-                        <th scope="col">Posta</th>
-                        <th scope="col">Consultorio</th>
-                        <th scope="col">Paciente</th>
-                        <th scope="col">Estado</th>
-                        <th scope="col">Accion</th>
+                        <td colSpan="7" className="text-center py-5 text-muted">
+                          <i className="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
+                          No hay citas programadas para atender.
+                        </td>
                       </tr>
-                    </thead>
-                    <tbody>
-                      {citas?.data?.length === 0 ? (
-                        <p>No hay citas para mostrar</p>
-                      ) : (
-                        citas?.data?.map((cita) => (
+                    ) : (
+                      citas.data.map((cita) => {
+                        const estadoClass =
+                          cita.estado === "Atendido"
+                            ? "badge-status atendido"
+                            : cita.estado === "En espera"
+                            ? "badge-status espera"
+                            : "badge-status ausente";
+
+                        return (
                           <tr key={cita.idcita}>
-                            <td scope="row">{cita.fecha}</td>
-                            <td>{cita.hora_aprox}</td>
-                            <td>{cita.motivo}</td>
-                            <td>{cita.posta_nombre}</td>
-                            <td>{cita.consultorio}</td>
-                            <td>
-                              {cita.paciente_nombre +
-                                " " +
-                                cita.paciente_apellido}
+                            <td className="fw-semibold text-dark">
+                              <i className="bi bi-calendar2-event me-2 text-primary"></i>
+                              {cita.fecha}
                             </td>
-                            <td>{cita.estado}</td>
                             <td>
+                              <span className="small text-muted">{cita.hora_aprox}</span>
+                            </td>
+                            <td>
+                              <span className="fw-semibold">
+                                {cita.paciente_nombre + " " + cita.paciente_apellido}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="badge bg-light text-dark border">
+                                {cita.consultorio}
+                              </span>
+                            </td>
+                            <td>{cita.posta_nombre}</td>
+                            <td>
+                              <span className={estadoClass}>
+                                {cita.estado}
+                              </span>
+                            </td>
+                            <td className="text-end pe-3">
                               <Link
                                 to={`/medico/diagnostico/${cita.idcita}`}
-                                className={`btn btn-primary ${
-                                  cita.estado === "Atendido" ||
-                                  cita.estado === "Ausente"
-                                    ? "disabled"
-                                    : ""
+                                className={`btn btn-sm ${
+                                  cita.estado === "Atendido" || cita.estado === "Ausente"
+                                    ? "btn-secondary disabled"
+                                    : "btn-warning"
                                 }`}
                               >
-                                Modificar
+                                <i className="bi bi-pencil-square me-1"></i>
+                                Atender
                               </Link>
                             </td>
                           </tr>
-                        ))
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Paginacion  */}
-                <Pagination
-                  currentPage={page}
-                  totalPages={citas.totalPages}
-                  onPageChange={setPage}
-                />
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
               </div>
             </div>
+
+            {/* Paginación */}
+            <Pagination
+              currentPage={page}
+              totalPages={citas.totalPages}
+              onPageChange={setPage}
+            />
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

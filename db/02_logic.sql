@@ -1,26 +1,51 @@
-USE posta;
-
 -- ==========================================================
--- 1. PROCEDIMIENTOS ALMACENADOS
+-- Funciones, Procedimientos y Triggers en PostgreSQL
 -- ==========================================================
 
-DROP PROCEDURE IF EXISTS `actualizarPostaYConsultorios`;
-CREATE PROCEDURE `actualizarPostaYConsultorios`(
-    IN p_idposta INT,
-    IN p_nombre VARCHAR(100),
-    IN p_ciudad VARCHAR(50),
-    IN p_direccion VARCHAR(255),
-    IN p_telefono VARCHAR(9),
-    IN p_estado TINYINT(1),
-    IN p_consultorios JSON,
-    IN p_nuevos_consultorios JSON
-)
+-- 1. Helper de compatibilidad MySQL DATE_FORMAT
+CREATE OR REPLACE FUNCTION DATE_FORMAT(d TIMESTAMP WITH TIME ZONE, fmt TEXT)
+RETURNS TEXT LANGUAGE plpgsql AS $$
 BEGIN
-    DECLARE idx INT DEFAULT 0;
-    DECLARE total INT DEFAULT 0;
-    DECLARE v_idconsultorio INT;
-    DECLARE v_disponible TINYINT(1);
+    IF fmt = '%d-%m-%Y' THEN
+        RETURN TO_CHAR(d, 'DD-MM-YYYY');
+    ELSIF fmt = '%Y-%m-%d' THEN
+        RETURN TO_CHAR(d, 'YYYY-MM-DD');
+    ELSE
+        RETURN TO_CHAR(d, 'YYYY-MM-DD');
+    END IF;
+END;
+$$;
 
+CREATE OR REPLACE FUNCTION DATE_FORMAT(d DATE, fmt TEXT)
+RETURNS TEXT LANGUAGE plpgsql AS $$
+BEGIN
+    IF fmt = '%d-%m-%Y' THEN
+        RETURN TO_CHAR(d, 'DD-MM-YYYY');
+    ELSIF fmt = '%Y-%m-%d' THEN
+        RETURN TO_CHAR(d, 'YYYY-MM-DD');
+    ELSE
+        RETURN TO_CHAR(d, 'YYYY-MM-DD');
+    END IF;
+END;
+$$;
+
+-- 2. Procedimiento para actualizar Posta y Consultorios
+DROP PROCEDURE IF EXISTS actualizarPostaYConsultorios;
+CREATE OR REPLACE PROCEDURE actualizarPostaYConsultorios(
+    p_idposta INT,
+    p_nombre VARCHAR(100),
+    p_ciudad VARCHAR(50),
+    p_direccion VARCHAR(255),
+    p_telefono VARCHAR(9),
+    p_estado INT,
+    p_consultorios JSONB,
+    p_nuevos_consultorios JSONB
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    elem JSONB;
+BEGIN
     UPDATE posta
     SET nombre = p_nombre,
         ciudad = p_ciudad,
@@ -29,88 +54,99 @@ BEGIN
         disponible = p_estado
     WHERE idposta = p_idposta;
 
-    IF p_consultorios IS NOT NULL THEN
-        SET total = JSON_LENGTH(p_consultorios);
-        WHILE idx < total DO
-            SET v_idconsultorio = JSON_VALUE(JSON_EXTRACT(p_consultorios, CONCAT('$[', idx, ']')), '$.idconsultorio');
-            SET v_disponible = JSON_VALUE(JSON_EXTRACT(p_consultorios, CONCAT('$[', idx, ']')), '$.disponible');
-
+    IF p_consultorios IS NOT NULL AND jsonb_typeof(p_consultorios) = 'array' THEN
+        FOR elem IN SELECT * FROM jsonb_array_elements(p_consultorios)
+        LOOP
             UPDATE consultorio_posta
-            SET disponible = v_disponible
-            WHERE idposta = p_idposta AND idconsultorio = v_idconsultorio;
-            SET idx = idx + 1;
-        END WHILE;
+            SET disponible = (elem->>'disponible')::INT
+            WHERE idposta = p_idposta AND idconsultorio = (elem->>'idconsultorio')::INT;
+        END LOOP;
     END IF;
 
-    SET idx = 0;
-    IF p_nuevos_consultorios IS NOT NULL THEN
-        SET total = JSON_LENGTH(p_nuevos_consultorios);
-        WHILE idx < total DO
-            SET v_idconsultorio = JSON_VALUE(JSON_EXTRACT(p_nuevos_consultorios, CONCAT('$[', idx, ']')), '$');
+    IF p_nuevos_consultorios IS NOT NULL AND jsonb_typeof(p_nuevos_consultorios) = 'array' THEN
+        FOR elem IN SELECT * FROM jsonb_array_elements(p_nuevos_consultorios)
+        LOOP
             INSERT INTO consultorio_posta (idposta, idconsultorio, disponible)
-            VALUES (p_idposta, v_idconsultorio, 1);
-            SET idx = idx + 1;
-        END WHILE;
+            VALUES (p_idposta, (elem#>>'{}')::INT, 1)
+            ON CONFLICT DO NOTHING;
+        END LOOP;
     END IF;
 END;
+$$;
 
-DROP PROCEDURE IF EXISTS sp_insertar_medico;
-CREATE PROCEDURE sp_insertar_medico (
-    IN i_correo VARCHAR(100),
-    IN i_contrasenia VARCHAR(100),
-    IN i_nombre VARCHAR(50),
-    IN i_apellidoP VARCHAR(20),
-    IN i_apellidoM VARCHAR(20),
-    IN i_dni VARCHAR(8),
-    IN i_especialidad VARCHAR(50)
+-- 3. Función / Procedimiento para insertar médico
+DROP FUNCTION IF EXISTS sp_insertar_medico;
+CREATE OR REPLACE FUNCTION sp_insertar_medico(
+    i_correo VARCHAR(100),
+    i_contrasenia VARCHAR(100),
+    i_nombre VARCHAR(50),
+    i_apellidoP VARCHAR(20),
+    i_apellidoM VARCHAR(20),
+    i_dni VARCHAR(8),
+    i_especialidad VARCHAR(50)
 )
+RETURNS TABLE (
+    mensaje TEXT,
+    usuario_id INT,
+    correo VARCHAR(100),
+    nombre VARCHAR(50),
+    apellidoP VARCHAR(20),
+    apellidoM VARCHAR(20),
+    dni VARCHAR(8),
+    especialidad VARCHAR(50)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    existe_correo INT := 0;
+    v_usuario_id INT := 0;
+    v_especialidad_id INT := 0;
 BEGIN
-    DECLARE existe_correo INT DEFAULT 0;
-    DECLARE usuario_id INT DEFAULT 0;
-    DECLARE especialidad_id INT DEFAULT 0;
-
-    START TRANSACTION;
-    SELECT COUNT(*) INTO existe_correo FROM usuario WHERE correo = i_correo;
-
+    SELECT COUNT(*) INTO existe_correo FROM usuario u WHERE u.correo = i_correo;
     IF existe_correo > 0 THEN
-        ROLLBACK;
-        SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'El correo ingresado ya existe';
-    ELSE
-        SELECT idespecialidad INTO especialidad_id FROM especialidad WHERE nombre = i_especialidad;
-        IF especialidad_id IS NULL OR especialidad_id = 0 THEN
-            ROLLBACK;
-            SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'La especialidad ingresada no existe';
-        ELSE
-            INSERT INTO usuario (rol, correo, contrasenia)
-            VALUES ('Medico', i_correo, i_contrasenia);
-            SET usuario_id = LAST_INSERT_ID();
-
-            INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, dni, idespecialidad)
-            VALUES (usuario_id, i_nombre, i_apellidoP, i_apellidoM, i_dni, especialidad_id);
-            COMMIT;
-
-            SELECT 'Médico registrado con éxito' AS mensaje, usuario_id, i_correo as correo, i_nombre as nombre, i_apellidoP as apellidoP, i_apellidoM as apellidoM, i_dni as dni, i_especialidad as especialidad;
-        END IF;
+        RAISE EXCEPTION 'El correo ingresado ya existe' USING ERRCODE = '45000';
     END IF;
+
+    SELECT e.idespecialidad INTO v_especialidad_id FROM especialidad e WHERE e.nombre = i_especialidad LIMIT 1;
+    IF v_especialidad_id IS NULL OR v_especialidad_id = 0 THEN
+        RAISE EXCEPTION 'La especialidad ingresada no existe' USING ERRCODE = '45000';
+    END IF;
+
+    INSERT INTO usuario (rol, correo, contrasenia)
+    VALUES ('Medico', i_correo, i_contrasenia)
+    RETURNING usuario.idusuario INTO v_usuario_id;
+
+    INSERT INTO medico (idusuario, nombre, apellidoP, apellidoM, dni, idespecialidad)
+    VALUES (v_usuario_id, i_nombre, i_apellidoP, i_apellidoM, i_dni, v_especialidad_id);
+
+    RETURN QUERY SELECT
+        'Médico registrado con éxito'::TEXT,
+        v_usuario_id,
+        i_correo,
+        i_nombre,
+        i_apellidoP,
+        i_apellidoM,
+        i_dni,
+        i_especialidad;
 END;
+$$;
 
--- ==========================================================
--- 2. FUNCIONES Y TRIGGERS
--- ==========================================================
-
-DROP FUNCTION IF EXISTS f_calcular_hora_aprox;
-CREATE FUNCTION f_calcular_hora_aprox(
+-- 4. Función para cálculo de hora aproximada
+CREATE OR REPLACE FUNCTION f_calcular_hora_aprox(
     p_num_cupo INT,
     p_idprogramacion_cita INT
 ) RETURNS TIME
-DETERMINISTIC
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_hora_inicio TIME;
+    v_hora_fin TIME;
+    v_num_total_cupos INT;
+    v_start_sec INT;
+    v_end_sec INT;
+    v_intervalo_sec NUMERIC;
+    v_hora_aprox_sec INT;
 BEGIN
-    DECLARE v_hora_inicio TIME;
-    DECLARE v_hora_fin TIME;
-    DECLARE v_num_total_cupos INT;
-    DECLARE v_intervalo INT;
-    DECLARE v_hora_aprox_sec INT;
-
     SELECT h.hora_inicio, h.hora_fin, pc.cupos_totales
     INTO v_hora_inicio, v_hora_fin, v_num_total_cupos
     FROM programacion_cita pc
@@ -122,25 +158,46 @@ BEGIN
         RETURN NULL;
     END IF;
 
-    SET v_intervalo = (TIME_TO_SEC(v_hora_fin) - TIME_TO_SEC(v_hora_inicio)) / v_num_total_cupos;
-    SET v_hora_aprox_sec = TIME_TO_SEC(v_hora_inicio) + ((p_num_cupo - 1) * v_intervalo);
-    RETURN SEC_TO_TIME(v_hora_aprox_sec);
-END;
+    v_start_sec := EXTRACT(HOUR FROM v_hora_inicio)::INT * 3600 + EXTRACT(MINUTE FROM v_hora_inicio)::INT * 60 + EXTRACT(SECOND FROM v_hora_inicio)::INT;
+    v_end_sec := EXTRACT(HOUR FROM v_hora_fin)::INT * 3600 + EXTRACT(MINUTE FROM v_hora_fin)::INT * 60 + EXTRACT(SECOND FROM v_hora_fin)::INT;
+    v_intervalo_sec := (v_end_sec - v_start_sec)::NUMERIC / v_num_total_cupos;
+    v_hora_aprox_sec := (v_start_sec + ((p_num_cupo - 1) * v_intervalo_sec))::INT;
 
-DROP TRIGGER IF EXISTS trg_calculate_hora_aprox_before_insert;
+    RETURN (INTERVAL '1 second' * v_hora_aprox_sec)::TIME;
+END;
+$$;
+
+-- 5. Triggers
+CREATE OR REPLACE FUNCTION fn_trg_calculate_hora_aprox()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.hora_aprox := f_calcular_hora_aprox(NEW.num_cupo, NEW.idprogramacion_cita);
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_calculate_hora_aprox_before_insert ON cita;
 CREATE TRIGGER trg_calculate_hora_aprox_before_insert
 BEFORE INSERT ON cita
 FOR EACH ROW
-BEGIN
-    SET NEW.hora_aprox = f_calcular_hora_aprox(NEW.num_cupo, NEW.idprogramacion_cita);
-END;
+EXECUTE FUNCTION fn_trg_calculate_hora_aprox();
 
-DROP TRIGGER IF EXISTS update_cupos_disponibles;
+CREATE OR REPLACE FUNCTION fn_trg_update_cupos_disponibles()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    UPDATE programacion_cita
+    SET cupos_disponibles = cupos_disponibles - 1
+    WHERE idprogramacion_cita = NEW.idprogramacion_cita;
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS update_cupos_disponibles ON cita;
 CREATE TRIGGER update_cupos_disponibles
 AFTER INSERT ON cita
 FOR EACH ROW
-BEGIN
-  UPDATE programacion_cita
-  SET cupos_disponibles = cupos_disponibles - 1
-  WHERE idprogramacion_cita = NEW.idprogramacion_cita;
-END;
+EXECUTE FUNCTION fn_trg_update_cupos_disponibles();

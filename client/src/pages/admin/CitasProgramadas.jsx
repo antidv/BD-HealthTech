@@ -3,6 +3,8 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProgracionCitas, deleteProgramacionCita } from "../../api/citas";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../hooks/usePagination";
+import Loading from "../Loading";
+import ErrorPage from "../ErrorPage";
 
 function CitasProgramadas() {
   const { page, setPage } = usePagination();
@@ -22,7 +24,6 @@ function CitasProgramadas() {
     limit: 10,
   });
 
-  // Manejar el cambio en los filtros del formulario
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setSearchFilters((prev) => ({
@@ -31,24 +32,22 @@ function CitasProgramadas() {
     }));
   };
 
-  // Manejar el evento de búsqueda
-  const handleSearch = () => {
+  const handleSearch = (e) => {
+    e.preventDefault();
     setAppliedFilters({
       ...searchFilters,
       page: 1,
       limit: 10,
     });
-    setPage(1); // Reiniciar a la primera página
+    setPage(1);
   };
 
-  // Uso de useQuery con filtros dinámicos
   const { data, isLoading, isError } = useQuery({
     queryKey: ["programacionCitas", appliedFilters],
     queryFn: () => getProgracionCitas(appliedFilters),
     keepPreviousData: true,
   });
 
-  // Eliminar programacion
   const deleteMutation = useMutation({
     mutationFn: deleteProgramacionCita,
     onSuccess: () => {
@@ -56,16 +55,12 @@ function CitasProgramadas() {
     },
   });
 
-  // Manejar la eliminacion
   const handleDelete = (id) => {
-    if (
-      window.confirm("¿Estás seguro de eliminar esta programación de cita?")
-    ) {
+    if (window.confirm("¿Estás seguro de eliminar esta programación de cita?")) {
       deleteMutation.mutate(id);
     }
   };
 
-  // Actualizar el estado de la página al cambiar de página
   const handlePageChange = (newPage) => {
     setAppliedFilters((prev) => ({
       ...prev,
@@ -74,42 +69,61 @@ function CitasProgramadas() {
     setPage(newPage);
   };
 
-  if (isLoading) return <div>Cargando citas...</div>;
-  if (isError) return <div>Ha ocurrido un error</div>;
+  if (isLoading) return <Loading nombre="citas programadas..." />;
+  if (isError) return <ErrorPage code={500} message="Ocurrió un error al obtener las citas" />;
 
   return (
-    <div className="container-fluid containerColor">
-      <div className="row align-items-center justify-content-center">
-        <div className="col-12">
-          <h2 className="m-3">Lista de citas programadas</h2>
+    <div className="containerColor py-4">
+      <div className="container" style={{ maxWidth: "1200px" }}>
+        <div className="mb-4">
+          <h1 className="fw-bold mb-1">Citas Programadas</h1>
+          <p className="text-muted small mb-0">Listado y gestión de horarios de atención disponibles</p>
         </div>
-        <div className="col-12">
-          {/* Filtros */}
-          <div className="d-flex m-3">
-            <input
-              type="text"
-              className="form-control w-25"
-              placeholder="Buscar por nombre de posta"
-              name="nombre"
-              value={searchFilters.nombre}
-              onChange={handleInputChange}
-            />
-            <input
-              type="date"
-              name="fecha"
-              value={searchFilters.fecha}
-              onChange={handleInputChange}
-              className="form-control w-25 ms-3"
-            />
-            <button className="btn btn-primary ms-3" onClick={handleSearch}>
-              Buscar
-            </button>
-          </div>
+
+        {/* Filtros */}
+        <div className="search-bar-container mb-4">
+          <form onSubmit={handleSearch} className="row g-2 align-items-center">
+            <div className="col-12 col-md-5">
+              <div className="input-group">
+                <span className="input-group-text bg-white border-end-0 text-muted">
+                  <i className="bi bi-search"></i>
+                </span>
+                <input
+                  type="text"
+                  className="form-control border-start-0"
+                  placeholder="Buscar por nombre de posta..."
+                  name="nombre"
+                  value={searchFilters.nombre}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className="col-12 col-md-4">
+              <div className="input-group">
+                <span className="input-group-text bg-white border-end-0 text-muted">
+                  <i className="bi bi-calendar3"></i>
+                </span>
+                <input
+                  type="date"
+                  name="fecha"
+                  value={searchFilters.fecha}
+                  onChange={handleInputChange}
+                  className="form-control border-start-0"
+                />
+              </div>
+            </div>
+            <div className="col-12 col-md-3">
+              <button type="submit" className="btn btn-primary w-100">
+                <i className="bi bi-funnel me-1"></i> Filtrar
+              </button>
+            </div>
+          </form>
         </div>
-        <div className="col-12">
-          <div className="table-responsive me-5 ms-5">
-            {/* Tabla de citas */}
-            <table border="1" style={{ width: "100%", marginTop: "20px" }} className="table table-info">
+
+        {/* Tabla en Card */}
+        <div className="card shadow-sm border-0 overflow-hidden mb-4">
+          <div className="table-responsive">
+            <table className="table table-hover align-middle mb-0">
               <thead>
                 <tr>
                   <th>Fecha</th>
@@ -117,50 +131,78 @@ function CitasProgramadas() {
                   <th>Consultorio</th>
                   <th>Posta</th>
                   <th>Horario</th>
-                  <th>Cupos Totales</th>
-                  <th>Cupos Disponibles</th>
-                  <th></th>
+                  <th>Cupos</th>
+                  <th className="text-end pe-4">Acción</th>
                 </tr>
               </thead>
               <tbody>
-                {data.data.length > 0 ? (
-                  data.data.map((cita) => (
-                    <tr key={cita.idprogramacion_cita}>
-                      <td>{cita.fecha}</td>
-                      <td>{cita.nombre + " " + cita.apellido}</td>
-                      <td>{cita.consultorio}</td>
-                      <td>{cita.posta}</td>
-                      <td>{cita.hora}</td>
-                      <td>{cita.cupos_totales}</td>
-                      <td>{cita.cupos_disponibles}</td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-danger"
-                          disabled={cita.cupos_totales > cita.cupos_disponibles}
-                          onClick={() => handleDelete(cita.idprogramacion_cita)}
-                        >
-                          Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))
+                {data.data && data.data.length > 0 ? (
+                  data.data.map((cita) => {
+                    const ocupados = cita.cupos_totales > cita.cupos_disponibles;
+                    return (
+                      <tr key={cita.idprogramacion_cita}>
+                        <td className="fw-semibold text-dark">
+                          <i className="bi bi-calendar2-event me-2 text-primary"></i>
+                          {cita.fecha}
+                        </td>
+                        <td>{cita.nombre + " " + cita.apellido}</td>
+                        <td>
+                          <span className="badge bg-light text-dark border">
+                            {cita.consultorio}
+                          </span>
+                        </td>
+                        <td>{cita.posta}</td>
+                        <td>
+                          <span className="small text-muted">
+                            <i className="bi bi-clock me-1"></i>
+                            {cita.hora}
+                          </span>
+                        </td>
+                        <td>
+                          <span
+                            className={`badge ${
+                              cita.cupos_disponibles > 0
+                                ? "bg-success bg-opacity-10 text-success"
+                                : "bg-danger bg-opacity-10 text-danger"
+                            }`}
+                          >
+                            {cita.cupos_disponibles} / {cita.cupos_totales} disp.
+                          </span>
+                        </td>
+                        <td className="text-end pe-4">
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger"
+                            disabled={ocupados || deleteMutation.isPending}
+                            title={ocupados ? "No se puede eliminar: tiene citas asignadas" : "Eliminar"}
+                            onClick={() => handleDelete(cita.idprogramacion_cita)}
+                          >
+                            <i className="bi bi-trash"></i>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
-                    <td colSpan="7">No se encontraron citas programadas.</td>
+                    <td colSpan="7" className="text-center py-5 text-muted">
+                      <i className="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
+                      No se encontraron citas programadas.
+                    </td>
                   </tr>
                 )}
               </tbody>
             </table>
           </div>
         </div>
+
+        {/* Paginación */}
+        <Pagination
+          currentPage={page}
+          totalPages={data.totalPages}
+          onPageChange={handlePageChange}
+        />
       </div>
-      {/* Paginación */}
-      <Pagination
-        currentPage={page}
-        totalPages={data.totalPages}
-        onPageChange={handlePageChange}
-      />
     </div>
   );
 }

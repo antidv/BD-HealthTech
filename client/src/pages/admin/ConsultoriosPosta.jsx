@@ -9,7 +9,6 @@ import Pagination from "../../components/Pagination";
 
 function ConsultoriosPosta() {
   const { idposta } = useParams();
-
   const { page, setPage } = usePagination();
 
   // Petición de datos para posta
@@ -30,115 +29,170 @@ function ConsultoriosPosta() {
   } = useQuery({
     queryKey: ["consultorios", { idposta, page, limit: 6 }],
     queryFn: () => getConsultoriosPosta({ idposta, page, limit: 6 }),
-    enabled: !!posta, // Solo activa si `posta` tiene valor
+    enabled: !!posta,
     keepPreviousData: true,
   });
 
   if (isPostaLoading || isConsultoriosLoading)
     return <Loading nombre="posta y consultorios ..." />;
   if (isPostaError || isConsultoriosError)
-    return <ErrorPage code={500} message="Ocurrió un error ..." />;
+    return <ErrorPage code={500} message="Ocurrió un error al cargar la posta." />;
 
   return (
-    <>
-      <div className="container-fluid containerColor">
-        <div className="row justify-content-center">
-          <div className="col-6 d-flex justify-content-center">
-            {/* Posta */}
-            <div className="card m-5 cardConsultorioPosta">
-              <h2 className="m-3 text-center">{posta.nombre}</h2>
-              <div className="d-flex justify-content-center">
-                <img src={posta.foto} alt="posta" width={200} />
+    <div className="container py-4">
+      <div className="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+        <div className="d-flex align-items-center gap-3">
+          <Link to="/admin/postas" className="btn btn-outline-secondary btn-sm">
+            <i className="bi bi-arrow-left me-1"></i> Volver a Postas
+          </Link>
+          <h2 className="mb-0 fw-bold">{posta.nombre}</h2>
+        </div>
+        <span className={`badge ${posta.disponible ? "badge-active" : "badge-inactive"} px-3 py-2 fs-6`}>
+          <i className={`bi bi-${posta.disponible ? "check-circle" : "x-circle"} me-1`}></i>
+          {posta.disponible ? "Posta Operativa" : "Posta No Operativa"}
+        </span>
+      </div>
+
+      <div className="row g-4">
+        {/* Tarjeta de la Posta */}
+        <div className="col-12 col-lg-4">
+          <div className="card shadow-sm border-0 sticky-top" style={{ top: "90px" }}>
+            <div className="card-body text-center p-4">
+              <div className="avatar-frame mx-auto mb-3" style={{ width: "110px", height: "110px" }}>
+                <img
+                  src={posta.foto || "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=300"}
+                  alt={posta.nombre}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
               </div>
-              <div className="card-body">
-                <p className="card-text">
-                  <b>Ciudad: </b>
-                  {posta.ciudad}
-                </p>
-                <p className="card-text">
-                  <b>Dirección: </b>
-                  {posta.direccion}
-                </p>
-                <p>
-                  <b>Estado: </b>
-                  {`${posta.disponible ? "Disponible" : "No disponible"}`}
-                </p>
+
+              <h4 className="fw-bold mb-1">{posta.nombre}</h4>
+              <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-1 mb-3">
+                <i className="bi bi-geo-alt me-1"></i>
+                {posta.ciudad}
+              </span>
+
+              <hr className="my-3 opacity-25" />
+
+              <div className="text-start mb-4">
+                <div className="d-flex justify-content-between py-2 border-bottom border-light">
+                  <span className="text-muted"><i className="bi bi-geo me-2"></i>Dirección</span>
+                  <span className="fw-semibold text-truncate" style={{ maxWidth: "160px" }}>{posta.direccion}</span>
+                </div>
+                {posta.telefono && (
+                  <div className="d-flex justify-content-between py-2 border-bottom border-light">
+                    <span className="text-muted"><i className="bi bi-telephone me-2"></i>Teléfono</span>
+                    <span className="fw-semibold">{posta.telefono}</span>
+                  </div>
+                )}
+                <div className="d-flex justify-content-between py-2">
+                  <span className="text-muted"><i className="bi bi-activity me-2"></i>Estado</span>
+                  <span className={`fw-semibold ${posta.disponible ? "text-success" : "text-danger"}`}>
+                    {posta.disponible ? "Disponible" : "No disponible"}
+                  </span>
+                </div>
               </div>
-              <div className="card-body text-center">
-                <a
-                  href={`/admin/editar/posta/${posta.idposta}`}
-                  className="card-link btn btn-warning"
+
+              <div className="d-grid gap-2">
+                <Link
+                  to={`/admin/editar/posta/${posta.idposta}`}
+                  className="btn btn-warning"
                 >
-                  Editar
-                </a>
-                <a
-                  href="#"
-                  className={`card-link btn ${
-                    posta.disponible ? "btn-danger" : "btn-success"
-                  }`}
-                >
-                  {posta.disponible ? "Deshabilitar" : "Habilitar"}
-                </a>
+                  <i className="bi bi-pencil-square me-1"></i> Editar Posta y Consultorios
+                </Link>
               </div>
             </div>
           </div>
-          <div className="col-6 d-flex flex-column">
-            {/* Consultorios */}
-            <div className="row mt-5">
-              <div className="col-12">
-                <h2 className="mb-3">Consultorios</h2>
-              </div>
+        </div>
+
+        {/* Consultorios de la Posta */}
+        <div className="col-12 col-lg-8">
+          <div className="card shadow-sm border-0 mb-4">
+            <div className="card-header bg-transparent border-0 pt-4 px-4 pb-0 d-flex align-items-center justify-content-between">
+              <h5 className="fw-bold mb-0 text-primary">
+                <i className="bi bi-door-open me-2"></i>Consultorios Asociados
+              </h5>
+              <span className="badge bg-secondary bg-opacity-10 text-secondary">
+                Total: {consultorios?.totalRecords || consultorios?.data?.length || 0}
+              </span>
             </div>
-            <div className="row me-3">
+            <div className="card-body p-4">
               {consultorios?.data?.length === 0 ? (
-                <p>No hay consultorios disponibles</p>
+                <div className="text-center py-5 text-muted">
+                  <i className="bi bi-inbox fs-1 d-block mb-2"></i>
+                  <p>No hay consultorios registrados para esta posta médica.</p>
+                </div>
               ) : (
-                consultorios?.data?.map((consultorio) => (
-                  <div
-                    key={consultorio.idconsultorio}
-                    className="col-12 col-md-4 mb-4"
-                  >
+                <div className="row g-3">
+                  {consultorios?.data?.map((consultorio) => (
                     <div
-                      className={`card ${
-                        consultorio.disponible === 0 ? "cardRed" : "cardGreen"
-                      }`}
+                      key={consultorio.idconsultorio_posta || consultorio.idconsultorio}
+                      className="col-12 col-md-6"
                     >
-                      <div className="d-flex justify-content-center">
-                        <img
-                          src={consultorio.consultorio_foto}
-                          alt="consultorio"
-                          className="imageConsultorio mt-3"
-                        />
-                      </div>
-                      <div className="card-body">
-                        <p>{`${consultorio.consultorio_nombre}`}</p>
-                      </div>
-                      <div className="card-body text-center">
-                        <Link
-                          to={`/admin/programacion-citas/${consultorio.idconsultorio_posta}`}
-                          className={`card-link btn btn-warning ${
-                            consultorio.disponible ? "" : "disabled"
-                          } `}
-                        >
-                          Programar cita
-                        </Link>
+                      <div className="card h-100 border-0 shadow-sm hover-lift">
+                        <div className="card-body p-4 text-center">
+                          <div
+                            className="avatar-frame mx-auto mb-3"
+                            style={{ width: "70px", height: "70px" }}
+                          >
+                            <img
+                              src={
+                                consultorio.consultorio_foto ||
+                                "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=300"
+                              }
+                              alt={consultorio.consultorio_nombre}
+                              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            />
+                          </div>
+
+                          <h6 className="fw-bold mb-1 text-truncate">
+                            {consultorio.consultorio_nombre}
+                          </h6>
+
+                          <div className="my-2">
+                            <span
+                              className={`badge ${
+                                consultorio.disponible
+                                  ? "badge-active"
+                                  : "badge-inactive"
+                              }`}
+                            >
+                              {consultorio.disponible ? "Disponible" : "No disponible"}
+                            </span>
+                          </div>
+
+                          <div className="mt-3">
+                            <Link
+                              to={`/admin/programacion-citas/${consultorio.idconsultorio_posta}`}
+                              className={`btn btn-sm btn-warning w-100 ${
+                                consultorio.disponible ? "" : "disabled"
+                              }`}
+                            >
+                              <i className="bi bi-calendar-plus me-1"></i> Programar Cita
+                            </Link>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  ))}
+                </div>
+              )}
+
+              {/* Paginación */}
+              {consultorios?.totalPages > 1 && (
+                <div className="mt-4">
+                  <Pagination
+                    currentPage={page}
+                    totalPages={consultorios.totalPages}
+                    onPageChange={setPage}
+                  />
+                </div>
               )}
             </div>
-
-            {/* Paginacion de consultorios */}
-            <Pagination
-              currentPage={page}
-              totalPages={consultorios.totalPages}
-              onPageChange={setPage}
-            />
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

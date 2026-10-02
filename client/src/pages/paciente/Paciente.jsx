@@ -10,6 +10,7 @@ import usePagination from "../../hooks/usePagination";
 
 function Paciente() {
   const { page, setPage } = usePagination();
+
   // Peticion de datos de paciente
   const {
     data: paciente,
@@ -31,15 +32,16 @@ function Paciente() {
   });
 
   if (isPLoad || isCitaLoad)
-    return <Loading nombre="perfil paciente y citas ..." />;
+    return <Loading nombre="perfil de paciente y citas..." />;
   if (isPError || isCitaError)
-    return <ErrorPage code={500} message={"Ocurrió un error"} />;
+    return <ErrorPage code={500} message={"Ocurrió un error al cargar la información"} />;
 
   return (
-    <>
-      <div className="container-fluid containerColor">
-        <div className="row justify-content-center">
-          <div className="col-4 justify-content-center">
+    <div className="containerColor py-4">
+      <div className="container" style={{ maxWidth: "1280px" }}>
+        <div className="row g-4 align-items-start">
+          {/* Tarjeta de información del paciente */}
+          <div className="col-12 col-lg-4">
             <CardPaciente
               nombre={
                 paciente.nombre +
@@ -55,56 +57,97 @@ function Paciente() {
               ciudad={paciente.ciudad}
             />
           </div>
-          <div className="col-8">
-            <div className="table-responsive mt-5 me-5">
-              <h2 className="mb-4">Mis citas</h2>
-              <table className="table table-info table-bordered">
-                <thead className="table-light">
-                  <tr>
-                    <th scope="col">Fecha</th>
-                    <th scope="col">Hora</th>
-                    <th scope="col">Cupo</th>
-                    <th scope="col">Motivo</th>
-                    <th scope="col">Posta</th>
-                    <th scope="col">Consultorio</th>
-                    <th scope="col">Médico</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Detalles</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {citas?.data?.length === 0 ? (
-                    <p>No hay citas para mostrar</p>
-                  ) : (
-                    citas?.data?.map((cita) => (
-                      <tr key={cita.idcita}>
-                        <th scope="row">{cita.fecha}</th>
-                        <td>{cita.hora_aprox}</td>
-                        <td>{cita.num_cupo}</td>
-                        <td>{cita.motivo}</td>
-                        <td>{cita.posta_nombre}</td>
-                        <td>{cita.consultorio}</td>
-                        <td>
-                          {cita.medico_nombre + " " + cita.medico_apellido}
-                        </td>
-                        <td>{cita.estado}</td>
-                        <td>
-                          <Link
-                            to={`/paciente/citas/${cita.idcita}`}
-                            className={`btn btn-primary ${
-                              cita.estado === "Atendido" ? "" : "disabled"
-                            }`}
-                          >
-                            Ver
-                          </Link>
+
+          {/* Tabla de Citas del Paciente */}
+          <div className="col-12 col-lg-8">
+            <div className="d-flex align-items-center justify-content-between mb-3">
+              <div>
+                <h2 className="fw-bold mb-0">Mis Citas Médicas</h2>
+                <p className="text-muted small mb-0">Historial y citas programadas</p>
+              </div>
+              <Link to="/paciente/citas-disponibles" className="btn btn-warning shadow-sm">
+                <i className="bi bi-calendar-plus me-1"></i>
+                Solicitar Cita
+              </Link>
+            </div>
+
+            <div className="card border-0 shadow-sm overflow-hidden mb-4">
+              <div className="table-responsive">
+                <table className="table table-hover align-middle mb-0">
+                  <thead>
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Posta</th>
+                      <th>Consultorio</th>
+                      <th>Médico</th>
+                      <th>Estado</th>
+                      <th className="text-end pe-3">Detalles</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {!citas?.data || citas?.data?.length === 0 ? (
+                      <tr>
+                        <td colSpan="7" className="text-center py-5 text-muted">
+                          <i className="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
+                          No tienes citas registradas.
                         </td>
                       </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
+                    ) : (
+                      citas.data.map((cita) => {
+                        const estadoClass =
+                          cita.estado === "Atendido"
+                            ? "badge-status atendido"
+                            : cita.estado === "En espera"
+                            ? "badge-status espera"
+                            : "badge-status ausente";
+
+                        return (
+                          <tr key={cita.idcita}>
+                            <td className="fw-semibold text-dark">
+                              <i className="bi bi-calendar2-event me-2 text-primary"></i>
+                              {cita.fecha}
+                            </td>
+                            <td>
+                              <span className="small text-muted">{cita.hora_aprox}</span>
+                            </td>
+                            <td>{cita.posta_nombre}</td>
+                            <td>
+                              <span className="badge bg-light text-dark border">
+                                {cita.consultorio}
+                              </span>
+                            </td>
+                            <td className="small">
+                              {cita.medico_nombre + " " + cita.medico_apellido}
+                            </td>
+                            <td>
+                              <span className={estadoClass}>
+                                {cita.estado}
+                              </span>
+                            </td>
+                            <td className="text-end pe-3">
+                              {cita.estado === "Atendido" ? (
+                                <Link
+                                  to={`/paciente/citas/${cita.idcita}`}
+                                  className="btn btn-sm btn-primary"
+                                >
+                                  <i className="bi bi-file-earmark-medical me-1"></i>
+                                  Ver
+                                </Link>
+                              ) : (
+                                <span className="text-muted small">-</span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
-            {/* Paginacion */}
+
+            {/* Paginación */}
             <Pagination
               currentPage={page}
               totalPages={citas.totalPages}
@@ -113,7 +156,7 @@ function Paciente() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
