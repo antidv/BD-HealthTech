@@ -30,13 +30,42 @@
   box-sizing: border-box;
 }
 
+html {
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  direction: ltr;
+}
+
 body {
   margin: 0;
   padding: 0;
   background-color: var(--bg-azure);
   color: var(--color-text-main);
   min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  direction: ltr;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Custom modern scrollbars - only visible when overflowing */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
 }
 
 /* ==========================================================
@@ -45,8 +74,9 @@ body {
 
 .containerColor {
   background: radial-gradient(circle at top right, rgba(224, 242, 254, 0.7) 0%, rgba(240, 247, 253, 0.95) 50%, #f0f7fd 100%) !important;
-  min-height: 100vh;
-  padding-bottom: 2.5rem;
+  min-height: calc(100vh - 65px);
+  padding-bottom: 1.5rem;
+  overflow-x: hidden;
 }
 
 /* Page Headers */
@@ -61,7 +91,7 @@ h1, h2, h3, h4, h5, h6 {
    ========================================================== */
 
 .navbar {
-  background: rgba(255, 255, 255, 0.88) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
@@ -70,6 +100,8 @@ h1, h2, h3, h4, h5, h6 {
   position: sticky;
   top: 0;
   z-index: 1030;
+  min-height: 65px;
+  width: 100%;
 }
 
 .navbar-brand {

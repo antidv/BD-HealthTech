@@ -1,6 +1,9 @@
 function Loading(props) {
   return (
-    <div className="containerColor d-flex flex-column align-items-center justify-content-center min-vh-100 p-4">
+    <div
+      className="containerColor d-flex flex-column align-items-center justify-content-center p-4"
+      style={{ minHeight: "calc(100vh - 65px)" }}
+    >
       <div className="card border-0 shadow-sm p-4 p-md-5 text-center fade-in-scale" style={{ maxWidth: "420px" }}>
         <div className="spinner-border text-primary mx-auto mb-3" style={{ width: "3rem", height: "3rem" }} role="status">
           <span className="visually-hidden">Cargando...</span>

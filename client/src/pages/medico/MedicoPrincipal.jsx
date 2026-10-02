@@ -1,4 +1,3 @@
-import CardMedicoVistaM from "../../components/cards/CardMedicoVistaM";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getPerfilMedico } from "../../api/medicos";
@@ -36,116 +35,174 @@ function MedicoPrincipal() {
   if (isMedError || isCitaError)
     return <ErrorPage code={500} message={"Ocurrió un error al cargar la información"} />;
 
+  const nombreCompleto = `${medico?.nombre || ""} ${medico?.apellidoP || ""} ${medico?.apellidoM || ""}`.trim();
+
   return (
     <div className="containerColor py-4">
       <div className="container" style={{ maxWidth: "1280px" }}>
-        <div className="row g-4 align-items-start">
-          {/* Datos del médico */}
-          <div className="col-12 col-lg-4">
-            <CardMedicoVistaM
-              nombre={
-                medico.nombre + " " + medico.apellidoP + " " + medico.apellidoM
-              }
-              foto={medico.foto}
-              especialidad={medico.especialidad}
-              dni={medico.dni}
-              disponible={medico.disponible}
-            />
-          </div>
+        
+        {/* Banner Superior: Perfil del Médico */}
+        <div className="card shadow-sm border-0 mb-4 overflow-hidden">
+          <div className="card-body p-4 p-md-5">
+            <div className="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+              <div className="d-flex flex-column flex-sm-row align-items-center gap-4 text-center text-sm-start">
+                <div className="avatar-frame flex-shrink-0" style={{ width: "95px", height: "95px" }}>
+                  <img
+                    src={medico.foto || "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=300"}
+                    alt={nombreCompleto}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                </div>
+                <div>
+                  <div className="d-flex align-items-center gap-2 flex-wrap justify-content-center justify-content-sm-start mb-1">
+                    <h3 className="fw-bold mb-0 text-dark">{nombreCompleto}</h3>
+                    <span className={`badge ${medico.disponible ? "badge-active" : "badge-inactive"}`}>
+                      <i className={`bi bi-${medico.disponible ? "check-circle" : "x-circle"} me-1`}></i>
+                      {medico.disponible ? "Disponible" : "No disponible"}
+                    </span>
+                  </div>
+                  <div className="d-flex align-items-center gap-3 flex-wrap text-muted small mt-2 justify-content-center justify-content-sm-start">
+                    <span className="badge bg-primary bg-opacity-10 text-primary px-3 py-1 fw-semibold">
+                      <i className="bi bi-award me-1"></i>
+                      {medico.especialidad}
+                    </span>
+                    <span>
+                      <i className="bi bi-card-text me-1 text-primary"></i>
+                      DNI: <strong>{medico.dni}</strong>
+                    </span>
+                    {medico.correo && (
+                      <span>
+                        <i className="bi bi-envelope me-1 text-primary"></i>
+                        {medico.correo}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
 
-          {/* Tabla de citas asignadas */}
-          <div className="col-12 col-lg-8">
-            <div className="d-flex align-items-center justify-content-between mb-3">
-              <div>
-                <h2 className="fw-bold mb-0">Historial de Citas</h2>
-                <p className="text-muted small mb-0">Citas asignadas y atención a pacientes</p>
+              {/* Accesos directos */}
+              <div className="d-flex gap-2 flex-shrink-0">
+                <Link to="/medico/programacion" className="btn btn-outline-primary px-3 shadow-sm">
+                  <i className="bi bi-calendar-week me-1"></i> Mi Programación
+                </Link>
+                <Link to="/medico/consultorios" className="btn btn-outline-secondary px-3 shadow-sm">
+                  <i className="bi bi-door-open me-1"></i> Consultorios
+                </Link>
               </div>
             </div>
+          </div>
+        </div>
 
-            <div className="card border-0 shadow-sm overflow-hidden mb-4">
-              <div className="table-responsive">
-                <table className="table table-hover align-middle mb-0">
-                  <thead>
+        {/* Sección Inferior: Tabla Completa de Citas Asignadas */}
+        <div className="card shadow-sm border-0 mb-4">
+          <div className="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <div>
+              <h4 className="fw-bold mb-0 text-primary">
+                <i className="bi bi-journal-medical me-2"></i>Citas y Pacientes Asignados
+              </h4>
+              <p className="text-muted small mb-0">Listado completo de atenciones y consultas médicas</p>
+            </div>
+            <span className="badge bg-secondary bg-opacity-10 text-secondary px-3 py-2">
+              Total: {citas?.totalRecords || citas?.data?.length || 0} Citas
+            </span>
+          </div>
+
+          <div className="card-body p-0">
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th className="ps-4">Fecha</th>
+                    <th>Hora Aprox.</th>
+                    <th>Paciente</th>
+                    <th>Consultorio</th>
+                    <th>Posta Médica</th>
+                    <th>Estado</th>
+                    <th className="text-end pe-4">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {!citas?.data || citas?.data?.length === 0 ? (
                     <tr>
-                      <th>Fecha</th>
-                      <th>Hora</th>
-                      <th>Paciente</th>
-                      <th>Consultorio</th>
-                      <th>Posta</th>
-                      <th>Estado</th>
-                      <th className="text-end pe-3">Acción</th>
+                      <td colSpan="7" className="text-center py-5 text-muted">
+                        <i className="bi bi-calendar-x fs-1 d-block mb-2 text-secondary"></i>
+                        <h5>No hay citas registradas para atender</h5>
+                        <p className="small mb-0">Las citas agendadas por los pacientes aparecerán aquí.</p>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {!citas?.data || citas?.data?.length === 0 ? (
-                      <tr>
-                        <td colSpan="7" className="text-center py-5 text-muted">
-                          <i className="bi bi-calendar-x fs-2 d-block mb-2 text-secondary"></i>
-                          No hay citas programadas para atender.
-                        </td>
-                      </tr>
-                    ) : (
-                      citas.data.map((cita) => {
-                        const estadoClass =
-                          cita.estado === "Atendido"
-                            ? "badge-status atendido"
-                            : cita.estado === "En espera"
-                            ? "badge-status espera"
-                            : "badge-status ausente";
+                  ) : (
+                    citas.data.map((cita) => {
+                      const estadoClass =
+                        cita.estado === "Atendido"
+                          ? "badge-status atendido"
+                          : cita.estado === "En espera"
+                          ? "badge-status espera"
+                          : "badge-status ausente";
 
-                        return (
-                          <tr key={cita.idcita}>
-                            <td className="fw-semibold text-dark">
-                              <i className="bi bi-calendar2-event me-2 text-primary"></i>
-                              {cita.fecha}
-                            </td>
-                            <td>
-                              <span className="small text-muted">{cita.hora_aprox}</span>
-                            </td>
-                            <td>
-                              <span className="fw-semibold">
-                                {cita.paciente_nombre + " " + cita.paciente_apellido}
-                              </span>
-                            </td>
-                            <td>
-                              <span className="badge bg-light text-dark border">
-                                {cita.consultorio}
-                              </span>
-                            </td>
-                            <td>{cita.posta_nombre}</td>
-                            <td>
-                              <span className={estadoClass}>
-                                {cita.estado}
-                              </span>
-                            </td>
-                            <td className="text-end pe-3">
-                              <Link
-                                to={`/medico/diagnostico/${cita.idcita}`}
-                                className={`btn btn-sm ${
-                                  cita.estado === "Atendido" || cita.estado === "Ausente"
-                                    ? "btn-secondary disabled"
-                                    : "btn-warning"
-                                }`}
-                              >
-                                <i className="bi bi-pencil-square me-1"></i>
-                                Atender
-                              </Link>
-                            </td>
-                          </tr>
-                        );
-                      })
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                      return (
+                        <tr key={cita.idcita}>
+                          <td className="ps-4 fw-semibold text-dark">
+                            <i className="bi bi-calendar2-event me-2 text-primary"></i>
+                            {cita.fecha}
+                          </td>
+                          <td>
+                            <span className="badge bg-light text-dark border">
+                              <i className="bi bi-clock me-1 text-primary"></i>
+                              {cita.hora_aprox || "Programada"}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="fw-bold text-dark">
+                              {cita.paciente_nombre + " " + cita.paciente_apellido}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="badge bg-primary bg-opacity-10 text-primary">
+                              <i className="bi bi-door-open me-1"></i>
+                              {cita.consultorio}
+                            </span>
+                          </td>
+                          <td className="text-muted small">
+                            <i className="bi bi-hospital me-1"></i>
+                            {cita.posta_nombre}
+                          </td>
+                          <td>
+                            <span className={estadoClass}>
+                              <i className={`bi bi-${cita.estado === "Atendido" ? "check2-all" : cita.estado === "En espera" ? "hourglass-split" : "x-circle"} me-1`}></i>
+                              {cita.estado}
+                            </span>
+                          </td>
+                          <td className="text-end pe-4">
+                            <Link
+                              to={`/medico/diagnostico/${cita.idcita}`}
+                              className={`btn btn-sm ${
+                                cita.estado === "Atendido" || cita.estado === "Ausente"
+                                  ? "btn-outline-secondary disabled"
+                                  : "btn-warning"
+                              }`}
+                            >
+                              <i className="bi bi-stethoscope me-1"></i>
+                              {cita.estado === "Atendido" ? "Atendido" : "Atender"}
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
             </div>
 
             {/* Paginación */}
-            <Pagination
-              currentPage={page}
-              totalPages={citas.totalPages}
-              onPageChange={setPage}
-            />
+            {citas?.totalPages > 1 && (
+              <div className="p-3 border-top border-light">
+                <Pagination
+                  currentPage={page}
+                  totalPages={citas.totalPages}
+                  onPageChange={setPage}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

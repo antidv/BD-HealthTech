@@ -4,13 +4,13 @@ import { useState } from "react";
 import Pagination from "../../components/Pagination";
 import usePagination from "../../hooks/usePagination";
 import CardPosta from "../../components/cards/CardPosta";
+import SearchBar from "../../components/SearchBar";
 import Loading from "../Loading";
 import ErrorPage from "../ErrorPage";
 
 function Postas() {
   const { page, setPage } = usePagination();
   const [filter, setFilter] = useState("");
-  const [search, setSearch] = useState("");
 
   const {
     data: postas,
@@ -22,43 +22,38 @@ function Postas() {
     keepPreviousData: true,
   });
 
-  const handleSearch = () => {
-    setFilter(search); // Actualiza el filtro con el texto ingresado
-    setPage(1); // Reinicia a la primera página
+  const handleSearch = (search) => {
+    setFilter(search);
+    setPage(1);
   };
 
   if (isLoading) return <Loading nombre="postas ..." />;
   if (isError) return <ErrorPage code={500} message="Ocurrió un error ..." />;
 
   return (
-    <>
-      <div className="container-fluid containerColor">
-        <div className="row align-items-center justify-content-center">
-          <div className="col-12">
-            <h1 className="m-3">Postas</h1>
-            {/* Barra de búsqueda */}
-            <div className="d-flex m-3">
-              <input
-                type="text"
-                className="form-control w-25"
-                placeholder="Buscar por nombre"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)} // Actualiza `search` con cada tecla
-              />
-              <button
-                className="btn btn-primary ms-3"
-                onClick={handleSearch} // Llama a la función directamente
-              >
-                Buscar
-              </button>
-            </div>
+    <div className="containerColor py-4">
+      <div className="container" style={{ maxWidth: "1200px" }}>
+        <div className="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h1 className="fw-bold mb-1">Postas Médicas</h1>
+            <p className="text-muted small mb-0">Directorio de establecimientos de salud</p>
           </div>
         </div>
 
-        <div className="row m-3">
-          {/* Renderizado de cards */}
+        {/* Barra de busqueda */}
+        <SearchBar
+          onSearch={handleSearch}
+          nombre=""
+          url=""
+        />
+
+        {/* Renderizado de cards */}
+        <div className="row g-4">
           {postas.data.length === 0 ? (
-            <p>No hay datos para mostrar</p>
+            <div className="col-12 text-center py-5">
+              <i className="bi bi-buildings text-muted fs-1 mb-2 d-block"></i>
+              <p className="text-muted">No se encontraron postas médicas.</p>
+            </div>
           ) : (
             postas.data.map((posta) => (
               <CardPosta
@@ -73,15 +68,16 @@ function Postas() {
               />
             ))
           )}
-          {/* Paginación */}
-          <Pagination
-            currentPage={page}
-            totalPages={postas.totalPages}
-            onPageChange={setPage}
-          />
         </div>
+
+        {/* Paginación */}
+        <Pagination
+          currentPage={page}
+          totalPages={postas.totalPages}
+          onPageChange={setPage}
+        />
       </div>
-    </>
+    </div>
   );
 }
 

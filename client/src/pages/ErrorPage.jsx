@@ -1,6 +1,9 @@
 function ErrorPage({ code, message }) {
   return (
-    <div className="containerColor d-flex flex-column align-items-center justify-content-center min-vh-100 p-4">
+    <div
+      className="containerColor d-flex flex-column align-items-center justify-content-center p-4"
+      style={{ minHeight: "calc(100vh - 65px)" }}
+    >
       <div className="card text-center p-5 border-0 shadow-lg fade-in-scale" style={{ maxWidth: "520px" }}>
         <div className="mb-3">
           <i className="bi bi-exclamation-octagon text-danger display-1"></i>
