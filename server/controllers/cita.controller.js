@@ -127,16 +127,19 @@ export const getCitaPaciente = async (req, res) => {
         const citaQuery = `
             SELECT 
                 c.idcita, 
+                c.idpaciente,
                 c.fecha, 
                 c.motivo, 
                 c.consultorio, 
                 m.nombre AS medico_nombre, 
-                m.apellidoP AS medico_apellido
+                m.apellidoP AS medico_apellido,
+                paciente_sesion.idpaciente AS idpaciente_sesion
             FROM cita c
             INNER JOIN medico m ON c.idmedico = m.idmedico
+            LEFT JOIN paciente paciente_sesion ON paciente_sesion.idusuario = ?
             WHERE c.idcita = ?
         `;
-        const citaRows = await connection.query(citaQuery, [id]);
+        const citaRows = await connection.query(citaQuery, [req.userId, id]);
 
         if (citaRows.length === 0) {
             connection.release();
@@ -144,6 +147,10 @@ export const getCitaPaciente = async (req, res) => {
         }
 
         const cita = citaRows[0];
+        if (cita.idpaciente_sesion == null || cita.idpaciente !== cita.idpaciente_sesion) {
+            connection.release();
+            return res.status(403).json({ error: "No tienes acceso a esta cita" });
+        }
 
         const diagnosticoQuery = `
             SELECT 
