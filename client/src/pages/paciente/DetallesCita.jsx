@@ -11,13 +11,24 @@ function DetallesCita() {
     data: cita,
     isLoading,
     isError,
+    error,
   } = useQuery({
     queryKey: ["cita", idcita],
     queryFn: () => getCitaPaciente(idcita),
   });
 
   if (isLoading) return <Loading nombre="detalles de la cita..." />;
-  if (isError) return <ErrorPage code={500} message={"Ocurrió un error al cargar la cita"} />;
+  if (isError) {
+    const code = error?.response?.status ?? 500;
+    const message =
+      code === 403
+        ? "No tienes permiso para ver esta cita."
+        : code === 404
+          ? "La cita solicitada no existe."
+          : "Ocurrió un error al cargar la cita.";
+
+    return <ErrorPage code={code} message={message} />;
+  }
 
   return (
     <div className="containerColor py-4">
